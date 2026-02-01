@@ -99,13 +99,24 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
                 });
             } else if (profile) {
                 console.log('User profile found:', profile);
-                // Check if user logged in within the last 5 minutes (new signup)
+                // Check if this is a new user:
+                // 1. Account created within last 30 minutes
+                // 2. Has zero streak (hasn't started their journey yet)
                 const createdAt = new Date(profile.created_at);
                 const now = new Date();
-                const isRecent = (now.getTime() - createdAt.getTime()) < 5 * 60 * 1000; // 5 minutes
+                const minutesSinceCreation = (now.getTime() - createdAt.getTime()) / (1000 * 60);
+                const isRecentlyCreated = minutesSinceCreation < 30; // 30 minutes window
 
                 setUser(profile);
-                setIsNewUser(isRecent && profile.streak === 0);
+                // Mark as new user if account is recent AND hasn't built any streak yet
+                const isFirstTimeUser = isRecentlyCreated && profile.streak === 0;
+                setIsNewUser(isFirstTimeUser);
+
+                console.log('User status:', {
+                    minutesSinceCreation,
+                    streak: profile.streak,
+                    isNewUser: isFirstTimeUser
+                });
             }
         } catch (error) {
             console.error('Error fetching user profile:', error);
