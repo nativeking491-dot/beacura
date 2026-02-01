@@ -120,6 +120,28 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
             }
         } catch (error) {
             console.error('Error fetching user profile:', error);
+            // Fallback: try to reconstruct user from session if DB fails
+            try {
+                const session = await authService.getSession();
+                if (session?.user) {
+                    console.log('Using session fallback due to DB error');
+                    const fallbackUser: UserProfile = {
+                        id: session.user.id,
+                        name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
+                        email: session.user.email || '',
+                        role: session.user.user_metadata?.role === 'MENTOR' ? 'RECOVERED_MENTOR' : 'RECOVERING_USER',
+                        streak: 0,
+                        points: 0,
+                        isNewUser: true // Assume new if we can't check DB (or just default)
+                    };
+                    setUser(fallbackUser);
+                    // If we can't verify streak, defaulting to "Welcome" might be safer or just keep it simple
+                    // For now, let's set isNewUser to true so they feel welcomed if it's broken
+                    setIsNewUser(true);
+                }
+            } catch (innerError) {
+                console.error('Session fallback failed:', innerError);
+            }
         } finally {
             setLoading(false);
         }
