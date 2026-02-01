@@ -101,3 +101,4 @@ export const authService = {
         return supabase.auth.onAuthStateChange(callback);
     }
 };
+
