@@ -1,0 +1,8 @@
+
+{
+  "name": "Recovery",
+  "description": "A comprehensive drug recovery and support platform featuring AI-powered counseling, community peer support, habit tracking, and motivational tools.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
