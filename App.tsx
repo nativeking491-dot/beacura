@@ -52,6 +52,24 @@ const App: React.FC = () => {
 
     checkSession();
 
+    // Check database connection
+    const checkConnection = async () => {
+      try {
+        const { count, error } = await authService.supabase
+          .from('users')
+          .select('*', { count: 'exact', head: true });
+
+        if (error) {
+          console.error('Database connection failed:', error.message);
+        } else {
+          console.log('Database connected successfully. User count:', count);
+        }
+      } catch (err) {
+        console.error('Database connection error:', err);
+      }
+    };
+    checkConnection();
+
     // Listen for auth state changes
     const { data: { subscription } } = authService.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {

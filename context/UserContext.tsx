@@ -40,10 +40,14 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [isNewUser, setIsNewUser] = useState(false);
 
-    const fetchUserProfile = async () => {
+    const fetchUserProfile = async (retryCount = 0) => {
         try {
             const session = await authService.getSession();
             console.log('Session:', session);
+            if (session?.user) {
+                console.log('Session User Metadata:', session.user.user_metadata);
+                console.log('Session User Email:', session.user.email);
+            }
 
             if (!session?.user) {
                 console.log('No session found');
@@ -52,7 +56,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
                 return;
             }
 
-            console.log('Fetching user profile for ID:', session.user.id);
+            console.log(`Fetching user profile for ID: ${session.user.id} (Attempt ${retryCount + 1})`);
 
             // Fetch user profile from database
             const { data: profile, error } = await supabase
@@ -64,8 +68,18 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
             console.log('Profile query result:', { profile, error });
 
             if (error && error.code === 'PGRST116') {
-                // User not found in database - create new profile
-                console.log('Creating new user profile');
+                // User not found in database using standard query
+
+                // RETRY LOGIC: If profile is missing, it might be a race condition during sign up.
+                // Wait and retry a few times before creating a new one or falling back.
+                if (retryCount < 3) {
+                    console.log(`Profile not found, retrying in 1000ms... (Attempt ${retryCount + 1}/3)`);
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    return fetchUserProfile(retryCount + 1);
+                }
+
+                // If still not found after retries, create new profile
+                console.log('Creating new user profile after retries');
                 const newProfile: UserProfile = {
                     id: session.user.id,
                     name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
@@ -135,7 +149,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
                         isNewUser: true // Assume new if we can't check DB (or just default)
                     };
                     setUser(fallbackUser);
-                    // If we can't verify streak, defaulting to "Welcome" might be safer or just keep it simple
                     // For now, let's set isNewUser to true so they feel welcomed if it's broken
                     setIsNewUser(true);
                 }
@@ -143,7 +156,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
                 console.error('Session fallback failed:', innerError);
             }
         } finally {
-            setLoading(false);
+            if (retryCount === 0 || retryCount === 3) {
+                setLoading(false);
+            }
         }
     };
 
