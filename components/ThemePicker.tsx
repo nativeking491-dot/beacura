@@ -37,7 +37,7 @@ export const ThemePicker: React.FC = () => {
                 {/* Background Mode Selection */}
                 <div>
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 block">
-                        Background Mode
+                        Change Theme
                     </label>
                     <div className="grid grid-cols-5 gap-2">
                         {modes.map((m) => (
