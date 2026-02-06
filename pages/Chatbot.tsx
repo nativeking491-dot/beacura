@@ -1,19 +1,18 @@
-
-import React, { useState, useRef, useEffect } from 'react';
-import { Send, Mic, User, Bot, Loader2, Info } from 'lucide-react';
-import { generateChatResponse } from '../services/geminiService';
-import { ChatMessage } from '../types';
+import React, { useState, useRef, useEffect } from "react";
+import { Send, Mic, User, Bot, Loader2, Info } from "lucide-react";
+import { generateChatResponse } from "../services/geminiService";
+import { ChatMessage } from "../types";
 
 const Chatbot: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
-      id: '1',
-      sender: 'ai',
+      id: "1",
+      sender: "ai",
       text: "Hey there! 👋 I'm Recovery, your support buddy. Having a tough moment or just want to chat? I'm here for you.",
-      timestamp: new Date()
-    }
+      timestamp: new Date(),
+    },
   ]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -28,25 +27,25 @@ const Chatbot: React.FC = () => {
 
     const userMsg: ChatMessage = {
       id: Date.now().toString(),
-      sender: 'user',
+      sender: "user",
       text: input,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMsg]);
-    setInput('');
+    setMessages((prev) => [...prev, userMsg]);
+    setInput("");
     setIsLoading(true);
 
     const aiText = await generateChatResponse(input);
 
     const aiMsg: ChatMessage = {
       id: (Date.now() + 1).toString(),
-      sender: 'ai',
+      sender: "ai",
       text: aiText || "I'm sorry, I couldn't process that. Stay strong.",
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, aiMsg]);
+    setMessages((prev) => [...prev, aiMsg]);
     setIsLoading(false);
   };
 
@@ -79,22 +78,33 @@ const Chatbot: React.FC = () => {
         {messages.map((msg) => (
           <div
             key={msg.id}
-            className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+            className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
           >
-            <div className={`flex max-w-[85%] md:max-w-[70%] ${msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-              <div className={`
+            <div
+              className={`flex max-w-[85%] md:max-w-[70%] ${msg.sender === "user" ? "flex-row-reverse" : "flex-row"}`}
+            >
+              <div
+                className={`
                 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white
-                ${msg.sender === 'user' ? 'bg-indigo-500 ml-2' : 'bg-teal-500 mr-2'}
-              `}>
-                {msg.sender === 'user' ? <User size={16} /> : <Bot size={16} />}
+                ${msg.sender === "user" ? "bg-indigo-500 ml-2" : "bg-teal-500 mr-2"}
+              `}
+              >
+                {msg.sender === "user" ? <User size={16} /> : <Bot size={16} />}
               </div>
-              <div className={`
+              <div
+                className={`
                 p-4 rounded-2xl shadow-sm text-sm md:text-base leading-relaxed
-                ${msg.sender === 'user' ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white text-slate-800 rounded-tl-none'}
-              `}>
+                ${msg.sender === "user" ? "bg-indigo-600 text-white rounded-tr-none" : "bg-white text-slate-800 rounded-tl-none"}
+              `}
+              >
                 {msg.text}
-                <div className={`text-[10px] mt-2 ${msg.sender === 'user' ? 'text-indigo-200' : 'text-slate-400'}`}>
-                  {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                <div
+                  className={`text-[10px] mt-2 ${msg.sender === "user" ? "text-indigo-200" : "text-slate-400"}`}
+                >
+                  {msg.timestamp.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </div>
               </div>
             </div>
@@ -104,7 +114,9 @@ const Chatbot: React.FC = () => {
           <div className="flex justify-start">
             <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-2">
               <Loader2 className="animate-spin text-teal-600" size={16} />
-              <span className="text-slate-500 text-sm">Recovery is thinking...</span>
+              <span className="text-slate-500 text-sm">
+                Recovery is thinking...
+              </span>
             </div>
           </div>
         )}
@@ -120,21 +132,25 @@ const Chatbot: React.FC = () => {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
             placeholder="Describe your craving or ask for motivation..."
             className="flex-1 bg-transparent border-none outline-none text-slate-700 px-2 py-2"
           />
           <button
             onClick={handleSend}
             disabled={!input.trim() || isLoading}
-            className={`p-2 rounded-xl transition-all ${!input.trim() || isLoading ? 'text-slate-300' : 'text-teal-600 bg-teal-50'
-              }`}
+            className={`p-2 rounded-xl transition-all ${
+              !input.trim() || isLoading
+                ? "text-slate-300"
+                : "text-teal-600 bg-teal-50"
+            }`}
           >
             <Send size={20} />
           </button>
         </div>
         <p className="text-[10px] text-center text-slate-400 mt-2">
-          Recovery AI can assist but is not a substitute for professional medical help.
+          Recovery AI can assist but is not a substitute for professional
+          medical help.
         </p>
       </div>
     </div>

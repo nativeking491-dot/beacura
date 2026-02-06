@@ -1,28 +1,41 @@
-
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, AreaChart, Area
-} from 'recharts';
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+} from "recharts";
 import {
-  Flame, Calendar, Award, TrendingUp,
-  ArrowRight, Heart, Brain, Zap, Loader2
-} from 'lucide-react';
-import { useUser } from '../context/UserContext';
+  Flame,
+  Calendar,
+  Award,
+  TrendingUp,
+  ArrowRight,
+  Heart,
+  Brain,
+  Zap,
+  Loader2,
+} from "lucide-react";
+import { useUser } from "../context/UserContext";
 
 const Dashboard: React.FC = () => {
   const { user, loading, isNewUser } = useUser();
   const navigate = useNavigate();
 
   const data = [
-    { day: 'Mon', cravings: 4 },
-    { day: 'Tue', cravings: 3 },
-    { day: 'Wed', cravings: 5 },
-    { day: 'Thu', cravings: 2 },
-    { day: 'Fri', cravings: 1 },
-    { day: 'Sat', cravings: 2 },
-    { day: 'Sun', cravings: 0 },
+    { day: "Mon", cravings: 4 },
+    { day: "Tue", cravings: 3 },
+    { day: "Wed", cravings: 5 },
+    { day: "Thu", cravings: 2 },
+    { day: "Fri", cravings: 1 },
+    { day: "Sat", cravings: 2 },
+    { day: "Sun", cravings: 0 },
   ];
 
   const StatCard = ({ icon: Icon, label, value, color }: any) => (
@@ -39,8 +52,13 @@ const Dashboard: React.FC = () => {
 
   // Default badges for display
   const defaultBadges = [
-    { id: 'b1', name: 'Week One', icon: 'Shield', color: 'text-blue-500' },
-    { id: 'b2', name: 'First Mentor Call', icon: 'Award', color: 'text-yellow-500' }
+    { id: "b1", name: "Week One", icon: "Shield", color: "text-blue-500" },
+    {
+      id: "b2",
+      name: "First Mentor Call",
+      icon: "Award",
+      color: "text-yellow-500",
+    },
   ];
 
   if (loading) {
@@ -53,11 +71,11 @@ const Dashboard: React.FC = () => {
 
   // Redirect to auth if no user is found after loading
   if (!user) {
-    navigate('/auth');
+    navigate("/auth");
     return null;
   }
 
-  const userName = user.name || 'User';
+  const userName = user.name || "User";
   const userStreak = user.streak || 0;
   const userPoints = user.points || 0;
 
@@ -82,10 +100,30 @@ const Dashboard: React.FC = () => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard icon={Flame} label="Sobriety Streak" value={`${userStreak} Days`} color="bg-orange-50 text-orange-600" />
-        <StatCard icon={Award} label="Recovery Points" value={userPoints.toLocaleString()} color="bg-teal-50 text-teal-600" />
-        <StatCard icon={Heart} label="Mood Score" value="Stable" color="bg-rose-50 text-rose-600" />
-        <StatCard icon={Zap} label="Daily Goal" value="80%" color="bg-indigo-50 text-indigo-600" />
+        <StatCard
+          icon={Flame}
+          label="Sobriety Streak"
+          value={`${userStreak} Days`}
+          color="bg-orange-50 text-orange-600"
+        />
+        <StatCard
+          icon={Award}
+          label="Recovery Points"
+          value={userPoints.toLocaleString()}
+          color="bg-teal-50 text-teal-600"
+        />
+        <StatCard
+          icon={Heart}
+          label="Mood Score"
+          value="Stable"
+          color="bg-rose-50 text-rose-600"
+        />
+        <StatCard
+          icon={Zap}
+          label="Daily Goal"
+          value="80%"
+          color="bg-indigo-50 text-indigo-600"
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -105,18 +143,48 @@ const Dashboard: React.FC = () => {
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={data}>
                 <defs>
-                  <linearGradient id="colorCravings" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient
+                    id="colorCravings"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
                     <stop offset="5%" stopColor="#0d9488" stopOpacity={0.1} />
                     <stop offset="95%" stopColor="#0d9488" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
-                <Tooltip
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="#f1f5f9"
                 />
-                <Area type="monotone" dataKey="cravings" stroke="#0d9488" strokeWidth={3} fillOpacity={1} fill="url(#colorCravings)" />
+                <XAxis
+                  dataKey="day"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#64748b", fontSize: 12 }}
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#64748b", fontSize: 12 }}
+                />
+                <Tooltip
+                  contentStyle={{
+                    borderRadius: "12px",
+                    border: "none",
+                    boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+                  }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="cravings"
+                  stroke="#0d9488"
+                  strokeWidth={3}
+                  fillOpacity={1}
+                  fill="url(#colorCravings)"
+                />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -130,8 +198,13 @@ const Dashboard: React.FC = () => {
           </h2>
           <div className="space-y-4">
             {defaultBadges.map((badge) => (
-              <div key={badge.id} className="flex items-center p-3 rounded-xl bg-slate-50 border border-slate-100">
-                <div className={`w-10 h-10 rounded-full bg-white flex items-center justify-center mr-3 shadow-sm ${badge.color}`}>
+              <div
+                key={badge.id}
+                className="flex items-center p-3 rounded-xl bg-slate-50 border border-slate-100"
+              >
+                <div
+                  className={`w-10 h-10 rounded-full bg-white flex items-center justify-center mr-3 shadow-sm ${badge.color}`}
+                >
                   <Award size={20} />
                 </div>
                 <div>
@@ -141,7 +214,7 @@ const Dashboard: React.FC = () => {
               </div>
             ))}
             <button
-              onClick={() => navigate('/profile')}
+              onClick={() => navigate("/profile")}
               className="w-full mt-4 flex items-center justify-center space-x-2 py-3 rounded-xl text-teal-600 font-semibold hover:bg-teal-50 transition-colors"
             >
               <span>View All Rewards</span>
@@ -157,9 +230,12 @@ const Dashboard: React.FC = () => {
           <div className="relative z-10">
             <Brain className="mb-4 opacity-80" size={32} />
             <h3 className="text-lg font-bold mb-2">Morning Reflection</h3>
-            <p className="text-teal-50 text-sm mb-4">Start your day with a calm mind. Spend 5 minutes on our AI counseling.</p>
+            <p className="text-teal-50 text-sm mb-4">
+              Start your day with a calm mind. Spend 5 minutes on our AI
+              counseling.
+            </p>
             <button
-              onClick={() => navigate('/chat')}
+              onClick={() => navigate("/chat")}
               className="bg-white text-teal-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-teal-50 transition-colors"
             >
               Start Now
@@ -173,9 +249,11 @@ const Dashboard: React.FC = () => {
           <div className="relative z-10">
             <Calendar className="mb-4 opacity-80" size={32} />
             <h3 className="text-lg font-bold mb-2">Meal Planning</h3>
-            <p className="text-indigo-50 text-sm mb-4">Good food is fuel for recovery. Check your suggested diet plan.</p>
+            <p className="text-indigo-50 text-sm mb-4">
+              Good food is fuel for recovery. Check your suggested diet plan.
+            </p>
             <button
-              onClick={() => navigate('/health')}
+              onClick={() => navigate("/health")}
               className="bg-white text-indigo-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-50 transition-colors"
             >
               Plan Meal
@@ -189,9 +267,11 @@ const Dashboard: React.FC = () => {
           <div className="relative z-10">
             <Flame className="mb-4 opacity-80" size={32} />
             <h3 className="text-lg font-bold mb-2">Community Chat</h3>
-            <p className="text-amber-50 text-sm mb-4">Talk to mentors who have stayed clean for over 5 years.</p>
+            <p className="text-amber-50 text-sm mb-4">
+              Talk to mentors who have stayed clean for over 5 years.
+            </p>
             <button
-              onClick={() => navigate('/counseling')}
+              onClick={() => navigate("/counseling")}
               className="bg-white text-amber-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-amber-50 transition-colors"
             >
               Join Chat

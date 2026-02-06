@@ -1,13 +1,24 @@
-
-import React, { useState, useEffect } from 'react';
-import { FOOD_TIPS, WEEKLY_MEAL_PLAN } from '../constants';
+import React, { useState, useEffect } from "react";
+import { FOOD_TIPS, WEEKLY_MEAL_PLAN } from "../constants";
 import {
-  Utensils, Droplets, Apple, Coffee,
-  CheckCircle2, Info, ChevronRight, Sparkles,
-  Sun, Sunset, Moon, Brain, RefreshCcw, Loader2,
-  Sparkle, Calendar
-} from 'lucide-react';
-import { generateChatResponse } from '../services/geminiService';
+  Utensils,
+  Droplets,
+  Apple,
+  Coffee,
+  CheckCircle2,
+  Info,
+  ChevronRight,
+  Sparkles,
+  Sun,
+  Sunset,
+  Moon,
+  Brain,
+  RefreshCcw,
+  Loader2,
+  Sparkle,
+  Calendar,
+} from "lucide-react";
+import { generateChatResponse } from "../services/geminiService";
 
 const Health: React.FC = () => {
   // Get current day of week (0-6)
@@ -20,13 +31,17 @@ const Health: React.FC = () => {
   const currentPlan = WEEKLY_MEAL_PLAN[activeDayIdx];
 
   const handleDrinkWater = () => {
-    if (glasses < 12) setGlasses(prev => prev + 1);
+    if (glasses < 12) setGlasses((prev) => prev + 1);
   };
 
   const getCustomSnack = async () => {
     setIsGeneratingSnack(true);
-    const instruction = "You are a recovery nutritionist. Suggest a quick, healthy snack that specifically helps reduce drug cravings and supports brain chemistry (dopamine/serotonin). Keep it under 2 sentences.";
-    const response = await generateChatResponse("What's a good snack for a craving right now?", instruction);
+    const instruction =
+      "You are a recovery nutritionist. Suggest a quick, healthy snack that specifically helps reduce drug cravings and supports brain chemistry (dopamine/serotonin). Keep it under 2 sentences.";
+    const response = await generateChatResponse(
+      "What's a good snack for a craving right now?",
+      instruction,
+    );
     setAiSnack(response);
     setIsGeneratingSnack(false);
   };
@@ -36,7 +51,9 @@ const Health: React.FC = () => {
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Health & Diet</h1>
-          <p className="text-slate-500">Science-backed nutrition to restore your brain and body.</p>
+          <p className="text-slate-500">
+            Science-backed nutrition to restore your brain and body.
+          </p>
         </div>
         <div className="flex items-center space-x-2 bg-emerald-50 text-emerald-600 px-4 py-2 rounded-xl border border-emerald-100">
           <Brain size={20} className="animate-pulse" />
@@ -49,11 +66,16 @@ const Health: React.FC = () => {
         <div className="relative z-10">
           <div className="flex items-center space-x-2 mb-4">
             <Sparkles size={20} className="text-amber-400" />
-            <span className="text-xs font-bold uppercase tracking-widest text-teal-100">Today's Nutritional Goal</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-teal-100">
+              Today's Nutritional Goal
+            </span>
           </div>
           <h2 className="text-4xl font-black mb-2">{currentPlan.theme}</h2>
           <p className="text-teal-50 text-sm max-w-xl mb-6 leading-relaxed">
-            Today's diet is specifically designed to: <span className="font-bold italic">{currentPlan.meals.benefit}</span>
+            Today's diet is specifically designed to:{" "}
+            <span className="font-bold italic">
+              {currentPlan.meals.benefit}
+            </span>
           </p>
           <div className="flex gap-4">
             <button className="bg-white text-teal-700 px-6 py-3 rounded-xl font-bold text-sm shadow-lg hover:scale-105 transition-transform">
@@ -74,16 +96,19 @@ const Health: React.FC = () => {
               <Droplets className="text-blue-500" />
               <span>Hydration Tracker</span>
             </h3>
-            <span className="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">{glasses}/12 Glasses</span>
+            <span className="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+              {glasses}/12 Glasses
+            </span>
           </div>
           <div className="grid grid-cols-6 gap-2 mb-6">
             {[...Array(12)].map((_, i) => (
               <div
                 key={i}
-                className={`h-16 rounded-xl transition-all border-2 ${i < glasses
-                  ? 'bg-blue-500 border-blue-400 shadow-lg shadow-blue-100'
-                  : 'bg-slate-50 border-slate-100'
-                  }`}
+                className={`h-16 rounded-xl transition-all border-2 ${
+                  i < glasses
+                    ? "bg-blue-500 border-blue-400 shadow-lg shadow-blue-100"
+                    : "bg-slate-50 border-slate-100"
+                }`}
               />
             ))}
           </div>
@@ -108,15 +133,25 @@ const Health: React.FC = () => {
           <div className="flex-1 bg-slate-50 rounded-2xl p-4 mb-4 border border-dashed border-slate-200 flex flex-col items-center justify-center text-center">
             {isGeneratingSnack ? (
               <div className="flex flex-col items-center">
-                <Loader2 className="animate-spin text-indigo-600 mb-2" size={32} />
-                <p className="text-xs text-slate-500">Consulting nutrition database...</p>
+                <Loader2
+                  className="animate-spin text-indigo-600 mb-2"
+                  size={32}
+                />
+                <p className="text-xs text-slate-500">
+                  Consulting nutrition database...
+                </p>
               </div>
             ) : aiSnack ? (
-              <p className="text-sm text-slate-700 italic leading-relaxed">"{aiSnack}"</p>
+              <p className="text-sm text-slate-700 italic leading-relaxed">
+                "{aiSnack}"
+              </p>
             ) : (
               <div className="text-slate-400">
                 <Apple size={32} className="mx-auto mb-2 opacity-50" />
-                <p className="text-xs">Need a quick snack to fight a craving? Ask our AI nutritionist.</p>
+                <p className="text-xs">
+                  Need a quick snack to fight a craving? Ask our AI
+                  nutritionist.
+                </p>
               </div>
             )}
           </div>
@@ -138,20 +173,29 @@ const Health: React.FC = () => {
               <Calendar className="text-teal-600" size={24} />
               7-Day Recovery Plan
             </h2>
-            <p className="text-slate-500 text-sm">Click a day to view its specialized recovery diet.</p>
+            <p className="text-slate-500 text-sm">
+              Click a day to view its specialized recovery diet.
+            </p>
           </div>
           <div className="flex bg-slate-100 p-1.5 rounded-2xl overflow-x-auto no-scrollbar">
             {WEEKLY_MEAL_PLAN.map((item, idx) => (
               <button
                 key={item.day}
                 onClick={() => setActiveDayIdx(idx)}
-                className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex flex-col items-center ${activeDayIdx === idx
-                  ? 'bg-white text-teal-600 shadow-md'
-                  : 'text-slate-500 hover:text-slate-700'
-                  }`}
+                className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex flex-col items-center ${
+                  activeDayIdx === idx
+                    ? "bg-white text-teal-600 shadow-md"
+                    : "text-slate-500 hover:text-slate-700"
+                }`}
               >
-                <span className="text-[10px] opacity-60 uppercase">{item.day.substring(0, 3)}</span>
-                <span>{item.day === WEEKLY_MEAL_PLAN[todayIdx].day ? 'TODAY' : item.day.substring(0, 3)}</span>
+                <span className="text-[10px] opacity-60 uppercase">
+                  {item.day.substring(0, 3)}
+                </span>
+                <span>
+                  {item.day === WEEKLY_MEAL_PLAN[todayIdx].day
+                    ? "TODAY"
+                    : item.day.substring(0, 3)}
+                </span>
               </button>
             ))}
           </div>
@@ -165,24 +209,36 @@ const Health: React.FC = () => {
                   <div className="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mb-4">
                     <Sun size={20} />
                   </div>
-                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Breakfast</h4>
-                  <p className="text-sm font-bold text-slate-800 leading-snug">{currentPlan.meals.breakfast}</p>
+                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                    Breakfast
+                  </h4>
+                  <p className="text-sm font-bold text-slate-800 leading-snug">
+                    {currentPlan.meals.breakfast}
+                  </p>
                 </div>
 
                 <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:-translate-y-1 transition-transform">
                   <div className="w-10 h-10 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center mb-4">
                     <Sunset size={20} />
                   </div>
-                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Lunch</h4>
-                  <p className="text-sm font-bold text-slate-800 leading-snug">{currentPlan.meals.lunch}</p>
+                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                    Lunch
+                  </h4>
+                  <p className="text-sm font-bold text-slate-800 leading-snug">
+                    {currentPlan.meals.lunch}
+                  </p>
                 </div>
 
                 <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:-translate-y-1 transition-transform">
                   <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4">
                     <Moon size={20} />
                   </div>
-                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Dinner</h4>
-                  <p className="text-sm font-bold text-slate-800 leading-snug">{currentPlan.meals.dinner}</p>
+                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                    Dinner
+                  </h4>
+                  <p className="text-sm font-bold text-slate-800 leading-snug">
+                    {currentPlan.meals.dinner}
+                  </p>
                 </div>
               </div>
 
@@ -191,11 +247,16 @@ const Health: React.FC = () => {
                   <CheckCircle2 className="text-emerald-500" size={24} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-emerald-900 mb-1">Site Integrated Nutrition Tip</h4>
+                  <h4 className="font-bold text-emerald-900 mb-1">
+                    Site Integrated Nutrition Tip
+                  </h4>
                   <p className="text-sm text-emerald-800 leading-relaxed">
-                    This meal plan is specifically cross-referenced with your recovery streak.
-                    Eating <span className="font-bold underline">Proteins</span> today will help stabilize your mood, reducing the
-                    "Day {activeDayIdx + 1}" irritability commonly reported by our community.
+                    This meal plan is specifically cross-referenced with your
+                    recovery streak. Eating{" "}
+                    <span className="font-bold underline">Proteins</span> today
+                    will help stabilize your mood, reducing the "Day{" "}
+                    {activeDayIdx + 1}" irritability commonly reported by our
+                    community.
                   </p>
                 </div>
               </div>
@@ -224,21 +285,33 @@ const Health: React.FC = () => {
 
       {/* Nutritional Recovery Science */}
       <section className="space-y-6">
-        <h3 className="text-2xl font-bold text-slate-900 px-2">Recovery Science Tips</h3>
+        <h3 className="text-2xl font-bold text-slate-900 px-2">
+          Recovery Science Tips
+        </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {FOOD_TIPS.map((tip, i) => (
-            <div key={i} className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-lg transition-all">
+            <div
+              key={i}
+              className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-lg transition-all"
+            >
               <div className="w-14 h-14 bg-teal-50 rounded-2xl flex items-center justify-center mb-6">
                 <Utensils size={28} className="text-teal-600" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-3">{tip.title}</h3>
-              <p className="text-sm text-slate-600 mb-6 leading-relaxed">{tip.description}</p>
+              <h3 className="text-lg font-bold text-slate-900 mb-3">
+                {tip.title}
+              </h3>
+              <p className="text-sm text-slate-600 mb-6 leading-relaxed">
+                {tip.description}
+              </p>
               <div className="pt-4 border-t border-slate-50 flex items-start space-x-3">
                 <div className="bg-teal-600 p-1.5 rounded-lg text-white mt-1">
                   <Brain size={14} />
                 </div>
                 <p className="text-[11px] font-bold text-teal-700 leading-tight uppercase tracking-tight">
-                  Recovery Link: <span className="font-medium text-slate-500 normal-case">{tip.benefits}</span>
+                  Recovery Link:{" "}
+                  <span className="font-medium text-slate-500 normal-case">
+                    {tip.benefits}
+                  </span>
                 </p>
               </div>
             </div>

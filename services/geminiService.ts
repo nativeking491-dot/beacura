@@ -1,8 +1,10 @@
-
 import { GoogleGenAI } from "@google/genai";
 
 // Enhanced service to allow custom system instructions
-export const generateChatResponse = async (prompt: string, customInstruction?: string) => {
+export const generateChatResponse = async (
+  prompt: string,
+  customInstruction?: string,
+) => {
   try {
     const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 

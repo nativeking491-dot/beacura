@@ -1,10 +1,22 @@
-
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
-  Quote, Play, ThumbsUp, Heart, Share2,
-  Sparkles, Globe, X, Clock, ExternalLink,
-  Search, Languages, Film, Brain, Flower2, MessageCircle
-} from 'lucide-react';
+  Quote,
+  Play,
+  ThumbsUp,
+  Heart,
+  Share2,
+  Sparkles,
+  Globe,
+  X,
+  Clock,
+  ExternalLink,
+  Search,
+  Languages,
+  Film,
+  Brain,
+  Flower2,
+  MessageCircle,
+} from "lucide-react";
 
 interface VideoCategory {
   id: string;
@@ -18,123 +30,171 @@ interface VideoCategory {
 }
 
 const Motivation: React.FC = () => {
-  const [selectedLanguage, setSelectedLanguage] = useState('English');
-  const [selectedCategory, setSelectedCategory] = useState<VideoCategory | null>(null);
+  const [selectedLanguage, setSelectedLanguage] = useState("English");
+  const [selectedCategory, setSelectedCategory] =
+    useState<VideoCategory | null>(null);
 
   const languages = [
-    { code: 'English', label: 'English', flag: '🇺🇸' },
-    { code: 'Hindi', label: 'हिंदी', flag: '🇮🇳' },
-    { code: 'Telugu', label: 'తెలుగు', flag: '🇮🇳' }
+    { code: "English", label: "English", flag: "🇺🇸" },
+    { code: "Hindi", label: "हिंदी", flag: "🇮🇳" },
+    { code: "Telugu", label: "తెలుగు", flag: "🇮🇳" },
   ];
 
   const categories: VideoCategory[] = [
     {
-      id: 'meditation',
-      title: 'Meditation',
-      titleHindi: 'ध्यान',
-      titleTelugu: 'ధ్యానం',
+      id: "meditation",
+      title: "Meditation",
+      titleHindi: "ध्यान",
+      titleTelugu: "ధ్యానం",
       icon: <Brain size={24} />,
       searchQuery: {
-        English: 'guided meditation for addiction recovery',
-        Hindi: 'ध्यान meditation hindi guided',
-        Telugu: 'ధ్యానం telugu meditation'
+        English: "guided meditation for addiction recovery",
+        Hindi: "ध्यान meditation hindi guided",
+        Telugu: "ధ్యానం telugu meditation",
       },
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50'
+      color: "text-purple-600",
+      bgColor: "bg-purple-50",
     },
     {
-      id: 'yoga',
-      title: 'Yoga',
-      titleHindi: 'योग',
-      titleTelugu: 'యోగా',
+      id: "yoga",
+      title: "Yoga",
+      titleHindi: "योग",
+      titleTelugu: "యోగా",
       icon: <Flower2 size={24} />,
       searchQuery: {
-        English: 'yoga for stress relief beginners',
-        Hindi: 'योग yoga hindi swami ramdev',
-        Telugu: 'యోగా telugu yoga beginners'
+        English: "yoga for stress relief beginners",
+        Hindi: "योग yoga hindi swami ramdev",
+        Telugu: "యోగా telugu yoga beginners",
       },
-      color: 'text-teal-600',
-      bgColor: 'bg-teal-50'
+      color: "text-teal-600",
+      bgColor: "bg-teal-50",
     },
     {
-      id: 'recovery',
-      title: 'Recovery Stories',
-      titleHindi: 'रिकवरी गाइड',
-      titleTelugu: 'రికవరీ గైడ్',
+      id: "recovery",
+      title: "Recovery Stories",
+      titleHindi: "रिकवरी गाइड",
+      titleTelugu: "రికవరీ గైడ్",
       icon: <Heart size={24} />,
       searchQuery: {
-        English: 'addiction recovery motivation success story',
-        Hindi: 'नशा मुक्ति addiction recovery hindi',
-        Telugu: 'addiction recovery telugu motivation'
+        English: "addiction recovery motivation success story",
+        Hindi: "नशा मुक्ति addiction recovery hindi",
+        Telugu: "addiction recovery telugu motivation",
       },
-      color: 'text-rose-600',
-      bgColor: 'bg-rose-50'
+      color: "text-rose-600",
+      bgColor: "bg-rose-50",
     },
     {
-      id: 'therapy',
-      title: 'Mental Health',
-      titleHindi: 'मानसिक स्वास्थ्य',
-      titleTelugu: 'మానసిక ఆరోగ్యం',
+      id: "therapy",
+      title: "Mental Health",
+      titleHindi: "मानसिक स्वास्थ्य",
+      titleTelugu: "మానసిక ఆరోగ్యం",
       icon: <MessageCircle size={24} />,
       searchQuery: {
-        English: 'mental health therapy tips anxiety',
-        Hindi: 'मानसिक स्वास्थ्य mental health hindi bk shivani',
-        Telugu: 'మానసిక ఆరోగ్యం mental health telugu'
+        English: "mental health therapy tips anxiety",
+        Hindi: "मानसिक स्वास्थ्य mental health hindi bk shivani",
+        Telugu: "మానసిక ఆరోగ్యం mental health telugu",
       },
-      color: 'text-indigo-600',
-      bgColor: 'bg-indigo-50'
-    }
+      color: "text-indigo-600",
+      bgColor: "bg-indigo-50",
+    },
   ];
 
   const getCategoryTitle = (category: VideoCategory) => {
     switch (selectedLanguage) {
-      case 'Hindi': return category.titleHindi;
-      case 'Telugu': return category.titleTelugu;
-      default: return category.title;
+      case "Hindi":
+        return category.titleHindi;
+      case "Telugu":
+        return category.titleTelugu;
+      default:
+        return category.title;
     }
   };
 
   const openYouTubeSearch = (category: VideoCategory) => {
     const query = category.searchQuery[selectedLanguage];
     const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
-    window.open(url, '_blank');
+    window.open(url, "_blank");
   };
 
   const successStories = [
     {
       name: "David K.",
       time: "2 Years Clean",
-      story: "I lost everything to pills. Today, I have my family back and a steady job. Recovery helped me find my voice again.",
-      img: "https://picsum.photos/seed/david/200"
+      story:
+        "I lost everything to pills. Today, I have my family back and a steady job. Recovery helped me find my voice again.",
+      img: "https://picsum.photos/seed/david/200",
     },
     {
       name: "Elena R.",
       time: "18 Months Clean",
-      story: "The community here is what saved me. Knowing I wasn't alone in the middle of the night changed everything.",
-      img: "https://picsum.photos/seed/elena/200"
-    }
+      story:
+        "The community here is what saved me. Knowing I wasn't alone in the middle of the night changed everything.",
+      img: "https://picsum.photos/seed/elena/200",
+    },
   ];
 
   // Featured curated playlists - these are verified working
   const curatedPlaylists = {
     English: [
-      { title: 'Addiction Recovery Meditations', playlistId: 'PLB3F2CF45AA221C88', thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=400' },
-      { title: 'TED Talks on Addiction', playlistId: 'PL70DEC2B0568B5469', thumbnail: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&q=80&w=400' },
+      {
+        title: "Addiction Recovery Meditations",
+        playlistId: "PLB3F2CF45AA221C88",
+        thumbnail:
+          "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=400",
+      },
+      {
+        title: "TED Talks on Addiction",
+        playlistId: "PL70DEC2B0568B5469",
+        thumbnail:
+          "https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&q=80&w=400",
+      },
     ],
     Hindi: [
-      { title: 'Best Motivational Video - Hindi', videoId: 'CRPhPUNNrVU', thumbnail: 'https://img.youtube.com/vi/CRPhPUNNrVU/hqdefault.jpg' },
-      { title: 'How I QUIT DRUGS - Arvind Kumar', videoId: 'F2TChiFHi2Q', thumbnail: 'https://img.youtube.com/vi/F2TChiFHi2Q/hqdefault.jpg' },
-      { title: 'Powerful Motivational Speech', videoId: 'TKpv_u4r18Y', thumbnail: 'https://img.youtube.com/vi/TKpv_u4r18Y/hqdefault.jpg' },
+      {
+        title: "Best Motivational Video - Hindi",
+        videoId: "CRPhPUNNrVU",
+        thumbnail: "https://img.youtube.com/vi/CRPhPUNNrVU/hqdefault.jpg",
+      },
+      {
+        title: "How I QUIT DRUGS - Arvind Kumar",
+        videoId: "F2TChiFHi2Q",
+        thumbnail: "https://img.youtube.com/vi/F2TChiFHi2Q/hqdefault.jpg",
+      },
+      {
+        title: "Powerful Motivational Speech",
+        videoId: "TKpv_u4r18Y",
+        thumbnail: "https://img.youtube.com/vi/TKpv_u4r18Y/hqdefault.jpg",
+      },
     ],
     Telugu: [
-      { title: 'Addiction Recovery - Sadhguru', videoId: 'J2ie7Yw5qJs', thumbnail: 'https://img.youtube.com/vi/J2ie7Yw5qJs/hqdefault.jpg' },
-      { title: 'Stop Smoking & Drinking - Venu Kalyan', videoId: 'iQfHKURjG9Y', thumbnail: 'https://img.youtube.com/vi/iQfHKURjG9Y/hqdefault.jpg' },
-      { title: 'Telugu Motivation', videoId: 'nT_HXP6pQC4', thumbnail: 'https://img.youtube.com/vi/nT_HXP6pQC4/hqdefault.jpg' },
-    ]
+      {
+        title: "Addiction Recovery - Sadhguru",
+        videoId: "J2ie7Yw5qJs",
+        thumbnail: "https://img.youtube.com/vi/J2ie7Yw5qJs/hqdefault.jpg",
+      },
+      {
+        title: "Stop Smoking & Drinking - Venu Kalyan",
+        videoId: "iQfHKURjG9Y",
+        thumbnail: "https://img.youtube.com/vi/iQfHKURjG9Y/hqdefault.jpg",
+      },
+      {
+        title: "Telugu Motivation",
+        videoId: "nT_HXP6pQC4",
+        thumbnail: "https://img.youtube.com/vi/nT_HXP6pQC4/hqdefault.jpg",
+      },
+    ],
   };
 
   /* Video Modal Component */
-  const VideoModal = ({ videoId, playlistId, onClose }: { videoId?: string, playlistId?: string, onClose: () => void }) => {
+  const VideoModal = ({
+    videoId,
+    playlistId,
+    onClose,
+  }: {
+    videoId?: string;
+    playlistId?: string;
+    onClose: () => void;
+  }) => {
     // Construct embed URL
     let embedUrl = "";
     if (playlistId) {
@@ -164,9 +224,14 @@ const Motivation: React.FC = () => {
     );
   };
 
-  const [activeVideo, setActiveVideo] = useState<{ playlistId?: string, videoId?: string } | null>(null);
+  const [activeVideo, setActiveVideo] = useState<{
+    playlistId?: string;
+    videoId?: string;
+  } | null>(null);
 
-  const currentPlaylists = curatedPlaylists[selectedLanguage as keyof typeof curatedPlaylists] || curatedPlaylists.English;
+  const currentPlaylists =
+    curatedPlaylists[selectedLanguage as keyof typeof curatedPlaylists] ||
+    curatedPlaylists.English;
 
   return (
     <div className="space-y-10 animate-in fade-in duration-500 pb-20">
@@ -174,17 +239,20 @@ const Motivation: React.FC = () => {
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Mental Strength</h1>
-          <p className="text-slate-500">Feed your mind with hope, knowledge, and recovery resources.</p>
+          <p className="text-slate-500">
+            Feed your mind with hope, knowledge, and recovery resources.
+          </p>
         </div>
         <div className="flex bg-white p-1 rounded-2xl border border-slate-100 shadow-sm overflow-x-auto scrollbar-hide max-w-full">
-          {languages.map(lang => (
+          {languages.map((lang) => (
             <button
               key={lang.code}
               onClick={() => setSelectedLanguage(lang.code)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 ${selectedLanguage === lang.code
-                ? 'bg-teal-600 text-white shadow-md'
-                : 'text-slate-500 hover:bg-slate-50'
-                }`}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 ${
+                selectedLanguage === lang.code
+                  ? "bg-teal-600 text-white shadow-md"
+                  : "text-slate-500 hover:bg-slate-50"
+              }`}
             >
               <span>{lang.flag}</span>
               <span>{lang.label}</span>
@@ -213,7 +281,9 @@ const Motivation: React.FC = () => {
               onClick={() => openYouTubeSearch(category)}
               className={`${category.bgColor} p-6 rounded-3xl border border-slate-100 shadow-sm text-left group cursor-pointer hover:shadow-xl transition-all hover:-translate-y-1 relative overflow-hidden`}
             >
-              <div className={`${category.color} mb-4 p-3 bg-white rounded-2xl inline-block shadow-sm`}>
+              <div
+                className={`${category.color} mb-4 p-3 bg-white rounded-2xl inline-block shadow-sm`}
+              >
                 {category.icon}
               </div>
               <h4 className="font-bold text-slate-800 text-lg mb-2">
@@ -222,7 +292,9 @@ const Motivation: React.FC = () => {
               <p className="text-slate-500 text-sm mb-4">
                 Find {category.title.toLowerCase()} videos in {selectedLanguage}
               </p>
-              <div className={`flex items-center gap-2 ${category.color} font-bold text-sm group-hover:translate-x-1 transition-transform`}>
+              <div
+                className={`flex items-center gap-2 ${category.color} font-bold text-sm group-hover:translate-x-1 transition-transform`}
+              >
                 <Search size={16} />
                 <span>Search on YouTube</span>
                 <ExternalLink size={14} />
@@ -245,11 +317,13 @@ const Motivation: React.FC = () => {
           {currentPlaylists.map((playlist, idx) => (
             <div
               key={idx}
-              onClick={() => setActiveVideo(
-                (playlist as any).videoId
-                  ? { videoId: (playlist as any).videoId }
-                  : { playlistId: (playlist as any).playlistId }
-              )}
+              onClick={() =>
+                setActiveVideo(
+                  (playlist as any).videoId
+                    ? { videoId: (playlist as any).videoId }
+                    : { playlistId: (playlist as any).playlistId },
+                )
+              }
               className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden group cursor-pointer hover:shadow-xl transition-all hover:-translate-y-1 flex relative"
             >
               <div className="relative w-48 h-32 flex-shrink-0 overflow-hidden bg-slate-200">
@@ -260,7 +334,11 @@ const Motivation: React.FC = () => {
                 />
                 <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors flex items-center justify-center">
                   <div className="bg-white/90 p-3 rounded-full shadow-xl">
-                    <Play size={20} className="text-teal-600 ml-0.5" fill="currentColor" />
+                    <Play
+                      size={20}
+                      className="text-teal-600 ml-0.5"
+                      fill="currentColor"
+                    />
                   </div>
                 </div>
               </div>
@@ -288,7 +366,8 @@ const Motivation: React.FC = () => {
           <div className="relative z-10">
             <Sparkles className="mx-auto text-amber-400 mb-6" size={40} />
             <h2 className="text-2xl md:text-3xl font-bold italic text-slate-800 mb-4">
-              "Healing is not linear, and it's okay to have bad days. What matters is that you keep choosing to move forward."
+              "Healing is not linear, and it's okay to have bad days. What
+              matters is that you keep choosing to move forward."
             </h2>
             <p className="text-teal-600 font-bold">- Recovery Community</p>
           </div>
@@ -311,20 +390,35 @@ const Motivation: React.FC = () => {
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {successStories.map((story, i) => (
-            <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-start space-x-4">
-              <img src={story.img} alt={story.name} className="w-16 h-16 rounded-2xl object-cover" />
+            <div
+              key={i}
+              className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-start space-x-4"
+            >
+              <img
+                src={story.img}
+                alt={story.name}
+                className="w-16 h-16 rounded-2xl object-cover"
+              />
               <div className="flex-1">
                 <div className="flex justify-between items-start mb-2">
                   <div>
                     <h4 className="font-bold text-slate-900">{story.name}</h4>
-                    <p className="text-xs font-bold text-teal-600 uppercase tracking-tighter">{story.time}</p>
+                    <p className="text-xs font-bold text-teal-600 uppercase tracking-tighter">
+                      {story.time}
+                    </p>
                   </div>
                   <div className="flex space-x-2">
-                    <button className="text-slate-400 hover:text-teal-600"><ThumbsUp size={16} /></button>
-                    <button className="text-slate-400 hover:text-indigo-600"><Share2 size={16} /></button>
+                    <button className="text-slate-400 hover:text-teal-600">
+                      <ThumbsUp size={16} />
+                    </button>
+                    <button className="text-slate-400 hover:text-indigo-600">
+                      <Share2 size={16} />
+                    </button>
                   </div>
                 </div>
-                <p className="text-slate-600 text-sm leading-relaxed">{story.story}</p>
+                <p className="text-slate-600 text-sm leading-relaxed">
+                  {story.story}
+                </p>
               </div>
             </div>
           ))}

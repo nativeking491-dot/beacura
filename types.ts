@@ -1,8 +1,7 @@
-
 export enum UserRole {
-  RECOVERING = 'Recovering User',
-  MENTOR = 'Recovered Mentor',
-  ADMIN = 'Admin'
+  RECOVERING = "Recovering User",
+  MENTOR = "Recovered Mentor",
+  ADMIN = "Admin",
 }
 
 export interface User {
@@ -25,7 +24,7 @@ export interface Badge {
 
 export interface ChatMessage {
   id: string;
-  sender: 'user' | 'ai';
+  sender: "user" | "ai";
   text: string;
   timestamp: Date;
 }

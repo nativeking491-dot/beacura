@@ -1,11 +1,22 @@
-
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import {
-  Dumbbell, Clock, Zap, Heart,
-  Wind, Sunrise, Sun, Sunset,
-  CheckCircle2, PlayCircle, Info,
-  X, RotateCcw, Award, Pause, Play
-} from 'lucide-react';
+  Dumbbell,
+  Clock,
+  Zap,
+  Heart,
+  Wind,
+  Sunrise,
+  Sun,
+  Sunset,
+  CheckCircle2,
+  PlayCircle,
+  Info,
+  X,
+  RotateCcw,
+  Award,
+  Pause,
+  Play,
+} from "lucide-react";
 
 interface ExerciseItem {
   id: string;
@@ -34,13 +45,14 @@ const Exercise: React.FC = () => {
 
   const exercises: ExerciseItem[] = [
     {
-      id: 'ex1',
+      id: "ex1",
       title: "Box Breathing",
       time: "Anytime",
       duration: 120, // 2 mins
       type: "Anxiety Control",
       icon: Wind,
-      benefit: "Instantly calms the nervous system and lowers heart rate during cravings.",
+      benefit:
+        "Instantly calms the nervous system and lowers heart rate during cravings.",
       difficulty: "Beginner",
       color: "text-sky-500",
       bg: "bg-sky-50",
@@ -48,11 +60,11 @@ const Exercise: React.FC = () => {
         { text: "Inhale (4s)", duration: 4 },
         { text: "Hold (4s)", duration: 4 },
         { text: "Exhale (4s)", duration: 4 },
-        { text: "Hold (4s)", duration: 4 }
-      ]
+        { text: "Hold (4s)", duration: 4 },
+      ],
     },
     {
-      id: 'ex2',
+      id: "ex2",
       title: "Mindful Yoga Flow",
       time: "07:00 AM",
       duration: 600, // 10 mins
@@ -61,37 +73,39 @@ const Exercise: React.FC = () => {
       benefit: "Improves blood flow and releases morning physical tension.",
       difficulty: "Intermediate",
       color: "text-amber-500",
-      bg: "bg-amber-50"
+      bg: "bg-amber-50",
     },
     {
-      id: 'ex3',
+      id: "ex3",
       title: "4-7-8 Breathing",
       time: "Bedtime",
       duration: 180, // 3 mins
       type: "Sleep Support",
       icon: Wind,
-      benefit: "A natural tranquilizer for the nervous system to aid restful sleep.",
+      benefit:
+        "A natural tranquilizer for the nervous system to aid restful sleep.",
       difficulty: "Beginner",
       color: "text-indigo-500",
       bg: "bg-indigo-50",
       instructions: [
         { text: "Inhale (4s)", duration: 4 },
         { text: "Hold (7s)", duration: 7 },
-        { text: "Exhale (8s)", duration: 8 }
-      ]
+        { text: "Exhale (8s)", duration: 8 },
+      ],
     },
     {
-      id: 'ex4',
+      id: "ex4",
       title: "Brisk Walking",
       time: "10:30 AM",
       duration: 1200, // 20 mins
       type: "Cardio",
       icon: Sun,
-      benefit: "Stimulates dopamine production naturally through steady movement.",
+      benefit:
+        "Stimulates dopamine production naturally through steady movement.",
       difficulty: "Easy",
       color: "text-teal-600",
-      bg: "bg-teal-50"
-    }
+      bg: "bg-teal-50",
+    },
   ];
 
   useEffect(() => {
@@ -104,7 +118,8 @@ const Exercise: React.FC = () => {
           setStepTimeLeft((prevStepTime) => {
             if (prevStepTime <= 1) {
               // Move to next step
-              const nextStep = (breathingStep + 1) % activeSession.instructions!.length;
+              const nextStep =
+                (breathingStep + 1) % activeSession.instructions!.length;
               setBreathingStep(nextStep);
               return activeSession.instructions![nextStep].duration;
             }
@@ -142,20 +157,26 @@ const Exercise: React.FC = () => {
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 pb-20">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Wellness & Exercise</h1>
-          <p className="text-slate-500">Healing through movement and rhythmic breathing.</p>
+          <h1 className="text-3xl font-bold text-slate-900">
+            Wellness & Exercise
+          </h1>
+          <p className="text-slate-500">
+            Healing through movement and rhythmic breathing.
+          </p>
         </div>
         <div className="bg-white px-4 py-2 rounded-2xl border border-slate-100 flex items-center space-x-3 shadow-sm">
           <Zap className="text-amber-500" size={20} />
           <div className="text-right">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Fitness Points</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+              Fitness Points
+            </p>
             <p className="text-sm font-bold text-slate-700">450 XP</p>
           </div>
         </div>
@@ -167,7 +188,8 @@ const Exercise: React.FC = () => {
           <div className="flex-1">
             <h2 className="text-2xl font-bold mb-2">Master Your Cravings</h2>
             <p className="text-teal-50 text-sm mb-6 leading-relaxed">
-              When a craving hits, your breathing becomes shallow. Use "Box Breathing" to reset your brain in under 2 minutes.
+              When a craving hits, your breathing becomes shallow. Use "Box
+              Breathing" to reset your brain in under 2 minutes.
             </p>
             <div className="flex gap-4">
               <button
@@ -189,7 +211,10 @@ const Exercise: React.FC = () => {
       {/* Grid of Exercises */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {exercises.map((ex) => (
-          <div key={ex.id} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all group flex flex-col justify-between">
+          <div
+            key={ex.id}
+            className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all group flex flex-col justify-between"
+          >
             <div>
               <div className="flex justify-between items-start mb-4">
                 <div className={`${ex.bg} ${ex.color} p-4 rounded-2xl`}>
@@ -200,8 +225,12 @@ const Exercise: React.FC = () => {
                   <span>{formatTime(ex.duration)}</span>
                 </div>
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-1">{ex.title}</h3>
-              <p className="text-slate-500 text-xs mb-4 line-clamp-2">{ex.benefit}</p>
+              <h3 className="text-lg font-bold text-slate-900 mb-1">
+                {ex.title}
+              </h3>
+              <p className="text-slate-500 text-xs mb-4 line-clamp-2">
+                {ex.benefit}
+              </p>
             </div>
 
             <div className="flex items-center justify-between mt-4">
@@ -233,8 +262,12 @@ const Exercise: React.FC = () => {
           {!sessionComplete ? (
             <div className="w-full max-w-md text-center space-y-12">
               <header>
-                <h2 className="text-3xl font-bold mb-2">{activeSession.title}</h2>
-                <p className="text-teal-400 font-medium tracking-widest uppercase text-xs">{activeSession.type}</p>
+                <h2 className="text-3xl font-bold mb-2">
+                  {activeSession.title}
+                </h2>
+                <p className="text-teal-400 font-medium tracking-widest uppercase text-xs">
+                  {activeSession.type}
+                </p>
               </header>
 
               <div className="relative flex items-center justify-center">
@@ -262,7 +295,9 @@ const Exercise: React.FC = () => {
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-6xl font-black">{formatTime(timeLeft)}</span>
+                  <span className="text-6xl font-black">
+                    {formatTime(timeLeft)}
+                  </span>
                 </div>
               </div>
 
@@ -274,7 +309,9 @@ const Exercise: React.FC = () => {
                       {activeSession.instructions[breathingStep].text}
                     </span>
                   </div>
-                  <p className="text-[10px] text-slate-500 mt-4 uppercase tracking-widest font-bold">Follow the rhythm</p>
+                  <p className="text-[10px] text-slate-500 mt-4 uppercase tracking-widest font-bold">
+                    Follow the rhythm
+                  </p>
                 </div>
               )}
 
@@ -289,7 +326,11 @@ const Exercise: React.FC = () => {
                   onClick={() => setIsActive(!isActive)}
                   className="p-6 bg-teal-500 rounded-3xl hover:bg-teal-600 transition-all shadow-xl shadow-teal-500/20"
                 >
-                  {isActive ? <Pause size={32} fill="currentColor" /> : <Play size={32} fill="currentColor" />}
+                  {isActive ? (
+                    <Pause size={32} fill="currentColor" />
+                  ) : (
+                    <Play size={32} fill="currentColor" />
+                  )}
                 </button>
               </div>
             </div>
@@ -300,10 +341,14 @@ const Exercise: React.FC = () => {
               </div>
               <div className="space-y-2">
                 <h2 className="text-4xl font-black">Session Complete!</h2>
-                <p className="text-slate-400">You've successfully built a healthier habit.</p>
+                <p className="text-slate-400">
+                  You've successfully built a healthier habit.
+                </p>
               </div>
               <div className="bg-white/10 p-6 rounded-3xl inline-block border border-white/10">
-                <p className="text-teal-400 text-xs font-bold uppercase mb-1">Rewards Earned</p>
+                <p className="text-teal-400 text-xs font-bold uppercase mb-1">
+                  Rewards Earned
+                </p>
                 <p className="text-2xl font-bold">+25 Recovery Points</p>
               </div>
               <button
@@ -325,7 +370,9 @@ const Exercise: React.FC = () => {
             <span>The Vagus Nerve</span>
           </h4>
           <p className="text-xs text-slate-500 leading-relaxed">
-            Breathing exercises stimulate the Vagus nerve, which signals your brain to turn off the "fight or flight" response triggered by cravings.
+            Breathing exercises stimulate the Vagus nerve, which signals your
+            brain to turn off the "fight or flight" response triggered by
+            cravings.
           </p>
         </div>
         <div className="space-y-2">
@@ -334,7 +381,8 @@ const Exercise: React.FC = () => {
             <span>Heart Rate Variability</span>
           </h4>
           <p className="text-xs text-slate-500 leading-relaxed">
-            Regular light exercise improves HRV, making you physically more resilient to the emotional ups and downs of recovery.
+            Regular light exercise improves HRV, making you physically more
+            resilient to the emotional ups and downs of recovery.
           </p>
         </div>
         <div className="space-y-2">
@@ -343,7 +391,8 @@ const Exercise: React.FC = () => {
             <span>Dopamine Baseline</span>
           </h4>
           <p className="text-xs text-slate-500 leading-relaxed">
-            Instead of high spikes from substances, these activities raise your baseline dopamine slowly and sustainably.
+            Instead of high spikes from substances, these activities raise your
+            baseline dopamine slowly and sustainably.
           </p>
         </div>
       </section>

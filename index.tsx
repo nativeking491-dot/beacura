@@ -1,12 +1,11 @@
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { HashRouter } from "react-router-dom";
+import App from "./App";
+import { UserProvider } from "./context/UserContext";
+import { ThemeProvider } from "./context/ThemeContext";
 
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { HashRouter } from 'react-router-dom';
-import App from './App';
-import { UserProvider } from './context/UserContext';
-import { ThemeProvider } from './context/ThemeContext';
-
-const rootElement = document.getElementById('root');
+const rootElement = document.getElementById("root");
 if (!rootElement) {
   throw new Error("Could not find root element to mount to");
 }
@@ -21,5 +20,5 @@ root.render(
         </UserProvider>
       </ThemeProvider>
     </HashRouter>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
