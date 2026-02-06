@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
 import {
   Home, User, MessageCircle, Utensils, Award,
   ShieldAlert, LayoutDashboard, LogOut, Menu, X,
