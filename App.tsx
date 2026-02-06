@@ -3,8 +3,9 @@ import { HashRouter as Router, Routes, Route, Link, Navigate, useLocation } from
 import {
   Home, User, MessageCircle, Utensils, Award,
   ShieldAlert, LayoutDashboard, LogOut, Menu, X,
-  Heart, Brain, Dumbbell, Loader2
+  Heart, Brain, Dumbbell, Loader2, Moon, Sun
 } from 'lucide-react';
+import { useTheme } from './context/ThemeContext';
 import Landing from './pages/Landing';
 import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
@@ -27,6 +28,7 @@ const App: React.FC = () => {
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const { theme, toggleTheme } = useTheme();
 
   // Check Supabase session on mount
   useEffect(() => {
@@ -220,6 +222,19 @@ const App: React.FC = () => {
                       <p className="text-xs text-purple-300 mt-1">Full system access</p>
                     </div>
                   )}
+
+                  {/* Theme Toggle */}
+                  <button
+                    onClick={toggleTheme}
+                    className={`flex items-center space-x-3 p-3 w-full rounded-lg mb-2 ${isAdmin
+                      ? 'text-purple-100 hover:bg-purple-800'
+                      : 'text-slate-600 hover:bg-teal-50 hover:text-teal-700'
+                      } transition-colors`}
+                  >
+                    {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+                    <span className="font-medium">{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
+                  </button>
+
                   <button
                     onClick={handleLogout}
                     className={`flex items-center space-x-3 p-3 w-full rounded-lg ${isAdmin
