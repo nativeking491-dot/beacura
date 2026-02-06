@@ -84,12 +84,11 @@ const Profile: React.FC = () => {
 
   // Default badges
   const badges = [
-    { id: "b1", name: "Week One", icon: "Shield", color: "text-blue-500" },
+    { id: "b1", name: "Week One", icon: "Shield" },
     {
       id: "b2",
       name: "First Mentor Call",
       icon: "Award",
-      color: "text-yellow-500",
     },
   ];
 
@@ -232,26 +231,30 @@ const Profile: React.FC = () => {
               Badges & Accomplishments
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {badges.map((badge) => (
+              {badges.map((badge, index) => (
                 <div
                   key={badge.id}
-                  className="flex flex-col items-center text-center p-4 rounded-2xl bg-slate-50 border border-slate-100 group hover:border-teal-200 transition-all"
+                  className="flex flex-col items-center text-center p-4 rounded-2xl bg-slate-50 border border-slate-100 group hover:border-teal-200 transition-all hover:shadow-md"
                 >
                   <div
-                    className={`w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center mb-3 ${badge.color} group-hover:scale-110 transition-transform`}
+                    className={`w-14 h-14 rounded-full flex items-center justify-center mb-3 transition-transform group-hover:scale-110 duration-300
+                      ${index === 0
+                        ? "bg-gradient-to-br from-teal-400 to-teal-600 text-white shadow-lg shadow-teal-500/30 ring-4 ring-teal-50"
+                        : "bg-gradient-to-br from-teal-100 to-teal-200 text-teal-700 ring-4 ring-teal-50"}
+                    `}
                   >
-                    <Award size={24} />
+                    <Award size={28} />
                   </div>
-                  <p className="text-xs font-bold text-slate-700">
+                  <p className="text-xs font-bold text-slate-700 bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-teal-800">
                     {badge.name}
                   </p>
                 </div>
               ))}
-              <div className="flex flex-col items-center text-center p-4 rounded-2xl border-2 border-dashed border-slate-200 justify-center">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center mb-2 text-slate-300">
+              <div className="flex flex-col items-center text-center p-4 rounded-2xl border-2 border-dashed border-slate-200 justify-center group hover:border-teal-300 transition-colors">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center mb-2 text-slate-300 group-hover:text-teal-400 transition-colors">
                   <Shield size={24} />
                 </div>
-                <p className="text-[10px] font-bold text-slate-400">
+                <p className="text-[10px] font-bold text-slate-400 group-hover:text-teal-500 transition-colors">
                   Next Milestone: 30 Days
                 </p>
               </div>
