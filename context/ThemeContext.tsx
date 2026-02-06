@@ -100,7 +100,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     const colors = THEMES[colorTheme];
 
     Object.entries(colors).forEach(([key, value]) => {
-      root.style.setProperty(`--primary-${key}`, value);
+      root.style.setProperty(`--primary-${key}`, value as string);
     });
 
     localStorage.setItem("colorTheme", colorTheme);
