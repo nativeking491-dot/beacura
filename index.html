@@ -112,8 +112,63 @@
 
     /* Fix Glass in Dark Mode */
     .dark .glass {
-      background: rgba(15, 23, 42, 0.6) !important;
+      background: rgba(15, 17, 23, 0.6) !important;
       border-color: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    /* --- GREY MODE OVERRIDES --- */
+    .grey body {
+      background-color: #27272a !important;
+      color: #e4e4e7 !important;
+    }
+
+    .grey .bg-slate-50,
+    .grey .bg-slate-900 {
+      background-color: #27272a !important;
+    }
+
+    .grey .bg-white {
+      background-color: #3f3f46 !important;
+      border-color: #52525b !important;
+      color: #f4f4f5 !important;
+    }
+
+    /* --- MIDNIGHT MODE OVERRIDES --- */
+    .midnight body {
+      background-color: #000000 !important;
+    }
+
+    .midnight .bg-slate-50,
+    .midnight .bg-slate-900 {
+      background-color: #000000 !important;
+    }
+
+    .midnight .bg-white {
+      background-color: #000000 !important;
+      border-color: #1e1e1e !important;
+    }
+
+    /* --- SEPIA MODE OVERRIDES --- */
+    .sepia body {
+      background-color: #fdf6e3 !important;
+      color: #5c4b37 !important;
+    }
+
+    .sepia .bg-slate-50,
+    .sepia .bg-slate-900 {
+      background-color: #fdf6e3 !important;
+    }
+
+    .sepia .bg-white {
+      background-color: #fffbf0 !important;
+      border-color: #e6dbb9 !important;
+      color: #5c4b37 !important;
+    }
+
+    .sepia .text-slate-900,
+    .sepia .text-slate-700,
+    .sepia .text-slate-600 {
+      color: #5c4b37 !important;
     }
   </style>
   <script type="importmap">
