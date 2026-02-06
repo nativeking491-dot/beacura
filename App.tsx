@@ -61,7 +61,9 @@ const App: React.FC = () => {
             console.log("👤 User profile fetched:", profile);
             console.log("🎭 User role:", profile?.role);
 
-            if (profile?.role === "ADMIN") {
+            const normalizedRole = profile?.role?.toUpperCase();
+
+            if (normalizedRole === "ADMIN") {
               console.log("👑 ADMIN ROLE DETECTED - Setting isAdmin to true");
               setIsAdmin(true);
               setUserRole(UserRole.MENTOR); // Set a fallback role
