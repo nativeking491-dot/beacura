@@ -26,6 +26,10 @@ const Profile: React.FC = () => {
 
   const handleSaveProfile = async () => {
     if (!user) return;
+    if (!editedName.trim()) {
+      alert("Name cannot be empty");
+      return;
+    }
     setIsSaving(true);
     try {
       const { error } = await supabase

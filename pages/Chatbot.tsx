@@ -2,8 +2,10 @@ import React, { useState, useRef, useEffect } from "react";
 import { Send, Mic, User, Bot, Loader2, Info } from "lucide-react";
 import { generateChatResponse } from "../services/geminiService";
 import { ChatMessage } from "../types";
+import { useUser } from "../context/UserContext";
 
 const Chatbot: React.FC = () => {
+  const { user } = useUser();
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "1",
@@ -36,7 +38,12 @@ const Chatbot: React.FC = () => {
     setInput("");
     setIsLoading(true);
 
-    const aiText = await generateChatResponse(input);
+    const aiText = await generateChatResponse(
+      input,
+      undefined,
+      user?.streak,
+      user?.points,
+    );
 
     const aiMsg: ChatMessage = {
       id: (Date.now() + 1).toString(),
@@ -139,11 +146,10 @@ const Chatbot: React.FC = () => {
           <button
             onClick={handleSend}
             disabled={!input.trim() || isLoading}
-            className={`p-2 rounded-xl transition-all ${
-              !input.trim() || isLoading
-                ? "text-slate-300"
-                : "text-teal-600 bg-teal-50"
-            }`}
+            className={`p-2 rounded-xl transition-all ${!input.trim() || isLoading
+              ? "text-slate-300"
+              : "text-teal-600 bg-teal-50"
+              }`}
           >
             <Send size={20} />
           </button>
