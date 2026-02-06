@@ -16,6 +16,7 @@ import {
   Award,
   Pause,
   Play,
+  Moon,
 } from "lucide-react";
 
 interface ExerciseItem {
