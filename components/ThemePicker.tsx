@@ -19,11 +19,11 @@ export const ThemePicker: React.FC = () => {
     ];
 
     const modes = [
-        { id: "light", label: "Light", bg: "bg-slate-50", border: "border-slate-200" },
-        { id: "dark", label: "Dark", bg: "bg-slate-900", border: "border-slate-700" },
-        { id: "grey", label: "Grey", bg: "bg-zinc-800", border: "border-zinc-600" },
-        { id: "midnight", label: "Midnight", bg: "bg-black", border: "border-slate-800" },
-        { id: "sepia", label: "Sepia", bg: "bg-[#fdf6e3]", border: "border-amber-200" },
+        { id: "light", label: "Light", color: "#f8fafc", borderColor: "#e2e8f0", textColor: "text-slate-900" },
+        { id: "dark", label: "Dark", color: "#0f172a", borderColor: "#334155", textColor: "text-white" },
+        { id: "grey", label: "Grey", color: "#27272a", borderColor: "#52525b", textColor: "text-zinc-200" },
+        { id: "midnight", label: "Midnight", color: "#000000", borderColor: "#1e293b", textColor: "text-white" },
+        { id: "sepia", label: "Sepia", color: "#fdf6e3", borderColor: "#fde68a", textColor: "text-amber-900" },
     ];
 
     return (
@@ -46,16 +46,19 @@ export const ThemePicker: React.FC = () => {
                                 onClick={() => setTheme(m.id as any)}
                                 className={`
                                     relative h-16 rounded-2xl flex flex-col items-center justify-center transition-all hover:scale-105 border-2
-                                    ${m.bg} ${m.border}
                                     ${theme === m.id ? "ring-2 ring-offset-2 ring-teal-500 scale-105 shadow-md" : ""}
                                 `}
+                                style={{
+                                    backgroundColor: m.color,
+                                    borderColor: m.borderColor
+                                }}
                             >
                                 {theme === m.id && (
                                     <div className="absolute top-1 right-1 bg-teal-500 rounded-full p-0.5">
                                         <Check size={10} className="text-white" />
                                     </div>
                                 )}
-                                <span className={`text-[10px] font-bold ${m.id === 'light' || m.id === 'sepia' ? 'text-slate-800' : 'text-slate-200'}`}>
+                                <span className={`text-[10px] font-bold ${m.textColor}`}>
                                     {m.label}
                                 </span>
                             </button>
