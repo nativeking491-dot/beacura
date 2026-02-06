@@ -1,9 +1,9 @@
 import React from "react";
 import { useTheme, ColorTheme } from "../context/ThemeContext";
-import { Moon, Sun, Palette, Check } from "lucide-react";
+import { Palette, Check } from "lucide-react";
 
 export const ThemePicker: React.FC = () => {
-    const { theme, toggleTheme, colorTheme, setColorTheme } = useTheme();
+    const { theme, setTheme, colorTheme, setColorTheme } = useTheme();
 
     const colors: { id: ColorTheme; label: string; color: string }[] = [
         { id: "teal", label: "Beacura Teal", color: "#14b8a6" },
@@ -18,6 +18,14 @@ export const ThemePicker: React.FC = () => {
         { id: "cyan", label: "Cool Cyan", color: "#06b6d4" },
     ];
 
+    const modes = [
+        { id: "light", label: "Light", bg: "bg-slate-50", border: "border-slate-200" },
+        { id: "dark", label: "Dark", bg: "bg-slate-900", border: "border-slate-700" },
+        { id: "grey", label: "Grey", bg: "bg-zinc-800", border: "border-zinc-600" },
+        { id: "midnight", label: "Midnight", bg: "bg-black", border: "border-slate-800" },
+        { id: "sepia", label: "Sepia", bg: "bg-[#fdf6e3]", border: "border-amber-200" },
+    ];
+
     return (
         <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm">
             <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
@@ -26,37 +34,33 @@ export const ThemePicker: React.FC = () => {
             </h3>
 
             <div className="space-y-6">
-                {/* Dark Mode Toggle */}
-                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-2xl">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-white dark:bg-slate-600 rounded-xl shadow-sm">
-                            {theme === "dark" ? (
-                                <Moon size={20} className="text-indigo-400" />
-                            ) : (
-                                <Sun size={20} className="text-amber-500" />
-                            )}
-                        </div>
-                        <div>
-                            <p className="font-bold text-slate-900 dark:text-white text-sm">Dark Mode</p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">
-                                {theme === "dark" ? "On" : "Off"}
-                            </p>
-                        </div>
+                {/* Background Mode Selection */}
+                <div>
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 block">
+                        Background Mode
+                    </label>
+                    <div className="grid grid-cols-5 gap-2">
+                        {modes.map((m) => (
+                            <button
+                                key={m.id}
+                                onClick={() => setTheme(m.id as any)}
+                                className={`
+                                    relative h-16 rounded-2xl flex flex-col items-center justify-center transition-all hover:scale-105 border-2
+                                    ${m.bg} ${m.border}
+                                    ${theme === m.id ? "ring-2 ring-offset-2 ring-teal-500 scale-105 shadow-md" : ""}
+                                `}
+                            >
+                                {theme === m.id && (
+                                    <div className="absolute top-1 right-1 bg-teal-500 rounded-full p-0.5">
+                                        <Check size={10} className="text-white" />
+                                    </div>
+                                )}
+                                <span className={`text-[10px] font-bold ${m.id === 'light' || m.id === 'sepia' ? 'text-slate-800' : 'text-slate-200'}`}>
+                                    {m.label}
+                                </span>
+                            </button>
+                        ))}
                     </div>
-                    <button
-                        onClick={toggleTheme}
-                        className={`
-              w-12 h-7 rounded-full transition-colors flex items-center p-1
-              ${theme === "dark" ? "bg-teal-500" : "bg-slate-200"}
-            `}
-                    >
-                        <div
-                            className={`
-                w-5 h-5 bg-white rounded-full shadow-md transform transition-transform
-                ${theme === "dark" ? "translate-x-5" : "translate-x-0"}
-              `}
-                        />
-                    </button>
                 </div>
 
                 {/* Color Theme Selection */}
@@ -70,9 +74,9 @@ export const ThemePicker: React.FC = () => {
                                 key={c.id}
                                 onClick={() => setColorTheme(c.id)}
                                 className={`
-                  relative h-10 rounded-full flex items-center justify-center transition-transform hover:scale-110
-                  ${colorTheme === c.id ? "ring-2 ring-offset-2 ring-slate-300 dark:ring-slate-600 scale-110" : ""}
-                `}
+                                    relative h-10 rounded-full flex items-center justify-center transition-transform hover:scale-110
+                                    ${colorTheme === c.id ? "ring-2 ring-offset-2 ring-slate-300 dark:ring-slate-600 scale-110" : ""}
+                                `}
                                 style={{ backgroundColor: c.color }}
                                 title={c.label}
                             >
