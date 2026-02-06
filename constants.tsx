@@ -49,6 +49,51 @@ export const MOCK_MENTORS: Mentor[] = [
     avatar:
       "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop",
   },
+  {
+    id: "m4",
+    name: "Dr. Priya Menon",
+    experience: "18+ Years Exp",
+    rating: 4.9,
+    specialty: ["Addiction Psychiatry", "Cognitive Behavioral Therapy"],
+    avatar:
+      "https://images.unsplash.com/photo-1594824476967-48c8b964273f?q=80&w=200&auto=format&fit=crop",
+  },
+  {
+    id: "m5",
+    name: "Dr. Rajesh Kumar",
+    experience: "22+ Years Exp",
+    rating: 4.7,
+    specialty: ["Family Therapy", "Relationship Counseling"],
+    avatar:
+      "https://images.unsplash.com/photo-1537368910025-700350fe46c7?q=80&w=200&auto=format&fit=crop",
+  },
+  {
+    id: "m6",
+    name: "Dr. Neha Sharma",
+    experience: "15+ Years Exp",
+    rating: 4.8,
+    specialty: ["Trauma Specialist", "PTSD Treatment"],
+    avatar:
+      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop",
+  },
+  {
+    id: "m7",
+    name: "Dr. Vikram Singh",
+    experience: "28+ Years Exp",
+    rating: 5.0,
+    specialty: ["Clinical Psychology", "Behavioral Addiction"],
+    avatar:
+      "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?q=80&w=200&auto=format&fit=crop",
+  },
+  {
+    id: "m8",
+    name: "Dr. Aisha Patel",
+    experience: "12+ Years Exp",
+    rating: 4.9,
+    specialty: ["Relapse Prevention", "Mindfulness Therapy"],
+    avatar:
+      "https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=200&auto=format&fit=crop",
+  },
 ];
 
 export const FOOD_TIPS: FoodTip[] = [

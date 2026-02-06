@@ -4,6 +4,8 @@ import { GoogleGenAI } from "@google/genai";
 export const generateChatResponse = async (
   prompt: string,
   customInstruction?: string,
+  userStreak?: number,
+  userPoints?: number
 ) => {
   try {
     const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
@@ -93,11 +95,46 @@ export const generateChatResponse = async (
         
         Remember: You're a supportive companion, not a medical encyclopedia. Keep it brief, kind, and helpful.`;
 
+    // Add personalized context if user data is available
+    let personalizedInstruction = customInstruction || defaultInstruction;
+
+    if (userStreak !== undefined || userPoints !== undefined) {
+      const recoveryStage = userStreak === undefined ? 'new' :
+        userStreak < 30 ? 'early' :
+          userStreak < 180 ? 'mid-term' : 'long-term';
+
+      const personalContext = `\n\nUSER CONTEXT:
+- Current recovery streak: ${userStreak || 0} days
+- Points earned: ${userPoints || 0}
+- Recovery stage: ${recoveryStage}
+
+PERSONALIZATION GUIDELINES:
+${recoveryStage === 'new' || recoveryStage === 'early' ? `
+- They're in the crucial early phase - be extra supportive and encouraging
+- Acknowledge how challenging the first weeks are
+- Celebrate every day as a victory
+- Remind them cravings will get easier with time` : ''}
+${recoveryStage === 'mid-term' ? `
+- They've built solid momentum - acknowledge their consistency
+- Encourage them to stay vigilant against complacency
+- Remind them of how far they've come
+- Support them through PAWS symptoms if mentioned` : ''}
+${recoveryStage === 'long-term' ? `
+- Celebrate their incredible achievement of ${userStreak}+ days
+- They're an inspiration - acknowledge their strength
+- Help them give back by sharing wisdom with newcomers  
+- Remind them recovery is ongoing, stay humble` : ''}
+
+Always reference their streak when appropriate to show you're paying attention and celebrating their journey.`;
+
+      personalizedInstruction = (customInstruction || defaultInstruction) + personalContext;
+    }
+
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: prompt,
       config: {
-        systemInstruction: customInstruction || defaultInstruction,
+        systemInstruction: personalizedInstruction,
       },
     });
 

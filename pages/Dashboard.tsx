@@ -28,7 +28,8 @@ const Dashboard: React.FC = () => {
   const { user, loading, isNewUser } = useUser();
   const navigate = useNavigate();
 
-  const data = [
+  // Mock data - in a real app this would come from the database
+  const mockData = [
     { day: "Mon", cravings: 4 },
     { day: "Tue", cravings: 3 },
     { day: "Wed", cravings: 5 },
@@ -37,6 +38,8 @@ const Dashboard: React.FC = () => {
     { day: "Sat", cravings: 2 },
     { day: "Sun", cravings: 0 },
   ];
+
+  const data = isNewUser ? [] : mockData;
 
   const StatCard = ({ icon: Icon, label, value, color }: any) => (
     <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center space-x-4">
@@ -140,53 +143,71 @@ const Dashboard: React.FC = () => {
             </select>
           </div>
           <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data}>
-                <defs>
-                  <linearGradient
-                    id="colorCravings"
-                    x1="0"
-                    y1="0"
-                    x2="0"
-                    y2="1"
-                  >
-                    <stop offset="5%" stopColor="#0d9488" stopOpacity={0.1} />
-                    <stop offset="95%" stopColor="#0d9488" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  vertical={false}
-                  stroke="#f1f5f9"
-                />
-                <XAxis
-                  dataKey="day"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "#64748b", fontSize: 12 }}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "#64748b", fontSize: 12 }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: "12px",
-                    border: "none",
-                    boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="cravings"
-                  stroke="#0d9488"
-                  strokeWidth={3}
-                  fillOpacity={1}
-                  fill="url(#colorCravings)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+            {data.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={data}>
+                  <defs>
+                    <linearGradient
+                      id="colorCravings"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop offset="5%" stopColor="#0d9488" stopOpacity={0.1} />
+                      <stop offset="95%" stopColor="#0d9488" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="#f1f5f9"
+                  />
+                  <XAxis
+                    dataKey="day"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#64748b", fontSize: 12 }}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#64748b", fontSize: 12 }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: "12px",
+                      border: "none",
+                      boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="cravings"
+                    stroke="#0d9488"
+                    strokeWidth={3}
+                    fillOpacity={1}
+                    fill="url(#colorCravings)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center text-center p-4">
+                <Brain size={40} className="text-slate-200 mb-3" />
+                <h3 className="text-base font-bold text-slate-600 mb-1">
+                  No Cravings Logged Yet
+                </h3>
+                <p className="text-xs text-slate-400 max-w-[200px] mb-3">
+                  Great job! Tracking urges helps you understand your triggers.
+                </p>
+                <button
+                  onClick={() => console.log('Log craving')}
+                  className="text-xs font-bold text-teal-600 bg-teal-50 px-4 py-2 rounded-lg hover:bg-teal-100 transition-colors"
+                >
+                  Log First Craving
+                </button>
+              </div>
+            )}
           </div>
         </div>
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense, lazy } from "react";
 import { Routes, Route, Link, Navigate, useLocation } from "react-router-dom";
 import {
   Home,
@@ -19,18 +19,21 @@ import {
   Sun,
 } from "lucide-react";
 import { useTheme } from "./context/ThemeContext";
-import Landing from "./pages/Landing";
-import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
-import Counseling from "./pages/Counseling";
-import Health from "./pages/Health";
-import Motivation from "./pages/Motivation";
-import Medical from "./pages/Medical";
-import Chatbot from "./pages/Chatbot";
-import Profile from "./pages/Profile";
-import Exercise from "./pages/Exercise";
-import AdminDashboard from "./pages/AdminDashboard";
-import CheckAdmin from "./pages/CheckAdmin";
+
+// Lazy load pages for performance
+const Landing = lazy(() => import("./pages/Landing"));
+const Auth = lazy(() => import("./pages/Auth"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Counseling = lazy(() => import("./pages/Counseling"));
+const Health = lazy(() => import("./pages/Health"));
+const Motivation = lazy(() => import("./pages/Motivation"));
+const Medical = lazy(() => import("./pages/Medical"));
+const Chatbot = lazy(() => import("./pages/Chatbot"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Exercise = lazy(() => import("./pages/Exercise"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const CheckAdmin = lazy(() => import("./pages/CheckAdmin"));
+
 import { UserRole } from "./types";
 import { authService } from "./services/supabaseClient";
 import { UserProvider, useUser } from "./context/UserContext";
@@ -151,11 +154,10 @@ const App: React.FC = () => {
         <Link
           to={to}
           onClick={() => setIsSidebarOpen(false)}
-          className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 ${
-            isActive
-              ? "bg-purple-700 text-white shadow-lg"
-              : "text-purple-100 hover:bg-purple-800 hover:text-white"
-          }`}
+          className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 ${isActive
+            ? "bg-purple-700 text-white shadow-lg"
+            : "text-purple-100 hover:bg-purple-800 hover:text-white"
+            }`}
         >
           <Icon size={20} />
           <span className="font-medium">{label}</span>
@@ -167,11 +169,10 @@ const App: React.FC = () => {
       <Link
         to={to}
         onClick={() => setIsSidebarOpen(false)}
-        className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 ${
-          isActive
-            ? "bg-teal-600 text-white shadow-lg"
-            : "text-slate-600 hover:bg-teal-50 hover:text-teal-700"
-        }`}
+        className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 ${isActive
+          ? "bg-teal-600 text-white shadow-lg"
+          : "text-slate-600 hover:bg-teal-50 hover:text-teal-700"
+          }`}
       >
         <Icon size={20} />
         <span className="font-medium">{label}</span>
@@ -322,11 +323,10 @@ const App: React.FC = () => {
                 {/* Theme Toggle */}
                 <button
                   onClick={toggleTheme}
-                  className={`flex items-center space-x-3 p-3 w-full rounded-lg mb-2 ${
-                    isAdmin
-                      ? "text-purple-100 hover:bg-purple-800"
-                      : "text-slate-600 hover:bg-teal-50 hover:text-teal-700"
-                  } transition-colors`}
+                  className={`flex items-center space-x-3 p-3 w-full rounded-lg mb-2 ${isAdmin
+                    ? "text-purple-100 hover:bg-purple-800"
+                    : "text-slate-600 hover:bg-teal-50 hover:text-teal-700"
+                    } transition-colors`}
                 >
                   {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
                   <span className="font-medium">
@@ -336,11 +336,10 @@ const App: React.FC = () => {
 
                 <button
                   onClick={handleLogout}
-                  className={`flex items-center space-x-3 p-3 w-full rounded-lg ${
-                    isAdmin
-                      ? "text-rose-300 hover:bg-purple-800 hover:text-rose-200"
-                      : "text-rose-600 hover:bg-rose-50"
-                  } transition-colors`}
+                  className={`flex items-center space-x-3 p-3 w-full rounded-lg ${isAdmin
+                    ? "text-rose-300 hover:bg-purple-800 hover:text-rose-200"
+                    : "text-rose-600 hover:bg-rose-50"
+                    } transition-colors`}
                 >
                   <LogOut size={20} />
                   <span className="font-medium">Logout</span>
@@ -355,87 +354,93 @@ const App: React.FC = () => {
           className={`flex-1 overflow-y-auto ${isAuthenticated ? "pt-16 md:pt-0" : ""}`}
         >
           <div className="max-w-6xl mx-auto p-4 md:p-8">
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  !isAuthenticated ? <Landing /> : <Navigate to="/dashboard" />
-                }
-              />
-              <Route
-                path="/auth"
-                element={
-                  !isAuthenticated ? (
-                    <Auth onLogin={handleLogin} />
-                  ) : (
-                    <Navigate to="/dashboard" />
-                  )
-                }
-              />
-
-              {/* Debug route - accessible when logged in */}
-              <Route
-                path="/check-admin"
-                element={
-                  isAuthenticated ? <CheckAdmin /> : <Navigate to="/auth" />
-                }
-              />
-
-              <Route
-                path="/dashboard"
-                element={
-                  isAuthenticated ? (
-                    isAdmin ? (
-                      <AdminDashboard />
+            <Suspense fallback={
+              <div className="flex items-center justify-center min-h-[50vh]">
+                <Loader2 className="animate-spin text-teal-600" size={48} />
+              </div>
+            }>
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    !isAuthenticated ? <Landing /> : <Navigate to="/dashboard" />
+                  }
+                />
+                <Route
+                  path="/auth"
+                  element={
+                    !isAuthenticated ? (
+                      <Auth onLogin={handleLogin} />
                     ) : (
-                      <Dashboard />
+                      <Navigate to="/dashboard" />
                     )
-                  ) : (
-                    <Navigate to="/auth" />
-                  )
-                }
-              />
-              <Route
-                path="/counseling"
-                element={
-                  isAuthenticated ? <Counseling /> : <Navigate to="/auth" />
-                }
-              />
-              <Route
-                path="/health"
-                element={isAuthenticated ? <Health /> : <Navigate to="/auth" />}
-              />
-              <Route
-                path="/exercise"
-                element={
-                  isAuthenticated ? <Exercise /> : <Navigate to="/auth" />
-                }
-              />
-              <Route
-                path="/motivation"
-                element={
-                  isAuthenticated ? <Motivation /> : <Navigate to="/auth" />
-                }
-              />
-              <Route
-                path="/medical"
-                element={
-                  isAuthenticated ? <Medical /> : <Navigate to="/auth" />
-                }
-              />
-              <Route
-                path="/chat"
-                element={
-                  isAuthenticated ? <Chatbot /> : <Navigate to="/auth" />
-                }
-              />
-              <Route
-                path="/profile"
-                element={
-                  isAuthenticated ? <Profile /> : <Navigate to="/auth" />
-                }
-              />
-            </Routes>
+                  }
+                />
+
+                {/* Debug route - accessible when logged in */}
+                <Route
+                  path="/check-admin"
+                  element={
+                    isAuthenticated ? <CheckAdmin /> : <Navigate to="/auth" />
+                  }
+                />
+
+                <Route
+                  path="/dashboard"
+                  element={
+                    isAuthenticated ? (
+                      isAdmin ? (
+                        <AdminDashboard />
+                      ) : (
+                        <Dashboard />
+                      )
+                    ) : (
+                      <Navigate to="/auth" />
+                    )
+                  }
+                />
+                <Route
+                  path="/counseling"
+                  element={
+                    isAuthenticated ? <Counseling /> : <Navigate to="/auth" />
+                  }
+                />
+                <Route
+                  path="/health"
+                  element={isAuthenticated ? <Health /> : <Navigate to="/auth" />}
+                />
+                <Route
+                  path="/exercise"
+                  element={
+                    isAuthenticated ? <Exercise /> : <Navigate to="/auth" />
+                  }
+                />
+                <Route
+                  path="/motivation"
+                  element={
+                    isAuthenticated ? <Motivation /> : <Navigate to="/auth" />
+                  }
+                />
+                <Route
+                  path="/medical"
+                  element={
+                    isAuthenticated ? <Medical /> : <Navigate to="/auth" />
+                  }
+                />
+                <Route
+                  path="/chat"
+                  element={
+                    isAuthenticated ? <Chatbot /> : <Navigate to="/auth" />
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    isAuthenticated ? <Profile /> : <Navigate to="/auth" />
+                  }
+                />
+              </Routes>
+            </Suspense>
           </div>
         </main>
       </div>

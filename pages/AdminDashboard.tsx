@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
 import { supabase } from "../services/supabaseClient";
 import {
   Users,
@@ -61,6 +62,7 @@ interface RecentUser {
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRole, setFilterRole] = useState("ALL");
@@ -120,9 +122,9 @@ const AdminDashboard: React.FC = () => {
         const averageStreak =
           regularUsers.length > 0
             ? Math.round(
-                regularUsers.reduce((sum, u) => sum + (u.streak || 0), 0) /
-                  regularUsers.length,
-              )
+              regularUsers.reduce((sum, u) => sum + (u.streak || 0), 0) /
+              regularUsers.length,
+            )
             : 0;
 
         const totalPoints = users.reduce((sum, u) => sum + (u.points || 0), 0);
@@ -211,22 +213,38 @@ const AdminDashboard: React.FC = () => {
   }: any) => (
     <div
       onClick={() => setSelectedStat(statId)}
-      className={`${bgColor} p-6 rounded-2xl border border-slate-200 shadow-lg hover:shadow-2xl transition-all duration-200 cursor-pointer hover:scale-105`}
+      className={`${theme === "dark"
+          ? "bg-slate-800 border-slate-700 hover:border-slate-600"
+          : `${bgColor || "bg-white"} border-slate-100`
+        } p-6 rounded-2xl border shadow-lg hover:shadow-2xl transition-all duration-200 cursor-pointer hover:scale-105`}
     >
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-sm font-semibold text-slate-600 mb-1">{label}</p>
-          <p className={`text-4xl font-bold ${color} mb-1`}>
+          <p
+            className={`text-sm font-semibold ${theme === "dark" ? "text-slate-400" : "text-slate-600"
+              } mb-1`}
+          >
+            {label}
+          </p>
+          <p className={`text-4xl font-bold ${color} mb-2`}>
             {value.toLocaleString()}
           </p>
-          {subtitle && <p className="text-xs text-slate-500">{subtitle}</p>}
-          <p className="text-xs text-slate-400 mt-2 flex items-center">
+          {subtitle && (
+            <p
+              className={`text-xs ${theme === "dark" ? "text-slate-500" : "text-slate-500"
+                }`}
+            >
+              {subtitle}
+            </p>
+          )}
+          <p className="text-xs text-slate-400 mt-3 flex items-center font-medium">
             <BarChart3 size={14} className="mr-1" />
             Click for details
           </p>
         </div>
         <div
-          className={`p-4 rounded-xl ${color} bg-opacity-20 backdrop-blur-sm`}
+          className={`p-4 rounded-xl ${color} ${theme === "dark" ? "bg-opacity-20" : "bg-opacity-10"
+            } backdrop-blur-sm`}
         >
           <Icon size={28} strokeWidth={2.5} />
         </div>
@@ -349,7 +367,7 @@ const AdminDashboard: React.FC = () => {
                   allUsers
                     .filter((u) => u.role === "RECOVERING_USER")
                     .reduce((sum, u) => sum + u.streak, 0) /
-                    Math.max(stats.recoveringUsers, 1),
+                  Math.max(stats.recoveringUsers, 1),
                 ),
                 icon: Activity,
               },
@@ -573,13 +591,12 @@ const AdminDashboard: React.FC = () => {
                           </td>
                           <td className="py-3 px-4">
                             <span
-                              className={`px-2 py-1 rounded-full text-xs font-bold ${
-                                user.role === "ADMIN"
-                                  ? "bg-rose-100 text-rose-700"
-                                  : user.role === "RECOVERED_MENTOR"
-                                    ? "bg-amber-100 text-amber-700"
-                                    : "bg-teal-100 text-teal-700"
-                              }`}
+                              className={`px-2 py-1 rounded-full text-xs font-bold ${user.role === "ADMIN"
+                                ? "bg-rose-100 text-rose-700"
+                                : user.role === "RECOVERED_MENTOR"
+                                  ? "bg-amber-100 text-amber-700"
+                                  : "bg-teal-100 text-teal-700"
+                                }`}
                             >
                               {user.role === "ADMIN"
                                 ? "👑"
@@ -631,8 +648,8 @@ const AdminDashboard: React.FC = () => {
                   <p className="text-3xl font-bold">
                     {stats.totalUsers > 0
                       ? Math.round(
-                          (stats.newUsersThisWeek / stats.totalUsers) * 100,
-                        )
+                        (stats.newUsersThisWeek / stats.totalUsers) * 100,
+                      )
                       : 0}
                     %
                   </p>
@@ -1067,13 +1084,12 @@ const AdminDashboard: React.FC = () => {
                   </td>
                   <td className="py-4 px-6">
                     <span
-                      className={`px-3 py-1.5 rounded-full text-xs font-bold ${
-                        user.role === "ADMIN"
-                          ? "bg-rose-100 text-rose-700 border border-rose-200"
-                          : user.role === "RECOVERED_MENTOR"
-                            ? "bg-amber-100 text-amber-700 border border-amber-200"
-                            : "bg-teal-100 text-teal-700 border border-teal-200"
-                      }`}
+                      className={`px-3 py-1.5 rounded-full text-xs font-bold ${user.role === "ADMIN"
+                        ? "bg-rose-100 text-rose-700 border border-rose-200"
+                        : user.role === "RECOVERED_MENTOR"
+                          ? "bg-amber-100 text-amber-700 border border-amber-200"
+                          : "bg-teal-100 text-teal-700 border border-teal-200"
+                        }`}
                     >
                       {user.role === "ADMIN"
                         ? "👑 Admin"

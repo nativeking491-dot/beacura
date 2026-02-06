@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { supabase } from "../services/supabaseClient";
 import { useUser } from "../context/UserContext";
 import {
   Settings,
@@ -14,6 +15,37 @@ import {
 
 const Profile: React.FC = () => {
   const { user, loading } = useUser();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedName, setEditedName] = useState(user?.name || "");
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Update local state when user loads
+  React.useEffect(() => {
+    if (user?.name) setEditedName(user.name);
+  }, [user]);
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from("users")
+        .update({ name: editedName })
+        .eq("id", user.id);
+
+      if (error) throw error;
+
+      alert("✅ Profile updated successfully!");
+      setIsEditing(false);
+      // Ideally refresh user context or just rely on local state update if simple
+      window.location.reload(); // Simple reload to fetch fresh data
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("❌ Failed to update profile");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -71,10 +103,23 @@ const Profile: React.FC = () => {
             </button>
           </div>
           <div className="text-center md:text-left flex-1">
-            <h1 className="text-3xl font-extrabold text-slate-900 mb-1">
-              {userName}
-            </h1>
-            <div className="flex flex-wrap justify-center md:justify-start gap-4 text-slate-500 text-sm">
+            <div className="flex items-center gap-4">
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={editedName}
+                  onChange={(e) => setEditedName(e.target.value)}
+                  className="text-3xl font-extrabold text-slate-900 bg-slate-50 border-2 border-teal-500 rounded-lg px-4 py-1 focus:outline-none w-full md:w-auto"
+                  autoFocus
+                />
+              ) : (
+                <h1 className="text-3xl font-extrabold text-slate-900 mb-1">
+                  {userName}
+                </h1>
+              )}
+            </div>
+
+            <div className="flex flex-wrap justify-center md:justify-start gap-4 text-slate-500 text-sm mt-2">
               <span className="flex items-center">
                 <Mail size={14} className="mr-1" /> {userEmail}
               </span>
@@ -83,15 +128,41 @@ const Profile: React.FC = () => {
                 {joinDate.toLocaleDateString()}
               </span>
             </div>
-            <div className="mt-6 flex flex-wrap justify-center md:justify-start gap-3">
+            <div className="mt-6 flex flex-wrap justify-center md:justify-start gap-3 items-center">
               <span className="bg-teal-50 text-teal-700 px-4 py-1.5 rounded-full text-xs font-bold border border-teal-100">
                 {userRole === "RECOVERED_MENTOR"
                   ? "Recovered Mentor"
                   : "Recovering User"}
               </span>
-              <span className="bg-amber-50 text-amber-700 px-4 py-1.5 rounded-full text-xs font-bold border border-amber-100 flex items-center">
-                <ShieldCheck size={12} className="mr-1" /> Verified Member
-              </span>
+
+              {isEditing ? (
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleSaveProfile}
+                    disabled={isSaving}
+                    className="bg-teal-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-teal-700 transition-colors disabled:opacity-50"
+                  >
+                    {isSaving ? "Saving..." : "Save Changes"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsEditing(false);
+                      setEditedName(user?.name || "");
+                    }}
+                    disabled={isSaving}
+                    className="bg-slate-200 text-slate-700 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-300 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="flex items-center gap-1 bg-slate-100 text-slate-600 px-4 py-1.5 rounded-full text-xs font-bold hover:bg-slate-200 transition-colors"
+                >
+                  <Edit2 size={12} /> Edit Profile
+                </button>
+              )}
             </div>
           </div>
           <button className="bg-slate-50 text-slate-600 p-3 rounded-2xl hover:bg-slate-100 transition-colors">
