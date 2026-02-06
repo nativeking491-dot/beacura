@@ -11,6 +11,11 @@ export const ThemePicker: React.FC = () => {
         { id: "violet", label: "Royal Violet", color: "#8b5cf6" },
         { id: "rose", label: "Energy Rose", color: "#f43f5e" },
         { id: "orange", label: "Warm Sunset", color: "#f97316" },
+        { id: "emerald", label: "Zen Emerald", color: "#10b981" },
+        { id: "indigo", label: "Deep Indigo", color: "#6366f1" },
+        { id: "amber", label: "Bright Amber", color: "#f59e0b" },
+        { id: "fuchsia", label: "Vivid Fuchsia", color: "#d946ef" },
+        { id: "cyan", label: "Cool Cyan", color: "#06b6d4" },
     ];
 
     return (
