@@ -23,10 +23,14 @@ import { generateChatResponse } from "../services/geminiService";
 const Health: React.FC = () => {
   // Get current day of week (0-6)
   const todayIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1; // Map Sun-Sat to Mon-Sun
+
   const [activeDayIdx, setActiveDayIdx] = useState(todayIdx);
   const [glasses, setGlasses] = useState(4);
   const [isGeneratingSnack, setIsGeneratingSnack] = useState(false);
   const [aiSnack, setAiSnack] = useState<string | null>(null);
+
+  const [showFullDetails, setShowFullDetails] = useState(false);
+  const [hoveredMeal, setHoveredMeal] = useState<{ type: string; content: string } | null>(null);
 
   const currentPlan = WEEKLY_MEAL_PLAN[activeDayIdx];
 
@@ -46,8 +50,62 @@ const Health: React.FC = () => {
     setIsGeneratingSnack(false);
   };
 
+  const handleAccountAction = (action: string) => {
+    alert(`✅ ${action} functionality triggered (Simulated)`);
+  };
+
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-left-4 duration-500 pb-20">
+    <div className="space-y-8 animate-in fade-in slide-in-from-left-4 duration-500 pb-20 relative">
+      {/* Meal Detail Popup Overlay */}
+      {hoveredMeal && (
+        <div className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center">
+          <div className="animate-in zoom-in duration-200 bg-white/90 backdrop-blur-xl border border-slate-200 p-8 rounded-[2rem] shadow-2xl max-w-sm text-center">
+            <h3 className="text-2xl font-black text-slate-800 mb-2">{hoveredMeal.type}</h3>
+            <div className="w-16 h-1 bg-teal-500 mx-auto rounded-full mb-4"></div>
+            <p className="text-lg text-slate-600 font-medium leading-relaxed">{hoveredMeal.content}</p>
+            <div className="mt-6 flex justify-center gap-2">
+              <span className="px-3 py-1 bg-teal-50 text-teal-600 rounded-full text-xs font-bold">High Protein</span>
+              <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs font-bold">Brain Fuel</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Full Details Modal */}
+      {showFullDetails && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm"
+          onClick={() => setShowFullDetails(false)}>
+          <div className="bg-white p-8 rounded-3xl max-w-2xl w-full max-h-[80vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-3xl font-bold text-slate-800">Nutritional Breakdown</h2>
+              <button onClick={() => setShowFullDetails(false)} className="p-2 bg-slate-100 rounded-full hover:bg-slate-200">
+                <CheckCircle2 size={24} className="text-slate-500" />
+              </button>
+            </div>
+            <div className="space-y-6">
+              <div className="bg-teal-50 p-6 rounded-2xl">
+                <h3 className="font-bold text-teal-800 mb-2">Why this plan?</h3>
+                <p className="text-teal-700">{currentPlan.meals.benefit}</p>
+              </div>
+              <div className="grid gap-4">
+                <div className="p-4 border border-slate-100 rounded-xl">
+                  <h4 className="font-bold">Breakfast</h4>
+                  <p className="text-slate-500">{currentPlan.meals.breakfast}</p>
+                </div>
+                <div className="p-4 border border-slate-100 rounded-xl">
+                  <h4 className="font-bold">Lunch</h4>
+                  <p className="text-slate-500">{currentPlan.meals.lunch}</p>
+                </div>
+                <div className="p-4 border border-slate-100 rounded-xl">
+                  <h4 className="font-bold">Dinner</h4>
+                  <p className="text-slate-500">{currentPlan.meals.dinner}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Health & Diet</h1>
@@ -77,9 +135,24 @@ const Health: React.FC = () => {
               {currentPlan.meals.benefit}
             </span>
           </p>
-          <div className="flex gap-4">
-            <button className="bg-white text-teal-700 px-6 py-3 rounded-xl font-bold text-sm shadow-lg hover:scale-105 transition-transform">
+          <div className="flex flex-wrap gap-4">
+            <button
+              onClick={() => setShowFullDetails(true)}
+              className="bg-white text-teal-700 px-6 py-3 rounded-xl font-bold text-sm shadow-lg hover:scale-105 transition-transform"
+            >
               View Full Details
+            </button>
+            <button
+              onClick={() => handleAccountAction("Saved Plan")}
+              className="bg-white/20 text-white border border-white/50 px-6 py-3 rounded-xl font-bold text-sm shadow-lg hover:bg-white/30 transition-all"
+            >
+              Save Plan
+            </button>
+            <button
+              onClick={() => handleAccountAction("Exported to PDF")}
+              className="bg-white/20 text-white border border-white/50 px-6 py-3 rounded-xl font-bold text-sm shadow-lg hover:bg-white/30 transition-all"
+            >
+              Export
             </button>
           </div>
         </div>
@@ -104,11 +177,10 @@ const Health: React.FC = () => {
             {[...Array(12)].map((_, i) => (
               <div
                 key={i}
-                className={`h-16 rounded-xl transition-all border-2 ${
-                  i < glasses
-                    ? "bg-blue-500 border-blue-400 shadow-lg shadow-blue-100"
-                    : "bg-slate-50 border-slate-100"
-                }`}
+                className={`h-16 rounded-xl transition-all border-2 ${i < glasses
+                  ? "bg-blue-500 border-blue-400 shadow-lg shadow-blue-100"
+                  : "bg-slate-50 border-slate-100"
+                  }`}
               />
             ))}
           </div>
@@ -182,11 +254,10 @@ const Health: React.FC = () => {
               <button
                 key={item.day}
                 onClick={() => setActiveDayIdx(idx)}
-                className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex flex-col items-center ${
-                  activeDayIdx === idx
-                    ? "bg-white text-teal-600 shadow-md"
-                    : "text-slate-500 hover:text-slate-700"
-                }`}
+                className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex flex-col items-center ${activeDayIdx === idx
+                  ? "bg-white text-teal-600 shadow-md"
+                  : "text-slate-500 hover:text-slate-700"
+                  }`}
               >
                 <span className="text-[10px] opacity-60 uppercase">
                   {item.day.substring(0, 3)}
@@ -205,8 +276,12 @@ const Health: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:-translate-y-1 transition-transform">
-                  <div className="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mb-4">
+                <div
+                  onMouseEnter={() => setHoveredMeal({ type: "Breakfast", content: currentPlan.meals.breakfast })}
+                  onMouseLeave={() => setHoveredMeal(null)}
+                  className="cursor-pointer bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:scale-105 transition-all duration-300 relative group"
+                >
+                  <div className="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <Sun size={20} />
                   </div>
                   <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
@@ -217,8 +292,12 @@ const Health: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:-translate-y-1 transition-transform">
-                  <div className="w-10 h-10 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center mb-4">
+                <div
+                  onMouseEnter={() => setHoveredMeal({ type: "Lunch", content: currentPlan.meals.lunch })}
+                  onMouseLeave={() => setHoveredMeal(null)}
+                  className="cursor-pointer bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:scale-105 transition-all duration-300 relative group"
+                >
+                  <div className="w-10 h-10 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <Sunset size={20} />
                   </div>
                   <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
@@ -229,8 +308,12 @@ const Health: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:-translate-y-1 transition-transform">
-                  <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4">
+                <div
+                  onMouseEnter={() => setHoveredMeal({ type: "Dinner", content: currentPlan.meals.dinner })}
+                  onMouseLeave={() => setHoveredMeal(null)}
+                  className="cursor-pointer bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:scale-105 transition-all duration-300 relative group"
+                >
+                  <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <Moon size={20} />
                   </div>
                   <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">

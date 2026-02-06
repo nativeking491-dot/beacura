@@ -106,6 +106,79 @@ const Exercise: React.FC = () => {
       color: "text-teal-600",
       bg: "bg-teal-50",
     },
+    {
+      id: "ex5",
+      title: "Guided Body Scan",
+      time: "Evening",
+      duration: 300, // 5 mins
+      type: "Relaxation",
+      icon: Moon,
+      benefit: "Systematic relaxation to release trapped physical trauma and tension.",
+      difficulty: "Easy",
+      color: "text-violet-500",
+      bg: "bg-violet-50",
+    },
+    {
+      id: "ex6",
+      title: "HIIT Burst",
+      time: "Craving Spike",
+      duration: 60, // 1 min
+      type: "Intensity",
+      icon: Zap,
+      benefit: "Immediate endorphin rush to crush intense cravings instantly.",
+      difficulty: "Hard",
+      color: "text-rose-500",
+      bg: "bg-rose-50",
+      instructions: [
+        { text: "Burpees (20s)", duration: 20 },
+        { text: "Rest (10s)", duration: 10 },
+        { text: "Jumping Jacks (20s)", duration: 20 },
+        { text: "Deep Breath (10s)", duration: 10 },
+      ],
+    },
+    {
+      id: "ex7",
+      title: "Gentle Stretching",
+      time: "Afternoon",
+      duration: 600, // 10 mins
+      type: "Mobility",
+      icon: Heart,
+      benefit: "Relieves muscle aches and 'body load' effectively.",
+      difficulty: "Easy",
+      color: "text-emerald-500",
+      bg: "bg-emerald-50",
+    },
+    {
+      id: "ex8",
+      title: "5 Senses Grounding",
+      time: "Panic/Anxiety",
+      duration: 120, // 2 mins
+      type: "Mindfulness",
+      icon: Info,
+      benefit: "Stops a panic attack or dissociation loop in its tracks.",
+      difficulty: "Easy",
+      color: "text-blue-500",
+      bg: "bg-blue-50",
+      instructions: [
+        { text: "Name 5 things you see", duration: 30 },
+        { text: "Touch 4 things", duration: 30 },
+        { text: "Hear 3 sounds", duration: 30 },
+        { text: "Smell 2 things", duration: 15 },
+        { text: "Taste 1 thing", duration: 15 },
+      ],
+    },
+    {
+      id: "ex9",
+      title: "Endurance Run",
+      time: "Morning",
+      duration: 1800, // 30 mins
+      type: "Cardio",
+      icon: Wind,
+      benefit: "Rebuilds lung capacity and stamina damaged by substance use.",
+      difficulty: "Hard",
+      color: "text-orange-500",
+      bg: "bg-orange-50",
+    },
   ];
 
   useEffect(() => {

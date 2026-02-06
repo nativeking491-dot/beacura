@@ -12,6 +12,7 @@ import {
   MapPin,
   Loader2,
 } from "lucide-react";
+import { ThemePicker } from "../components/ThemePicker";
 
 const Profile: React.FC = () => {
   const { user, loading } = useUser();
@@ -178,6 +179,8 @@ const Profile: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Recovery Journey Stats */}
         <div className="md:col-span-2 space-y-8">
+          <ThemePicker />
+
           <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
             <h3 className="font-bold text-slate-900 mb-6">Recovery Journey</h3>
             <div className="grid grid-cols-2 gap-4">
