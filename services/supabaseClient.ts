@@ -44,30 +44,22 @@ export const authService = {
 
     // Sign in with email and password
     async signIn(email: string, password: string) {
-        // First check if user exists in database
-        const { data: existingUser, error: userCheckError } = await supabase
-            .from('users')
-            .select('email')
-            .eq('email', email)
-            .single();
-
-        if (userCheckError || !existingUser) {
-            throw new Error('Email not registered. Please sign up first.');
-        }
-
-        // If user exists, proceed with login
+        // Attempt to sign in directly - Supabase Auth will handle if user doesn't exist
         const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password
         });
 
         if (error) {
-            // Provide user-friendly error message
+            // Provide user-friendly error messages
             if (error.message.includes('Invalid login credentials')) {
-                throw new Error('Incorrect password. Please try again.');
+                throw new Error('Invalid email or password. Please check your credentials and try again.');
+            } else if (error.message.includes('Email not confirmed')) {
+                throw new Error('Please confirm your email address before signing in.');
             }
             throw error;
         }
+
         return data;
     },
 

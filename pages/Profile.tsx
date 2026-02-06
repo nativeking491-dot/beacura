@@ -14,12 +14,27 @@ const Profile: React.FC = () => {
     );
   }
 
-  const userName = user?.name || 'User';
-  const userEmail = user?.email || 'email@example.com';
-  const userRole = user?.role || 'RECOVERING_USER';
-  const userStreak = user?.streak || 0;
-  const userPoints = user?.points || 0;
-  const joinDate = user?.created_at ? new Date(user.created_at) : new Date();
+  // Handle case when user data is not available
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+        <p className="text-slate-500">Unable to load profile data.</p>
+        <button
+          onClick={() => window.location.href = '/auth'}
+          className="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700"
+        >
+          Return to Login
+        </button>
+      </div>
+    );
+  }
+
+  const userName = user.name || 'User';
+  const userEmail = user.email || 'email@example.com';
+  const userRole = user.role || 'RECOVERING_USER';
+  const userStreak = user.streak || 0;
+  const userPoints = user.points || 0;
+  const joinDate = user.created_at ? new Date(user.created_at) : new Date();
 
   // Default badges
   const badges = [

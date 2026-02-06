@@ -51,9 +51,15 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  const userName = user?.name || 'User';
-  const userStreak = user?.streak || 0;
-  const userPoints = user?.points || 0;
+  // Redirect to auth if no user is found after loading
+  if (!user) {
+    navigate('/auth');
+    return null;
+  }
+
+  const userName = user.name || 'User';
+  const userStreak = user.streak || 0;
+  const userPoints = user.points || 0;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">

@@ -44,10 +44,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         try {
             const session = await authService.getSession();
             console.log('Session:', session);
-            if (session?.user) {
-                console.log('Session User Metadata:', session.user.user_metadata);
-                console.log('Session User Email:', session.user.email);
-            }
 
             if (!session?.user) {
                 console.log('No session found');
@@ -56,7 +52,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
                 return;
             }
 
-            console.log(`Fetching user profile for ID: ${session.user.id} (Attempt ${retryCount + 1})`);
+            console.log(`Fetching user profile for ID: ${session.user.id}`);
 
             // Fetch user profile from database
             const { data: profile, error } = await supabase
@@ -125,12 +121,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
                 // Mark as new user if account is recent AND hasn't built any streak yet
                 const isFirstTimeUser = isRecentlyCreated && profile.streak === 0;
                 setIsNewUser(isFirstTimeUser);
-
-                console.log('User status:', {
-                    minutesSinceCreation,
-                    streak: profile.streak,
-                    isNewUser: isFirstTimeUser
-                });
             }
         } catch (error) {
             console.error('Error fetching user profile:', error);
@@ -149,7 +139,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
                         isNewUser: true // Assume new if we can't check DB (or just default)
                     };
                     setUser(fallbackUser);
-                    // For now, let's set isNewUser to true so they feel welcomed if it's broken
                     setIsNewUser(true);
                 }
             } catch (innerError) {
