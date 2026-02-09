@@ -48,12 +48,15 @@ interface ResponsePattern {
 const KNOWLEDGE_BASE: ResponsePattern[] = [
     {
         intent: "nutrition",
-        patterns: [/\b(food|eat|diet|nutrition|vitamin|supplement|sugar|hungry)\b/i],
+        patterns: [/\b(food|eat|diet|nutrition|vitamin|supplement|sugar|hungry|snack)\b/i],
         responses: [
             "Your brain is healing, and it needs fuel. Foods high in Omega-3s (like walnuts, fish) and antioxidants (berries, leafy greens) are great for checking repair.",
             "Sugar cravings are common in early recovery as your dopamine levels adjust. Try to stick to complex carbs and protein to keep your blood sugar stable.",
             "Pro-Tip: Dark chocolate (70%+) triggers a small dopamine release and is packed with antioxidants. A healthy little treat!",
-            "Eating regular meals stabilizes your mood. Have you eaten something nutritious in the last 4 hours?"
+            "Eating regular meals stabilizes your mood. Have you eaten something nutritious in the last 4 hours?",
+            "Quick recovery snack: Apple slices with almond butter. The crunch helps with stress, and the healthy fats feed your brain.",
+            "Try Greek yogurt with a handful of berries. The protein helps stabilize blood sugar, preventing mood swings.",
+            "A handful of walnuts is great for brain repair. They are high in Omega-3 fatty acids which support emotional regulation."
         ]
     },
     {

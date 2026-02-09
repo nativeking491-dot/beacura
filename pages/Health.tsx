@@ -18,9 +18,11 @@ import {
   Sparkle,
   Calendar,
 } from "lucide-react";
-import { generateChatResponse } from "../services/geminiService";
+import { useUser } from "../context/UserContext";
+import { generateLocalResponse } from "../services/localChatService";
 
 const Health: React.FC = () => {
+  const { user } = useUser();
   // Get current day of week (0-6)
   const todayIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1; // Map Sun-Sat to Mon-Sun
 
@@ -40,11 +42,11 @@ const Health: React.FC = () => {
 
   const getCustomSnack = async () => {
     setIsGeneratingSnack(true);
-    const instruction =
-      "You are a recovery nutritionist. Suggest a quick, healthy snack that specifically helps reduce drug cravings and supports brain chemistry (dopamine/serotonin). Keep it under 2 sentences.";
-    const response = await generateChatResponse(
-      "What's a good snack for a craving right now?",
-      instruction,
+    // Trigger "nutrition" intent with "snack" keyword
+    const response = await generateLocalResponse(
+      "I need a healthy recovery snack nutrition",
+      user?.streak || 0,
+      user?.name || "Friend"
     );
     setAiSnack(response);
     setIsGeneratingSnack(false);
