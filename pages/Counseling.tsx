@@ -397,7 +397,7 @@ const Counseling: React.FC = () => {
                     placeholder={
                       isTyping ? "Please wait..." : "Type a message..."
                     }
-                    className="flex-1 bg-transparent border-none outline-none text-sm px-3 py-2 disabled:opacity-50"
+                    className="flex-1 bg-transparent border-none outline-none text-sm text-slate-900 placeholder-slate-500 px-3 py-2 disabled:opacity-50"
                   />
                   <button
                     onClick={sendMessage}
@@ -549,7 +549,7 @@ const Counseling: React.FC = () => {
                         value={upiId}
                         onChange={(e) => setUpiId(e.target.value)}
                         placeholder="Enter UPI ID or Mobile Number"
-                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm font-medium"
+                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-500 outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm font-medium"
                       />
                     </div>
                     <div className="bg-slate-50 p-4 rounded-2xl flex items-center space-x-3 border border-slate-100">

@@ -198,7 +198,7 @@ export const BecomeMentorModal: React.FC<BecameMentorModalProps> = ({
                   }
                   placeholder="Share your motivation and what inspired you to help others..."
                   rows={3}
-                  className="w-full p-4 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 resize-none"
+                  className="w-full p-4 border-2 border-slate-300 rounded-lg text-slate-900 placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 resize-none"
                 />
               </div>
 
@@ -216,7 +216,7 @@ export const BecomeMentorModal: React.FC<BecameMentorModalProps> = ({
                   }
                   placeholder="Share your journey - what you struggled with, how you overcame it, lessons learned..."
                   rows={3}
-                  className="w-full p-4 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 resize-none"
+                  className="w-full p-4 border-2 border-slate-300 rounded-lg text-slate-900 placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 resize-none"
                 />
               </div>
 
@@ -229,11 +229,10 @@ export const BecomeMentorModal: React.FC<BecameMentorModalProps> = ({
                     <button
                       key={specialty}
                       onClick={() => handleToggleSpecialty(specialty)}
-                      className={`p-3 rounded-lg border-2 font-semibold text-sm transition ${
-                        formData.specialties.includes(specialty)
+                      className={`p-3 rounded-lg border-2 font-semibold text-sm transition ${formData.specialties.includes(specialty)
                           ? "border-purple-600 bg-purple-50 text-purple-700"
                           : "border-slate-300 bg-white text-slate-700 hover:border-purple-300"
-                      }`}
+                        }`}
                     >
                       {formData.specialties.includes(specialty) && (
                         <span className="mr-1">✓</span>

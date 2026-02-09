@@ -217,7 +217,7 @@ const Onboarding: React.FC = () => {
                     onChange={(e) =>
                       updateOnboarding(q.key as any, e.target.value)
                     }
-                    className="w-full p-4 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent font-medium"
+                    className="w-full p-4 border-2 border-slate-300 rounded-lg text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent font-medium"
                   >
                     <option value="">Choose an option...</option>
                     {q.options?.map((opt) => (
@@ -236,7 +236,7 @@ const Onboarding: React.FC = () => {
                     }
                     placeholder={q.placeholder}
                     rows={3}
-                    className="w-full p-4 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none font-medium"
+                    className="w-full p-4 border-2 border-slate-300 rounded-lg text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none font-medium"
                   />
                 )}
 
@@ -296,9 +296,8 @@ const Onboarding: React.FC = () => {
               {Array.from({ length: totalSteps }).map((_, i) => (
                 <div
                   key={i}
-                  className={`h-2 rounded-full transition-all ${
-                    i < step ? "w-6 bg-amber-500" : i === step - 1 ? "w-3 bg-amber-400" : "w-2 bg-slate-300"
-                  }`}
+                  className={`h-2 rounded-full transition-all ${i < step ? "w-6 bg-amber-500" : i === step - 1 ? "w-3 bg-amber-400" : "w-2 bg-slate-300"
+                    }`}
                 />
               ))}
             </div>

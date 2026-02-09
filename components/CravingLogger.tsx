@@ -109,7 +109,7 @@ export const CravingLogger: React.FC<CravingLoggerProps> = ({
                   value={trigger}
                   onChange={(e) => setTrigger(e.target.value)}
                   placeholder="e.g., stressful day, saw old friend..."
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
                 />
               </div>
 
@@ -122,7 +122,7 @@ export const CravingLogger: React.FC<CravingLoggerProps> = ({
                   onChange={(e) => setStrategy(e.target.value)}
                   placeholder="e.g., called mentor, went for run, meditated..."
                   rows={3}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent resize-none"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent resize-none"
                 />
               </div>
 
