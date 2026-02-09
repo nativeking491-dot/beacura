@@ -280,7 +280,7 @@ const Health: React.FC = () => {
               value={dailyMeals.breakfast}
               onChange={(e) => handleMealChange("breakfast", e.target.value)}
               placeholder={`e.g. ${currentPlan.meals.breakfast}`}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+              className="w-full bg-orange-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
             />
           </div>
           <div>
@@ -290,7 +290,7 @@ const Health: React.FC = () => {
               value={dailyMeals.lunch}
               onChange={(e) => handleMealChange("lunch", e.target.value)}
               placeholder={`e.g. ${currentPlan.meals.lunch}`}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+              className="w-full bg-orange-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
             />
           </div>
           <div>
@@ -300,7 +300,7 @@ const Health: React.FC = () => {
               value={dailyMeals.dinner}
               onChange={(e) => handleMealChange("dinner", e.target.value)}
               placeholder={`e.g. ${currentPlan.meals.dinner}`}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+              className="w-full bg-orange-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
             />
           </div>
         </div>

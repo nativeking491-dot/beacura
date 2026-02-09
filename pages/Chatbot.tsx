@@ -439,7 +439,7 @@ const Chatbot: React.FC = () => {
       {/* Input Area */}
       <div className="p-4 border-t bg-white">
         <div className="flex items-end space-x-2">
-          <div className="flex-1 bg-white rounded-2xl border-2 border-slate-300 p-2 focus-within:ring-2 focus-within:ring-amber-500 focus-within:border-amber-500 transition-all shadow-sm">
+          <div className="flex-1 bg-slate-50 rounded-2xl border-2 border-slate-200 p-2 focus-within:ring-2 focus-within:ring-amber-500 focus-within:border-amber-500 transition-all shadow-sm">
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -450,7 +450,7 @@ const Chatbot: React.FC = () => {
                 }
               }}
               placeholder="Share what's on your mind... (Press Enter to send)"
-              className="w-full bg-white border-none outline-none text-slate-900 placeholder-slate-400 px-3 py-2 resize-none max-h-32 font-medium"
+              className="w-full bg-slate-50 border-none outline-none text-slate-900 placeholder-slate-400 px-3 py-2 resize-none max-h-32 font-medium"
               rows={1}
               disabled={isLoading}
             />

@@ -141,7 +141,7 @@ export const FloatingChat = () => {
                     </div>
 
                     {/* Input */}
-                    <div className={`p-3 border-t ${theme === 'dark' ? 'border-slate-700 bg-slate-900' : 'border-slate-100 bg-white'}`}>
+                    <div className={`p-3 border-t ${theme === 'dark' ? 'border-slate-700 bg-slate-900' : 'border-slate-100 bg-slate-50'}`}>
                         <div className="relative flex items-center">
                             <input
                                 type="text"

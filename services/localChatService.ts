@@ -23,6 +23,7 @@ type IntentType =
     | "gratitude"
     | "farewell"
     | "halt_check"
+    | "crisis"
     | "nutrition"
     | "hydration"
     | "exercise"
@@ -178,9 +179,18 @@ const KNOWLEDGE_BASE: ResponsePattern[] = [
         intent: "relapse",
         patterns: [/\b(relapse|slipped|messed up|used again|drank|high)\b/i],
         responses: [
-            "Thank you for being honest. That takes courage. Please remember: a slip is an event, not a permanent failure. You haven't lost everything you learned.",
-            "I'm here for you, no judgment. You are still worthy of recovery. Are you safe right now?",
-            "Take a breath. Shame is not helpful right now—action is. What is the very next right thing you can do to get back to safety?"
+            "Thank you for being honest. That takes courage. Please remember: a slip is an event, not a permanent failure. We can support you through this.",
+            "I'm here for you, no judgment. You are still worthy of recovery. Are you safe right now? Just breathe.",
+            "Take a deep breath. Shame is not helpful right now—action is. What is the very next right thing you can do to get back to safety?"
+        ]
+    },
+    {
+        intent: "crisis",
+        patterns: [/\b(die|suicide|kill|end it|hurt myself)\b/i],
+        responses: [
+            "I hear that you are in pain. Please, take a deep breath. You are not alone. Support is available immediately.",
+            "Your life matters. Please reach out to a professional or call 988/911. We can get through this moment together. Just breathe.",
+            "I am concerned for your safety. Please contact emergency services or a trusted friend. You deserve support."
         ]
     },
     {
