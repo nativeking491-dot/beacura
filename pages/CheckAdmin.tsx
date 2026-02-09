@@ -58,7 +58,7 @@ const CheckAdmin: React.FC = () => {
         <div className="flex justify-between p-3 bg-slate-50 rounded">
           <span className="font-semibold">Role in Database:</span>
           <span
-            className={`font-bold ${info.profileRole === "ADMIN" ? "text-rose-600" : "text-teal-600"}`}
+            className={`font-bold ${info.profileRole === "ADMIN" ? "text-rose-600" : "text-amber-600"}`}
           >
             {info.profileRole || "NOT FOUND"}
           </span>

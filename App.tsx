@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Suspense, lazy } from "react";
-import { Routes, Route, Link, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import {
   Home,
   User,
@@ -23,6 +23,8 @@ import { useTheme } from "./context/ThemeContext";
 // Lazy load pages for performance
 const Landing = lazy(() => import("./pages/Landing"));
 const Auth = lazy(() => import("./pages/Auth"));
+import { FloatingChat } from "./components/FloatingChat";
+
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Counseling = lazy(() => import("./pages/Counseling"));
 const Health = lazy(() => import("./pages/Health"));
@@ -33,10 +35,16 @@ const Profile = lazy(() => import("./pages/Profile"));
 const Exercise = lazy(() => import("./pages/Exercise"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const CheckAdmin = lazy(() => import("./pages/CheckAdmin"));
+const ThemeSettings = lazy(() => import("./pages/ThemeSettings"));
+const LearnMore = lazy(() => import("./pages/LearnMore"));
+const Onboarding = lazy(() => import("./pages/Onboarding"));
+const MentorDashboard = lazy(() => import("./pages/MentorDashboard"));
+const DatabaseTest = lazy(() => import("./pages/DatabaseTest"));
 
 import { UserRole } from "./types";
-import { authService } from "./services/supabaseClient";
+import { authService, supabase } from "./services/supabaseClient";
 import { UserProvider, useUser } from "./context/UserContext";
+import { OnboardingProvider } from "./context/OnboardingContext";
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -89,7 +97,7 @@ const App: React.FC = () => {
     // Check database connection
     const checkConnection = async () => {
       try {
-        const { count, error } = await authService.supabase
+        const { count, error } = await supabase
           .from("users")
           .select("*", { count: "exact", head: true });
 
@@ -172,8 +180,8 @@ const App: React.FC = () => {
         to={to}
         onClick={() => setIsSidebarOpen(false)}
         className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 ${isActive
-          ? "bg-teal-600 text-white shadow-lg"
-          : "text-slate-600 hover:bg-teal-50 hover:text-teal-700"
+          ? "bg-gradient-to-r from-rose-600 to-red-600 text-white shadow-lg"
+          : "text-slate-600 hover:bg-amber-50 hover:text-amber-700"
           }`}
       >
         <Icon size={20} />
@@ -188,7 +196,7 @@ const App: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
           <Loader2
-            className="animate-spin text-teal-600 mx-auto mb-4"
+            className="animate-spin text-amber-600 mx-auto mb-4"
             size={48}
           />
           <p className="text-slate-500">Loading...</p>
@@ -198,255 +206,277 @@ const App: React.FC = () => {
   }
 
   return (
-    <UserProvider>
-      <div className="min-h-screen flex flex-col md:flex-row bg-slate-50">
-        {/* Sidebar / Navigation */}
-        {isAuthenticated && (
-          <>
-            {/* Mobile Header */}
-            <div
-              className={`md:hidden ${isAdmin ? "bg-gradient-to-r from-purple-600 to-indigo-600" : "bg-white"} border-b px-4 py-3 flex justify-between items-center fixed w-full z-50`}
-            >
+    <OnboardingProvider>
+      <UserProvider>
+        <div className="min-h-screen flex flex-col md:flex-row bg-slate-50">
+          {/* Sidebar / Navigation */}
+          {isAuthenticated && (
+            <>
+              {/* Mobile Header */}
               <div
-                className={`flex items-center space-x-2 ${isAdmin ? "text-white" : "text-teal-600"} font-bold text-xl`}
+                className={`md:hidden ${isAdmin ? "bg-gradient-to-r from-purple-600 to-indigo-600" : "bg-white"} border-b px-4 py-3 flex justify-between items-center fixed w-full z-50`}
               >
-                <Heart fill="currentColor" size={24} />
-                <span>{isAdmin ? "Beacura Admin" : "Beacura"}</span>
+                <div
+                  className={`flex items-center space-x-2 ${isAdmin ? "text-white" : "text-amber-600"} font-bold text-xl`}
+                >
+                  <Heart fill="currentColor" size={24} />
+                  <span>{isAdmin ? "Beacura Admin" : "Beacura"}</span>
+                </div>
+                <button
+                  onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                  className={isAdmin ? "text-white" : "text-slate-900"}
+                >
+                  {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+                </button>
               </div>
-              <button
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className={isAdmin ? "text-white" : "text-slate-900"}
-              >
-                {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
-              </button>
-            </div>
 
-            {/* Sidebar */}
-            <aside
-              className={`
+              {/* Sidebar */}
+              <aside
+                className={`
               fixed inset-y-0 left-0 transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
               md:relative md:translate-x-0 transition duration-200 ease-in-out z-40
               w-64 ${isAdmin ? "bg-gradient-to-b from-purple-900 to-indigo-900 text-white" : "bg-white"} border-r flex flex-col h-full shadow-sm
             `}
-            >
-              <div
-                className={`p-6 hidden md:flex items-center space-x-2 ${isAdmin ? "text-white" : "text-teal-600"} font-bold text-2xl`}
               >
-                <Heart fill="currentColor" size={28} />
-                <span>{isAdmin ? "Admin Panel" : "Beacura"}</span>
-              </div>
-
-              <nav className="flex-1 px-4 space-y-2 mt-16 md:mt-0">
-                {isAdmin ? (
-                  // Admin Navigation
-                  <>
-                    <NavItem
-                      to="/dashboard"
-                      icon={LayoutDashboard}
-                      label="Dashboard"
-                      isAdmin={isAdmin}
-                    />
-                    <NavItem
-                      to="/profile"
-                      icon={User}
-                      label="My Profile"
-                      isAdmin={isAdmin}
-                    />
-                  </>
-                ) : (
-                  // Regular User Navigation
-                  <>
-                    <NavItem
-                      to="/dashboard"
-                      icon={LayoutDashboard}
-                      label="Dashboard"
-                      isAdmin={isAdmin}
-                    />
-                    <NavItem
-                      to="/counseling"
-                      icon={MessageCircle}
-                      label="Counseling"
-                      isAdmin={isAdmin}
-                    />
-                    <NavItem
-                      to="/health"
-                      icon={Utensils}
-                      label="Health & Diet"
-                      isAdmin={isAdmin}
-                    />
-                    <NavItem
-                      to="/exercise"
-                      icon={Dumbbell}
-                      label="Exercise"
-                      isAdmin={isAdmin}
-                    />
-                    <NavItem
-                      to="/motivation"
-                      icon={Award}
-                      label="Motivation"
-                      isAdmin={isAdmin}
-                    />
-                    <NavItem
-                      to="/medical"
-                      icon={ShieldAlert}
-                      label="Medical Tips"
-                      isAdmin={isAdmin}
-                    />
-                    <NavItem
-                      to="/chat"
-                      icon={Brain}
-                      label="AI Support"
-                      isAdmin={isAdmin}
-                    />
-                    <NavItem
-                      to="/profile"
-                      icon={User}
-                      label="My Profile"
-                      isAdmin={isAdmin}
-                    />
-                  </>
-                )}
-              </nav>
-
-              <div
-                className={`p-4 ${isAdmin ? "border-t border-purple-700" : "border-t"}`}
-              >
-                {isAdmin && (
-                  <div className="mb-3 p-3 bg-purple-800 bg-opacity-50 rounded-lg">
-                    <p className="text-xs text-purple-200 font-semibold">
-                      ADMIN MODE
-                    </p>
-                    <p className="text-xs text-purple-300 mt-1">
-                      Full system access
-                    </p>
-                  </div>
-                )}
-
-                {/* Theme Toggle */}
-                <button
-                  onClick={toggleTheme}
-                  className={`flex items-center space-x-3 p-3 w-full rounded-lg mb-2 ${isAdmin
-                    ? "text-purple-100 hover:bg-purple-800"
-                    : "text-slate-600 hover:bg-teal-50 hover:text-teal-700"
-                    } transition-colors`}
+                <div
+                  className={`p-6 hidden md:flex items-center space-x-2 ${isAdmin ? "text-white" : "text-amber-600"} font-bold text-2xl`}
                 >
-                  {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
-                  <span className="font-medium">
-                    {theme === "light" ? "Dark Mode" : "Light Mode"}
-                  </span>
-                </button>
+                  <Heart fill="currentColor" size={28} />
+                  <span>{isAdmin ? "Admin Panel" : "Beacura"}</span>
+                </div>
 
-                <button
-                  onClick={handleLogout}
-                  className={`flex items-center space-x-3 p-3 w-full rounded-lg ${isAdmin
-                    ? "text-rose-300 hover:bg-purple-800 hover:text-rose-200"
-                    : "text-rose-600 hover:bg-rose-50"
-                    } transition-colors`}
+                <nav className="flex-1 px-4 space-y-2 mt-16 md:mt-0">
+                  {isAdmin ? (
+                    // Admin Navigation
+                    <>
+                      <NavItem
+                        to="/dashboard"
+                        icon={LayoutDashboard}
+                        label="Dashboard"
+                        isAdmin={isAdmin}
+                      />
+                      <NavItem
+                        to="/profile"
+                        icon={User}
+                        label="My Profile"
+                        isAdmin={isAdmin}
+                      />
+                    </>
+                  ) : (
+                    // Regular User Navigation
+                    <>
+                      <NavItem
+                        to="/dashboard"
+                        icon={LayoutDashboard}
+                        label="Dashboard"
+                        isAdmin={isAdmin}
+                      />
+                      <NavItem
+                        to="/counseling"
+                        icon={MessageCircle}
+                        label="Counseling"
+                        isAdmin={isAdmin}
+                      />
+                      <NavItem
+                        to="/health"
+                        icon={Utensils}
+                        label="Health & Diet"
+                        isAdmin={isAdmin}
+                      />
+                      <NavItem
+                        to="/exercise"
+                        icon={Dumbbell}
+                        label="Exercise"
+                        isAdmin={isAdmin}
+                      />
+                      <NavItem
+                        to="/motivation"
+                        icon={Award}
+                        label="Motivation"
+                        isAdmin={isAdmin}
+                      />
+                      <NavItem
+                        to="/medical"
+                        icon={ShieldAlert}
+                        label="Medical Tips"
+                        isAdmin={isAdmin}
+                      />
+                      <NavItem
+                        to="/chat"
+                        icon={Brain}
+                        label="AI Support"
+                        isAdmin={isAdmin}
+                      />
+                      <NavItem
+                        to="/profile"
+                        icon={User}
+                        label="My Profile"
+                        isAdmin={isAdmin}
+                      />
+                    </>
+                  )}
+                </nav>
+
+                <div
+                  className={`p-4 ${isAdmin ? "border-t border-purple-700" : "border-t"}`}
                 >
-                  <LogOut size={20} />
-                  <span className="font-medium">Logout</span>
-                </button>
-              </div>
-            </aside>
-          </>
-        )}
+                  {isAdmin && (
+                    <div className="mb-3 p-3 bg-purple-800 bg-opacity-50 rounded-lg">
+                      <p className="text-xs text-purple-200 font-semibold">
+                        ADMIN MODE
+                      </p>
+                      <p className="text-xs text-purple-300 mt-1">
+                        Full system access
+                      </p>
+                    </div>
+                  )}
 
-        {/* Main Content Area */}
-        <main
-          className={`flex-1 overflow-y-auto ${isAuthenticated ? "pt-16 md:pt-0" : ""}`}
-        >
-          <div className="max-w-6xl mx-auto p-4 md:p-8">
-            <Suspense fallback={
-              <div className="flex items-center justify-center min-h-[50vh]">
-                <Loader2 className="animate-spin text-teal-600" size={48} />
-              </div>
-            }>
-              <Routes>
-                <Route
-                  path="/"
-                  element={
-                    !isAuthenticated ? <Landing /> : <Navigate to="/dashboard" />
-                  }
-                />
-                <Route
-                  path="/auth"
-                  element={
-                    !isAuthenticated ? (
-                      <Auth onLogin={handleLogin} />
-                    ) : (
-                      <Navigate to="/dashboard" />
-                    )
-                  }
-                />
+                  {/* Change Theme Navigation */}
+                  <NavItem
+                    to="/theme-settings"
+                    icon={Moon}
+                    label="Change Theme"
+                    isAdmin={isAdmin}
+                  />
 
-                {/* Debug route - accessible when logged in */}
-                <Route
-                  path="/check-admin"
-                  element={
-                    isAuthenticated ? <CheckAdmin /> : <Navigate to="/auth" />
-                  }
-                />
+                  <button
+                    onClick={handleLogout}
+                    className={`flex items-center space-x-3 p-3 w-full rounded-lg ${isAdmin
+                      ? "text-rose-300 hover:bg-purple-800 hover:text-rose-200"
+                      : "text-rose-600 hover:bg-rose-50"
+                      } transition-colors`}
+                  >
+                    <LogOut size={20} />
+                    <span className="font-medium">Logout</span>
+                  </button>
+                </div>
+              </aside>
+            </>
+          )}
 
-                <Route
-                  path="/dashboard"
-                  element={
-                    isAuthenticated ? (
-                      isAdmin ? (
-                        <AdminDashboard />
+          {/* Main Content Area */}
+          <main
+            className={`flex-1 overflow-y-auto ${isAuthenticated ? "pt-16 md:pt-0" : ""}`}
+          >
+            <div className="max-w-6xl mx-auto p-4 md:p-8">
+              <Suspense fallback={
+                <div className="flex items-center justify-center min-h-[50vh]">
+                  <Loader2 className="animate-spin text-amber-600" size={48} />
+                </div>
+              }>
+                <Routes>
+                  <Route
+                    path="/"
+                    element={
+                      !isAuthenticated ? <Landing /> : <Navigate to="/dashboard" />
+                    }
+                  />
+                  <Route
+                    path="/auth"
+                    element={
+                      !isAuthenticated ? (
+                        <Auth onLogin={handleLogin} />
                       ) : (
-                        <Dashboard />
+                        <Navigate to="/dashboard" />
                       )
-                    ) : (
-                      <Navigate to="/auth" />
-                    )
-                  }
-                />
-                <Route
-                  path="/counseling"
-                  element={
-                    isAuthenticated ? <Counseling /> : <Navigate to="/auth" />
-                  }
-                />
-                <Route
-                  path="/health"
-                  element={isAuthenticated ? <Health /> : <Navigate to="/auth" />}
-                />
-                <Route
-                  path="/exercise"
-                  element={
-                    isAuthenticated ? <Exercise /> : <Navigate to="/auth" />
-                  }
-                />
-                <Route
-                  path="/motivation"
-                  element={
-                    isAuthenticated ? <Motivation /> : <Navigate to="/auth" />
-                  }
-                />
-                <Route
-                  path="/medical"
-                  element={
-                    isAuthenticated ? <Medical /> : <Navigate to="/auth" />
-                  }
-                />
-                <Route
-                  path="/chat"
-                  element={
-                    isAuthenticated ? <Chatbot /> : <Navigate to="/auth" />
-                  }
-                />
-                <Route
-                  path="/profile"
-                  element={
-                    isAuthenticated ? <Profile /> : <Navigate to="/auth" />
-                  }
-                />
-              </Routes>
-            </Suspense>
-          </div>
-        </main>
-      </div>
-    </UserProvider>
+                    }
+                  />
+                  <Route
+                    path="/learn-more"
+                    element={<LearnMore />}
+                  />
+                  <Route
+                    path="/onboarding"
+                    element={
+                      isAuthenticated ? <Onboarding /> : <Navigate to="/auth" />
+                    }
+                  />
+                  <Route
+                    path="/mentor-dashboard"
+                    element={
+                      isAuthenticated ? <MentorDashboard /> : <Navigate to="/auth" />
+                    }
+                  />
+
+                  {/* Debug route - accessible when logged in */}
+                  <Route
+                    path="/check-admin"
+                    element={
+                      isAuthenticated ? <CheckAdmin /> : <Navigate to="/auth" />
+                    }
+                  />
+
+                  {/* Database connectivity test - accessible without login */}
+                  <Route path="/db-test" element={<DatabaseTest />} />
+
+                  <Route
+                    path="/dashboard"
+                    element={
+                      isAuthenticated ? (
+                        isAdmin ? (
+                          <AdminDashboard />
+                        ) : (
+                          <Dashboard />
+                        )
+                      ) : (
+                        <Navigate to="/auth" />
+                      )
+                    }
+                  />
+                  <Route
+                    path="/counseling"
+                    element={
+                      isAuthenticated ? <Counseling /> : <Navigate to="/auth" />
+                    }
+                  />
+                  <Route
+                    path="/health"
+                    element={isAuthenticated ? <Health /> : <Navigate to="/auth" />}
+                  />
+                  <Route
+                    path="/exercise"
+                    element={
+                      isAuthenticated ? <Exercise /> : <Navigate to="/auth" />
+                    }
+                  />
+                  <Route
+                    path="/motivation"
+                    element={
+                      isAuthenticated ? <Motivation /> : <Navigate to="/auth" />
+                    }
+                  />
+                  <Route
+                    path="/medical"
+                    element={
+                      isAuthenticated ? <Medical /> : <Navigate to="/auth" />
+                    }
+                  />
+                  <Route
+                    path="/chat"
+                    element={
+                      isAuthenticated ? <Chatbot /> : <Navigate to="/auth" />
+                    }
+                  />
+                  <Route
+                    path="/profile"
+                    element={
+                      isAuthenticated ? <Profile /> : <Navigate to="/auth" />
+                    }
+                  />
+                  <Route
+                    path="/theme-settings"
+                    element={
+                      isAuthenticated ? <ThemeSettings /> : <Navigate to="/auth" />
+                    }
+                  />
+                </Routes>
+              </Suspense>
+            </div>
+          </main>
+        </div>
+      </UserProvider>
+      {isAuthenticated && <FloatingChat />}
+    </OnboardingProvider>
   );
 };
 

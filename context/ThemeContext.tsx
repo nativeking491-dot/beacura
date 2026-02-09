@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 type ThemeMode = "light" | "dark" | "grey" | "midnight" | "sepia";
-export type ColorTheme = "teal" | "blue" | "violet" | "rose" | "orange" | "emerald" | "indigo" | "amber" | "fuchsia" | "cyan";
+export type ColorTheme = "hope" | "bloom" | "renewal" | "harmony" | "sunrise" | "teal" | "blue" | "violet" | "rose" | "orange" | "emerald" | "indigo" | "amber" | "fuchsia" | "cyan";
 
 interface ThemeContextType {
   theme: ThemeMode;
@@ -14,6 +14,37 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 // Color definitions for themes
 const THEMES: Record<ColorTheme, Record<string, string>> = {
+  // Recovery-focused themes designed for happiness and hope
+  hope: {
+    // Gold, warm orange - represents sunrise, new beginnings, warmth
+    "50": "#fffaf0", "100": "#fef3e2", "200": "#fee5c3", "300": "#fdd8a8",
+    "400": "#fbba6d", "500": "#f59e0b", "600": "#d97706", "700": "#b45309",
+    "800": "#92400e", "900": "#78350f", "950": "#451a03",
+  },
+  bloom: {
+    // Coral, pink, rose - represents compassion, warmth, growth
+    "50": "#fff1f2", "100": "#ffe4e6", "200": "#fecdd3", "300": "#fda4af",
+    "400": "#fb7185", "500": "#f43f5e", "600": "#e11d48", "700": "#be123c",
+    "800": "#9f1239", "900": "#881337", "950": "#500724",
+  },
+  renewal: {
+    // Vibrant emerald green - represents growth, healing, new life
+    "50": "#ecfdf5", "100": "#d1fae5", "200": "#a7f3d0", "300": "#6ee7b7",
+    "400": "#34d399", "500": "#10b981", "600": "#059669", "700": "#047857",
+    "800": "#065f46", "900": "#064e3b", "950": "#022c22",
+  },
+  harmony: {
+    // Soft lavender to violet - represents calm, balance, hope
+    "50": "#f5f3ff", "100": "#ede9fe", "200": "#ddd6fe", "300": "#c4b5fd",
+    "400": "#a78bfa", "500": "#8b5cf6", "600": "#7c3aed", "700": "#6d28d9",
+    "800": "#5b21b6", "900": "#4c1d95", "950": "#2e1065",
+  },
+  sunrise: {
+    // Gradient from coral to gold - represents new hope, dawn
+    "50": "#fef3f2", "100": "#fde8e4", "200": "#fcccc4", "300": "#faa590",
+    "400": "#f77d5e", "500": "#ef5350", "600": "#e53935", "700": "#c62828",
+    "800": "#ad1457", "900": "#6a0572", "950": "#420a3e",
+  },
   teal: {
     "50": "#f0fdfa", "100": "#ccfbf1", "200": "#99f6e4", "300": "#5eead4",
     "400": "#2dd4bf", "500": "#14b8a6", "600": "#0d9488", "700": "#0f766e",
@@ -77,7 +108,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   });
 
   const [colorTheme, setColorTheme] = useState<ColorTheme>(() => {
-    return (localStorage.getItem("colorTheme") as ColorTheme) || "teal";
+    return (localStorage.getItem("colorTheme") as ColorTheme) || "hope";
   });
 
   useEffect(() => {

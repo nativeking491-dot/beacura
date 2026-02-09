@@ -13,12 +13,22 @@ import {
   Loader2,
 } from "lucide-react";
 import { ThemePicker } from "../components/ThemePicker";
+import { PrivacySettingsModal } from "../components/PrivacySettingsModal";
+import { NotificationPreferencesModal } from "../components/NotificationPreferencesModal";
+import { ExportDataModal } from "../components/ExportDataModal";
+import { BecomeMentorModal } from "../components/BecomeMentorModal";
 
 const Profile: React.FC = () => {
   const { user, loading } = useUser();
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(user?.name || "");
   const [isSaving, setIsSaving] = useState(false);
+
+  // Modal states
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [showMentorModal, setShowMentorModal] = useState(false);
 
   // Update local state when user loads
   React.useEffect(() => {
@@ -55,7 +65,7 @@ const Profile: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="animate-spin text-teal-600" size={48} />
+        <Loader2 className="animate-spin text-amber-500" size={48} />
       </div>
     );
   }
@@ -67,7 +77,7 @@ const Profile: React.FC = () => {
         <p className="text-slate-500">Unable to load profile data.</p>
         <button
           onClick={() => (window.location.href = "/auth")}
-          className="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700"
+          className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-2 rounded-lg hover:shadow-lg transition-all"
         >
           Return to Login
         </button>
@@ -96,13 +106,17 @@ const Profile: React.FC = () => {
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500">
       {/* Profile Header */}
       <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-teal-50 rounded-full -mr-20 -mt-20 opacity-50 blur-3xl"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-amber-50 to-orange-50 rounded-full -mr-20 -mt-20 opacity-50 blur-3xl"></div>
         <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
           <div className="relative">
-            <div className="w-32 h-32 rounded-[2rem] border-4 border-white shadow-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white text-4xl font-bold">
+            <div className="w-32 h-32 rounded-[2rem] border-4 border-white shadow-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-4xl font-bold">
               {userName.charAt(0).toUpperCase()}
             </div>
-            <button className="absolute bottom-0 right-0 bg-teal-600 text-white p-2 rounded-xl shadow-lg hover:scale-110 transition-transform">
+              <button
+                onClick={() => setIsEditing(true)}
+                className="absolute bottom-0 right-0 bg-gradient-to-r from-amber-500 to-orange-500 text-white p-2 rounded-xl shadow-lg hover:scale-110 transition-transform"
+                title="Click to edit profile"
+              >
               <Edit2 size={16} />
             </button>
           </div>
@@ -113,7 +127,7 @@ const Profile: React.FC = () => {
                   type="text"
                   value={editedName}
                   onChange={(e) => setEditedName(e.target.value)}
-                  className="text-3xl font-extrabold text-slate-900 bg-slate-50 border-2 border-teal-500 rounded-lg px-4 py-1 focus:outline-none w-full md:w-auto"
+                  className="text-3xl font-extrabold text-slate-900 bg-slate-50 border-2 border-amber-500 rounded-lg px-4 py-1 focus:outline-none w-full md:w-auto"
                   autoFocus
                 />
               ) : (
@@ -133,7 +147,7 @@ const Profile: React.FC = () => {
               </span>
             </div>
             <div className="mt-6 flex flex-wrap justify-center md:justify-start gap-3 items-center">
-              <span className="bg-teal-50 text-teal-700 px-4 py-1.5 rounded-full text-xs font-bold border border-teal-100">
+              <span className="bg-amber-50 text-amber-700 px-4 py-1.5 rounded-full text-xs font-bold border border-amber-100">
                 {userRole === "RECOVERED_MENTOR"
                   ? "Recovered Mentor"
                   : "Recovering User"}
@@ -144,7 +158,7 @@ const Profile: React.FC = () => {
                   <button
                     onClick={handleSaveProfile}
                     disabled={isSaving}
-                    className="bg-teal-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-teal-700 transition-colors disabled:opacity-50"
+                    className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:shadow-lg transition-all disabled:opacity-50"
                   >
                     {isSaving ? "Saving..." : "Save Changes"}
                   </button>
@@ -169,7 +183,11 @@ const Profile: React.FC = () => {
               )}
             </div>
           </div>
-          <button className="bg-slate-50 text-slate-600 p-3 rounded-2xl hover:bg-slate-100 transition-colors">
+            <button
+              onClick={() => setShowPrivacyModal(true)}
+              className="bg-slate-50 text-slate-600 p-3 rounded-2xl hover:bg-slate-100 transition-colors"
+              title="Account settings"
+            >
             <Settings size={24} />
           </button>
         </div>
@@ -184,7 +202,7 @@ const Profile: React.FC = () => {
             <h3 className="font-bold text-slate-900 mb-6">Recovery Journey</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 bg-slate-50 rounded-2xl text-center">
-                <p className="text-3xl font-bold text-teal-600 mb-1">
+                <p className="text-3xl font-bold text-amber-600 mb-1">
                   {userStreak}
                 </p>
                 <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">
@@ -217,7 +235,7 @@ const Profile: React.FC = () => {
               </div>
               <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-teal-500 rounded-full shadow-lg shadow-teal-100"
+                  className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full shadow-lg shadow-amber-200"
                   style={{
                     width: `${Math.min((userPoints / 1000) * 100, 100)}%`,
                   }}
@@ -234,12 +252,12 @@ const Profile: React.FC = () => {
               {badges.map((badge, index) => (
                 <div
                   key={badge.id}
-                  className="flex flex-col items-center text-center p-4 rounded-2xl bg-slate-50 border border-slate-100 group hover:border-teal-200 transition-all hover:shadow-md"
+                  className="flex flex-col items-center text-center p-4 rounded-2xl bg-slate-50 border border-slate-100 group hover:border-amber-200 transition-all hover:shadow-md"
                 >
                   <div
                     className={`w-14 h-14 rounded-full flex items-center justify-center mb-3 transition-transform group-hover:scale-110 duration-300
                       ${index === 0
-                        ? "bg-gradient-to-br from-teal-400 to-teal-600 text-white shadow-lg shadow-teal-500/30 ring-4 ring-teal-50"
+                        ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-lg shadow-amber-500/30 ring-4 ring-amber-50"
                         : "bg-gradient-to-br from-teal-100 to-teal-200 text-teal-700 ring-4 ring-teal-50"}
                     `}
                   >
@@ -254,7 +272,7 @@ const Profile: React.FC = () => {
                 <div className="w-12 h-12 rounded-full flex items-center justify-center mb-2 text-slate-300 group-hover:text-teal-400 transition-colors">
                   <Shield size={24} />
                 </div>
-                <p className="text-[10px] font-bold text-slate-400 group-hover:text-teal-500 transition-colors">
+                <p className="text-[10px] font-bold text-slate-400 group-hover:text-amber-500 transition-colors">
                   Next Milestone: 30 Days
                 </p>
               </div>
@@ -267,7 +285,10 @@ const Profile: React.FC = () => {
           <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
             <h3 className="font-bold text-slate-900 mb-6">Account Actions</h3>
             <div className="space-y-3">
-              <button className="w-full text-left p-4 rounded-xl hover:bg-slate-50 flex items-center justify-between group">
+              <button
+                onClick={() => setShowPrivacyModal(true)}
+                className="w-full text-left p-4 rounded-xl hover:bg-slate-50 flex items-center justify-between group transition-colors"
+              >
                 <span className="text-sm font-medium text-slate-700">
                   Privacy Settings
                 </span>
@@ -276,7 +297,10 @@ const Profile: React.FC = () => {
                   className="text-slate-400 group-hover:text-teal-600"
                 />
               </button>
-              <button className="w-full text-left p-4 rounded-xl hover:bg-slate-50 flex items-center justify-between group">
+              <button
+                onClick={() => setShowNotificationModal(true)}
+                className="w-full text-left p-4 rounded-xl hover:bg-slate-50 flex items-center justify-between group transition-colors"
+              >
                 <span className="text-sm font-medium text-slate-700">
                   Notification Preferences
                 </span>
@@ -285,7 +309,10 @@ const Profile: React.FC = () => {
                   className="text-slate-400 group-hover:text-teal-600"
                 />
               </button>
-              <button className="w-full text-left p-4 rounded-xl hover:bg-slate-50 flex items-center justify-between group">
+              <button
+                onClick={() => setShowExportModal(true)}
+                className="w-full text-left p-4 rounded-xl hover:bg-slate-50 flex items-center justify-between group transition-colors"
+              >
                 <span className="text-sm font-medium text-slate-700">
                   Export Recovery Data
                 </span>
@@ -305,15 +332,54 @@ const Profile: React.FC = () => {
                 the 1-year milestone.
               </p>
               <button
-                disabled
-                className="w-full py-3 bg-slate-800 text-slate-500 rounded-xl text-sm font-bold cursor-not-allowed"
+                onClick={() => setShowMentorModal(true)}
+                disabled={userStreak < 365}
+                className={`w-full py-3 rounded-xl text-sm font-bold transition-all ${
+                  userStreak >= 365
+                    ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg hover:shadow-purple-500/50"
+                    : "bg-slate-800 text-slate-500 cursor-not-allowed"
+                }`}
               >
-                Become a Mentor (Locked)
+                {userStreak >= 365
+                  ? "Become a Mentor"
+                  : `Become a Mentor (${365 - userStreak} days away)`}
               </button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      {showPrivacyModal && (
+        <PrivacySettingsModal
+          userId={user?.id}
+          onClose={() => setShowPrivacyModal(false)}
+        />
+      )}
+
+      {showNotificationModal && (
+        <NotificationPreferencesModal
+          userId={user?.id}
+          onClose={() => setShowNotificationModal(false)}
+        />
+      )}
+
+      {showExportModal && (
+        <ExportDataModal
+          userId={user?.id}
+          userName={userName}
+          onClose={() => setShowExportModal(false)}
+        />
+      )}
+
+      {showMentorModal && (
+        <BecomeMentorModal
+          userId={user?.id}
+          userStreak={userStreak}
+          userEmail={userEmail}
+          onClose={() => setShowMentorModal(false)}
+        />
+      )}
     </div>
   );
 };

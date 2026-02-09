@@ -30,10 +30,13 @@ export const authService = {
         email: data.user.email,
         name,
         role: role === "MENTOR" ? "RECOVERED_MENTOR" : "RECOVERING_USER",
+        streak: 0,
+        points: 0,
       });
 
       if (profileError) {
         console.error("Error creating user profile:", profileError);
+        throw profileError; // Throw error so signup fails properly
       }
     }
 
@@ -95,5 +98,108 @@ export const authService = {
   onAuthStateChange(callback: (event: string, session: any) => void) {
     return supabase.auth.onAuthStateChange(callback);
   },
-  supabase,
+};
+
+// Chat message helper functions
+export const chatService = {
+  // Create a new chat session
+  async createNewChatSession(userId: string): Promise<string> {
+    const { data, error } = await supabase
+      .from("chat_sessions")
+      .insert({ user_id: userId })
+      .select("id")
+      .single();
+
+    if (error) throw error;
+    return data.id;
+  },
+
+  // Save a chat message
+  async saveChatMessage(
+    userId: string,
+    sender: "user" | "ai",
+    message: string,
+    sessionId: string
+  ) {
+    const { data, error } = await supabase
+      .from("chat_messages")
+      .insert({
+        user_id: userId,
+        sender,
+        message,
+        session_id: sessionId,
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // Update session's last_message_at
+    await supabase
+      .from("chat_sessions")
+      .update({ last_message_at: new Date().toISOString() })
+      .eq("id", sessionId);
+
+    return data;
+  },
+
+  // Get chat history for a user
+  async getChatHistory(
+    userId: string,
+    sessionId?: string,
+    limit: number = 100
+  ) {
+    let query = supabase
+      .from("chat_messages")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: true })
+      .limit(limit);
+
+    if (sessionId) {
+      query = query.eq("session_id", sessionId);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Get all sessions for a user
+  async getUserSessions(userId: string, limit: number = 10) {
+    const { data, error } = await supabase
+      .from("chat_sessions")
+      .select("*")
+      .eq("user_id", userId)
+      .order("last_message_at", { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    return data;
+  },
+
+  // Get the most recent session for a user
+  async getLatestSession(userId: string) {
+    const { data, error } = await supabase
+      .from("chat_sessions")
+      .select("*")
+      .eq("user_id", userId)
+      .order("last_message_at", { ascending: false })
+      .limit(1)
+      .single();
+
+    if (error && error.code !== "PGRST116") throw error;
+    return data;
+  },
+
+  // Delete a chat session and all its messages
+  async deleteChatSession(sessionId: string) {
+    const { error } = await supabase
+      .from("chat_sessions")
+      .delete()
+      .eq("id", sessionId);
+
+    if (error) throw error;
+  },
 };

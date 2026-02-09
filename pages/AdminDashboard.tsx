@@ -64,6 +64,7 @@ const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const [loading, setLoading] = useState(true);
+  const [adminVerified, setAdminVerified] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRole, setFilterRole] = useState("ALL");
   const [selectedStat, setSelectedStat] = useState<string | null>(null);
@@ -82,21 +83,95 @@ const AdminDashboard: React.FC = () => {
   });
   const [allUsers, setAllUsers] = useState<RecentUser[]>([]);
 
+  // Verify admin access on component mount
   useEffect(() => {
-    fetchStats();
-  }, []);
+    const verifyAdmin = async () => {
+      try {
+        const session = await supabase.auth.getSession();
+        if (!session?.data?.session?.user?.id) {
+          console.warn("No active session");
+          navigate("/auth");
+          return;
+        }
+
+        // Get user profile to verify admin role
+        const { data: profile, error } = await supabase
+          .from("users")
+          .select("role")
+          .eq("id", session.data.session.user.id)
+          .single();
+
+        if (error || !profile) {
+          console.error("Could not verify admin status:", error);
+          navigate("/dashboard");
+          return;
+        }
+
+        if (profile.role !== "ADMIN") {
+          console.warn("User is not an admin");
+          navigate("/dashboard");
+          return;
+        }
+
+        console.log("✅ Admin verified, loading dashboard");
+        setAdminVerified(true);
+        
+        // Load stats after admin verification
+        await fetchStats();
+      } catch (error) {
+        console.error("Admin verification error:", error);
+        navigate("/dashboard");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    verifyAdmin();
+  }, [navigate]);
+
+  useEffect(() => {
+    if (!adminVerified) return;
+
+    // Set up real-time subscription to listen for changes
+    const channel = supabase
+      .channel('public:users')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'users' },
+        (payload) => {
+          console.log('User data changed:', payload);
+          // Refresh stats when changes are detected
+          fetchStats();
+        }
+      )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('Real-time subscription active');
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error('Subscription error, will fall back to manual refresh');
+        }
+      });
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [adminVerified]);
 
   const fetchStats = async () => {
-    setLoading(true);
     try {
       const { data: users, error } = await supabase
         .from("users")
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Database error:", error);
+        throw error;
+      }
 
-      if (users) {
+      if (users && users.length > 0) {
+        console.log(`Fetched ${users.length} users from database`);
+        
         const totalUsers = users.length;
         const recoveringUsers = users.filter(
           (u) => u.role === "RECOVERING_USER",
@@ -144,12 +219,17 @@ const AdminDashboard: React.FC = () => {
           activeToday,
         });
 
+        // Clear and set the filtered users list
         setAllUsers(users);
+        console.log("✅ Dashboard updated successfully");
+      } else {
+        console.log("No users found in database");
+        setAllUsers([]);
       }
     } catch (error) {
-      console.error("Error fetching admin stats:", error);
-    } finally {
-      setLoading(false);
+      console.error("❌ Error fetching admin stats:", error);
+      // Don't show alert on every error - just log it
+      // Users can use the Refresh button if data doesn't load
     }
   };
 
@@ -168,7 +248,8 @@ const AdminDashboard: React.FC = () => {
 
       if (error) throw error;
 
-      // Refresh data
+      // Refresh data with a slight delay to ensure database updates propagate
+      await new Promise(resolve => setTimeout(resolve, 300));
       await fetchStats();
       setEditingUser(null);
       alert("✅ User updated successfully!");
@@ -180,11 +261,30 @@ const AdminDashboard: React.FC = () => {
 
   const handleDeleteUser = async (userId: string) => {
     try {
-      const { error } = await supabase.from("users").delete().eq("id", userId);
+      // First delete the user profile from public.users
+      const { error: profileError } = await supabase
+        .from("users")
+        .delete()
+        .eq("id", userId);
 
-      if (error) throw error;
+      if (profileError) throw profileError;
 
-      // Refresh data
+      // Delete the user from auth (if you have admin access)
+      try {
+        const response = await fetch('/api/deleteUser', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId }),
+        });
+        if (!response.ok) {
+          console.warn('Could not delete from auth system - may require admin API key');
+        }
+      } catch (authError) {
+        console.warn('Auth deletion skipped:', authError);
+      }
+
+      // Refresh data with a small delay to ensure database updates
+      await new Promise(resolve => setTimeout(resolve, 500));
       await fetchStats();
       setDeletingUser(null);
       alert("✅ User deleted successfully!");
@@ -595,7 +695,7 @@ const AdminDashboard: React.FC = () => {
                                 ? "bg-rose-100 text-rose-700"
                                 : user.role === "RECOVERED_MENTOR"
                                   ? "bg-amber-100 text-amber-700"
-                                  : "bg-teal-100 text-teal-700"
+                                  : "bg-amber-100 text-amber-700"
                                 }`}
                             >
                               {user.role === "ADMIN"
@@ -605,7 +705,7 @@ const AdminDashboard: React.FC = () => {
                                   : "💚"}
                             </span>
                           </td>
-                          <td className="py-3 px-4 text-right font-bold text-teal-600">
+                          <td className="py-3 px-4 text-right font-bold text-amber-600">
                             {user.streak} 🔥
                           </td>
                           <td className="py-3 px-4 text-right font-bold text-indigo-600">
@@ -865,7 +965,7 @@ const AdminDashboard: React.FC = () => {
     );
   };
 
-  if (loading) {
+  if (loading || !adminVerified) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
@@ -874,7 +974,7 @@ const AdminDashboard: React.FC = () => {
             size={56}
           />
           <p className="text-slate-500 font-medium">
-            Loading admin dashboard...
+            {!adminVerified ? "Verifying admin access..." : "Loading admin dashboard..."}
           </p>
         </div>
       </div>
@@ -931,8 +1031,8 @@ const AdminDashboard: React.FC = () => {
           label="Recovering Users"
           value={stats.recoveringUsers}
           subtitle="Main user category"
-          color="text-teal-600"
-          bgColor="bg-teal-50"
+          color="text-amber-600"
+          bgColor="bg-amber-50"
         />
         <StatCard
           statId="growth"
@@ -1088,7 +1188,7 @@ const AdminDashboard: React.FC = () => {
                         ? "bg-rose-100 text-rose-700 border border-rose-200"
                         : user.role === "RECOVERED_MENTOR"
                           ? "bg-amber-100 text-amber-700 border border-amber-200"
-                          : "bg-teal-100 text-teal-700 border border-teal-200"
+                          : "bg-amber-100 text-amber-700 border border-amber-200"
                         }`}
                     >
                       {user.role === "ADMIN"
@@ -1099,7 +1199,7 @@ const AdminDashboard: React.FC = () => {
                     </span>
                   </td>
                   <td className="py-4 px-6 text-right">
-                    <span className="font-bold text-teal-600 text-lg">
+                    <span className="font-bold text-amber-600 text-lg">
                       {user.streak} 🔥
                     </span>
                   </td>

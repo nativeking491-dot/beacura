@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   LineChart,
@@ -23,23 +23,78 @@ import {
   Loader2,
 } from "lucide-react";
 import { useUser } from "../context/UserContext";
+import { supabase } from "../services/supabaseClient";
+import { CravingLogger } from "../components/CravingLogger";
+
+interface CravingData {
+  day: string;
+  cravings: number;
+  date: string;
+}
 
 const Dashboard: React.FC = () => {
   const { user, loading, isNewUser } = useUser();
   const navigate = useNavigate();
+  const [cravingData, setCravingData] = useState<CravingData[]>([]);
+  const [loadingChart, setLoadingChart] = useState(false);
 
-  // Mock data - in a real app this would come from the database
-  const mockData = [
-    { day: "Mon", cravings: 4 },
-    { day: "Tue", cravings: 3 },
-    { day: "Wed", cravings: 5 },
-    { day: "Thu", cravings: 2 },
-    { day: "Fri", cravings: 1 },
-    { day: "Sat", cravings: 2 },
-    { day: "Sun", cravings: 0 },
-  ];
+  useEffect(() => {
+    if (!user?.id || isNewUser) return;
+    fetchCravingData();
+  }, [user?.id, isNewUser]);
 
-  const data = isNewUser ? [] : mockData;
+  const fetchCravingData = async () => {
+    setLoadingChart(true);
+    try {
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+      const { data, error } = await supabase
+        .from("craving_logs")
+        .select("created_at, severity")
+        .eq("user_id", user?.id)
+        .gte("created_at", sevenDaysAgo.toISOString())
+        .order("created_at", { ascending: true });
+
+      if (error) throw error;
+
+      const dailyData = aggregateCravingsByDay(data || []);
+      setCravingData(dailyData);
+    } catch (error) {
+      console.error("Error fetching craving data:", error);
+    } finally {
+      setLoadingChart(false);
+    }
+  };
+
+  const aggregateCravingsByDay = (logs: any[]) => {
+    const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    const aggregated: Record<string, any> = {};
+
+    logs.forEach((log) => {
+      const date = new Date(log.created_at);
+      const dayIndex = date.getDay() === 0 ? 6 : date.getDay() - 1;
+      const day = days[dayIndex];
+      const dateStr = date.toLocaleDateString();
+
+      if (!aggregated[dateStr]) {
+        aggregated[dateStr] = { day, cravings: [], date: dateStr };
+      }
+      aggregated[dateStr].cravings.push(log.severity);
+    });
+
+    return Object.values(aggregated)
+      .map((item: any) => ({
+        ...item,
+        cravings: Math.round(
+          item.cravings.reduce((a: number, b: number) => a + b, 0) /
+            item.cravings.length
+        ),
+      }))
+      .slice(-7);
+  };
+
+  const data = isNewUser ? [] : cravingData;
 
   const StatCard = ({ icon: Icon, label, value, color }: any) => (
     <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center space-x-4">
@@ -67,7 +122,7 @@ const Dashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="animate-spin text-teal-600" size={48} />
+        <Loader2 className="animate-spin text-amber-600" size={48} />
       </div>
     );
   }
@@ -113,7 +168,7 @@ const Dashboard: React.FC = () => {
           icon={Award}
           label="Recovery Points"
           value={userPoints.toLocaleString()}
-          color="bg-teal-50 text-teal-600"
+          color="bg-amber-50 text-amber-600"
         />
         <StatCard
           icon={Heart}
@@ -134,7 +189,7 @@ const Dashboard: React.FC = () => {
         <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-slate-900 flex items-center space-x-2">
-              <TrendingUp size={20} className="text-teal-600" />
+              <TrendingUp size={20} className="text-amber-600" />
               <span>Cravings Frequency</span>
             </h2>
             <select className="text-sm border-none bg-slate-50 rounded-lg p-1">
@@ -200,15 +255,15 @@ const Dashboard: React.FC = () => {
                 <p className="text-xs text-slate-400 max-w-[200px] mb-3">
                   Great job! Tracking urges helps you understand your triggers.
                 </p>
-                <button
-                  onClick={() => console.log('Log craving')}
-                  className="text-xs font-bold text-teal-600 bg-teal-50 px-4 py-2 rounded-lg hover:bg-teal-100 transition-colors"
-                >
-                  Log First Craving
-                </button>
+                <CravingLogger userId={user?.id} onSuccess={fetchCravingData} />
               </div>
             )}
           </div>
+          {data.length > 0 && !isNewUser && (
+            <div className="mt-6 flex justify-end border-t border-slate-100 pt-6">
+              <CravingLogger userId={user?.id} onSuccess={fetchCravingData} />
+            </div>
+          )}
         </div>
 
         {/* Badges & Rewards */}
@@ -236,7 +291,7 @@ const Dashboard: React.FC = () => {
             ))}
             <button
               onClick={() => navigate("/profile")}
-              className="w-full mt-4 flex items-center justify-center space-x-2 py-3 rounded-xl text-teal-600 font-semibold hover:bg-teal-50 transition-colors"
+              className="w-full mt-4 flex items-center justify-center space-x-2 py-3 rounded-xl text-amber-600 font-semibold hover:bg-amber-50 transition-colors"
             >
               <span>View All Rewards</span>
               <ArrowRight size={16} />
@@ -257,7 +312,7 @@ const Dashboard: React.FC = () => {
             </p>
             <button
               onClick={() => navigate("/chat")}
-              className="bg-white text-teal-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-teal-50 transition-colors"
+              className="bg-white text-amber-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-amber-50 transition-colors"
             >
               Start Now
             </button>

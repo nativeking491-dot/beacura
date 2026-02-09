@@ -27,6 +27,14 @@ export interface ChatMessage {
   sender: "user" | "ai";
   text: string;
   timestamp: Date;
+  session_id?: string;
+}
+
+export interface ChatSession {
+  id: string;
+  user_id: string;
+  created_at: string;
+  last_message_at?: string;
 }
 
 export interface Mentor {

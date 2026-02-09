@@ -15,12 +15,12 @@ const Landing: React.FC = () => {
     <div className="flex flex-col items-center">
       {/* Hero Section */}
       <section className="text-center py-16 px-4">
-        <div className="inline-flex items-center space-x-2 bg-teal-100 text-teal-800 px-4 py-1.5 rounded-full text-sm font-medium mb-6 animate-pulse">
+        <div className="inline-flex items-center space-x-2 bg-amber-100 text-amber-800 px-4 py-1.5 rounded-full text-sm font-medium mb-6 animate-pulse">
           <Heart size={16} fill="currentColor" />
-          <span>There is hope for a better tomorrow</span>
+          <span>🌅 There is hope for a better tomorrow</span>
         </div>
         <h1 className="text-5xl md:text-7xl font-extrabold text-slate-900 mb-6 leading-tight">
-          Your Journey to <span className="text-teal-600">Beacura</span> <br />{" "}
+          Your Journey to <span className="bg-gradient-to-r from-amber-500 via-orange-400 to-rose-500 bg-clip-text text-transparent">Recovery & Joy</span> <br />{" "}
           Starts Here.
         </h1>
         <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed">
@@ -30,16 +30,16 @@ const Landing: React.FC = () => {
         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center">
           <Link
             to="/auth"
-            className="bg-teal-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-teal-700 transition-all shadow-xl hover:shadow-teal-200"
+            className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all shadow-lg hover:shadow-orange-300"
           >
-            Start Your Journey
+            ✨ Start Your Journey
           </Link>
-          <a
-            href="#features"
+          <Link
+            to="/learn-more"
             className="bg-white text-slate-900 border border-slate-200 px-8 py-4 rounded-xl font-bold text-lg hover:bg-slate-50 transition-all"
           >
             Learn More
-          </a>
+          </Link>
         </div>
       </section>
 
@@ -54,7 +54,7 @@ const Landing: React.FC = () => {
             key={i}
             className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 text-center"
           >
-            <div className="bg-teal-50 text-teal-600 w-12 h-12 flex items-center justify-center rounded-xl mx-auto mb-4">
+            <div className="bg-gradient-to-br from-amber-50 to-orange-50 text-amber-600 w-12 h-12 flex items-center justify-center rounded-xl mx-auto mb-4 shadow-sm">
               <stat.icon size={24} />
             </div>
             <div className="text-3xl font-bold text-slate-900">
@@ -113,7 +113,7 @@ const Landing: React.FC = () => {
               key={i}
               className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-slate-100"
             >
-              <div className="bg-slate-50 text-teal-600 w-10 h-10 flex items-center justify-center rounded-lg mb-4">
+              <div className="bg-gradient-to-br from-amber-50 to-orange-100 text-amber-600 w-10 h-10 flex items-center justify-center rounded-lg mb-4 shadow-sm">
                 <f.icon size={20} />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">

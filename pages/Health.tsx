@@ -54,6 +54,11 @@ const Health: React.FC = () => {
     alert(`✅ ${action} functionality triggered (Simulated)`);
   };
 
+  const handleLogAllMeals = async () => {
+    // Simulate logging all meals — in production this would create progress entries
+    alert('All meals logged! +20 XP (simulated)');
+  };
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-left-4 duration-500 pb-20 relative">
       {/* Meal Detail Popup Overlay */}
@@ -64,7 +69,7 @@ const Health: React.FC = () => {
             <div className="w-16 h-1 bg-teal-500 mx-auto rounded-full mb-4"></div>
             <p className="text-lg text-slate-600 font-medium leading-relaxed">{hoveredMeal.content}</p>
             <div className="mt-6 flex justify-center gap-2">
-              <span className="px-3 py-1 bg-teal-50 text-teal-600 rounded-full text-xs font-bold">High Protein</span>
+              <span className="px-3 py-1 bg-amber-50 text-amber-600 rounded-full text-xs font-bold">High Protein</span>
               <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs font-bold">Brain Fuel</span>
             </div>
           </div>
@@ -120,7 +125,7 @@ const Health: React.FC = () => {
       </header>
 
       {/* Today's Highlight Card */}
-      <div className="bg-gradient-to-r from-teal-600 to-indigo-700 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden">
+      <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden">
         <div className="relative z-10">
           <div className="flex items-center space-x-2 mb-4">
             <Sparkles size={20} className="text-amber-400" />
@@ -242,7 +247,7 @@ const Health: React.FC = () => {
         <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-              <Calendar className="text-teal-600" size={24} />
+              <Calendar className="text-amber-600" size={24} />
               7-Day Recovery Plan
             </h2>
             <p className="text-slate-500 text-sm">
@@ -255,7 +260,7 @@ const Health: React.FC = () => {
                 key={item.day}
                 onClick={() => setActiveDayIdx(idx)}
                 className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex flex-col items-center ${activeDayIdx === idx
-                  ? "bg-white text-teal-600 shadow-md"
+                  ? "bg-white text-amber-600 shadow-md"
                   : "text-slate-500 hover:text-slate-700"
                   }`}
               >
@@ -356,7 +361,10 @@ const Health: React.FC = () => {
                     {currentPlan.meals.benefit}
                   </p>
                 </div>
-                <button className="w-full bg-teal-500 text-white py-4 rounded-2xl font-bold hover:bg-teal-600 transition-all flex items-center justify-center space-x-2">
+                <button
+                  onClick={handleLogAllMeals}
+                  className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-4 rounded-2xl font-bold hover:shadow-lg transition-all flex items-center justify-center space-x-2"
+                >
                   <CheckCircle2 size={18} />
                   <span>Log All Meals (+20 XP)</span>
                 </button>
@@ -378,7 +386,7 @@ const Health: React.FC = () => {
               className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-lg transition-all"
             >
               <div className="w-14 h-14 bg-teal-50 rounded-2xl flex items-center justify-center mb-6">
-                <Utensils size={28} className="text-teal-600" />
+                <Utensils size={28} className="text-amber-600" />
               </div>
               <h3 className="text-lg font-bold text-slate-900 mb-3">
                 {tip.title}
@@ -387,7 +395,7 @@ const Health: React.FC = () => {
                 {tip.description}
               </p>
               <div className="pt-4 border-t border-slate-50 flex items-start space-x-3">
-                <div className="bg-teal-600 p-1.5 rounded-lg text-white mt-1">
+                <div className="bg-amber-600 p-1.5 rounded-lg text-white mt-1">
                   <Brain size={14} />
                 </div>
                 <p className="text-[11px] font-bold text-teal-700 leading-tight uppercase tracking-tight">

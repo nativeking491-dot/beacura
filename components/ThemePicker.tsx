@@ -6,6 +6,11 @@ export const ThemePicker: React.FC = () => {
     const { theme, setTheme, colorTheme, setColorTheme } = useTheme();
 
     const colors: { id: ColorTheme; label: string; color: string }[] = [
+        { id: "hope", label: "✨ Golden Hope", color: "#f59e0b" },
+        { id: "bloom", label: "🌸 Compassionate Bloom", color: "#f43f5e" },
+        { id: "renewal", label: "🌱 Renewal Green", color: "#10b981" },
+        { id: "harmony", label: "🦋 Peaceful Harmony", color: "#8b5cf6" },
+        { id: "sunrise", label: "🌅 Sunrise Promise", color: "#ef5350" },
         { id: "teal", label: "Beacura Teal", color: "#14b8a6" },
         { id: "blue", label: "Ocean Blue", color: "#3b82f6" },
         { id: "violet", label: "Royal Violet", color: "#8b5cf6" },
@@ -29,7 +34,7 @@ export const ThemePicker: React.FC = () => {
     return (
         <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm">
             <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                <Palette className="text-teal-500" />
+                <Palette className="text-amber-500" />
                 <span>Appearance</span>
             </h3>
 
@@ -46,7 +51,7 @@ export const ThemePicker: React.FC = () => {
                                 onClick={() => setTheme(m.id as any)}
                                 className={`
                                     relative h-16 rounded-2xl flex flex-col items-center justify-center transition-all hover:scale-105 border-2
-                                    ${theme === m.id ? "ring-2 ring-offset-2 ring-teal-500 scale-105 shadow-md" : ""}
+                                    ${theme === m.id ? "ring-2 ring-offset-2 ring-amber-500 scale-105 shadow-md" : ""}
                                 `}
                                 style={{
                                     backgroundColor: m.color,
@@ -54,7 +59,7 @@ export const ThemePicker: React.FC = () => {
                                 }}
                             >
                                 {theme === m.id && (
-                                    <div className="absolute top-1 right-1 bg-teal-500 rounded-full p-0.5">
+                                    <div className="absolute top-1 right-1 bg-amber-500 rounded-full p-0.5">
                                         <Check size={10} className="text-white" />
                                     </div>
                                 )}

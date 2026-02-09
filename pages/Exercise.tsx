@@ -104,7 +104,7 @@ const Exercise: React.FC = () => {
       benefit:
         "Stimulates dopamine production naturally through steady movement.",
       difficulty: "Easy",
-      color: "text-teal-600",
+      color: "text-amber-600",
       bg: "bg-teal-50",
     },
     {
@@ -365,7 +365,7 @@ const Exercise: React.FC = () => {
                     fill="transparent"
                     strokeDasharray={754}
                     strokeDashoffset={754 * (timeLeft / activeSession.duration)}
-                    className="text-teal-500 transition-all duration-1000 ease-linear"
+                    className="text-amber-500 transition-all duration-1000 ease-linear"
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">

@@ -385,7 +385,7 @@ const Motivation: React.FC = () => {
       {/* Success Stories */}
       <section className="space-y-6">
         <h3 className="text-xl font-bold text-slate-900 flex items-center space-x-2">
-          <Heart size={20} className="text-teal-500" />
+          <Heart size={20} className="text-amber-500" />
           <span>Success Stories</span>
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -408,10 +408,27 @@ const Motivation: React.FC = () => {
                     </p>
                   </div>
                   <div className="flex space-x-2">
-                    <button className="text-slate-400 hover:text-teal-600">
+                    <button
+                      onClick={() => alert('Liked!')}
+                      className="text-slate-400 hover:text-teal-600"
+                      title="Like story"
+                    >
                       <ThumbsUp size={16} />
                     </button>
-                    <button className="text-slate-400 hover:text-indigo-600">
+                    <button
+                      onClick={() => {
+                        if (navigator.share) {
+                          navigator.share({
+                            title: story.name,
+                            text: story.story,
+                          }).catch(() => {});
+                        } else {
+                          alert('Share copied to clipboard');
+                        }
+                      }}
+                      className="text-slate-400 hover:text-indigo-600"
+                      title="Share story"
+                    >
                       <Share2 size={16} />
                     </button>
                   </div>
@@ -423,7 +440,11 @@ const Motivation: React.FC = () => {
             </div>
           ))}
         </div>
-        <button className="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-500 font-bold hover:bg-slate-50 transition-colors">
+        <button
+          onClick={() => (window.location.href = '/stories')}
+          className="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-500 font-bold hover:bg-slate-50 transition-colors"
+          title="Read more stories"
+        >
           Read More Stories
         </button>
       </section>

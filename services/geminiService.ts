@@ -5,7 +5,8 @@ export const generateChatResponse = async (
   prompt: string,
   customInstruction?: string,
   userStreak?: number,
-  userPoints?: number
+  userPoints?: number,
+  chatHistory?: Array<{ sender: string; text: string }>
 ) => {
   try {
     const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
@@ -130,9 +131,20 @@ Always reference their streak when appropriate to show you're paying attention a
       personalizedInstruction = (customInstruction || defaultInstruction) + personalContext;
     }
 
+    // Add chat history context if available
+    let finalPrompt = prompt;
+    if (chatHistory && chatHistory.length > 0) {
+      const recentHistory = chatHistory.slice(-10); // Last 10 messages for context
+      const historyContext = recentHistory
+        .map((msg) => `${msg.sender === "user" ? "User" : "Recovery"}: ${msg.text}`)
+        .join("\n");
+
+      finalPrompt = `Previous conversation:\n${historyContext}\n\nUser: ${prompt}`;
+    }
+
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: prompt,
+      contents: finalPrompt,
       config: {
         systemInstruction: personalizedInstruction,
       },

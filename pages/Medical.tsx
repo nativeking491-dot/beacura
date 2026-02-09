@@ -10,6 +10,10 @@ import {
 } from "lucide-react";
 
 const Medical: React.FC = () => {
+  const handleCrisisHotline = () => {
+    window.open("tel:988", "_self");
+  };
+
   return (
     <div className="space-y-10 animate-in fade-in duration-500">
       <header>
@@ -40,7 +44,10 @@ const Medical: React.FC = () => {
               <Phone size={18} />
               <span>Call Emergency (911)</span>
             </a>
-            <button className="bg-white text-rose-600 border border-rose-200 px-6 py-3 rounded-xl font-bold flex items-center space-x-2">
+            <button
+              onClick={handleCrisisHotline}
+              className="bg-white text-rose-600 border border-rose-200 px-6 py-3 rounded-xl font-bold flex items-center space-x-2 hover:bg-rose-50 transition-colors"
+            >
               <AlertCircle size={18} />
               <span>Crisis Hotline</span>
             </button>
@@ -138,7 +145,7 @@ const Medical: React.FC = () => {
             <p className="text-indigo-100 text-sm mb-4">
               We can help you find addiction-specialized clinics in your area.
             </p>
-            <button className="bg-white text-indigo-600 w-full py-2.5 rounded-xl font-bold text-sm">
+            <button onClick={() => alert('Not implemented yet')}>
               Search Nearby Clinics
             </button>
           </div>
@@ -181,3 +188,4 @@ const Medical: React.FC = () => {
 };
 
 export default Medical;
+
