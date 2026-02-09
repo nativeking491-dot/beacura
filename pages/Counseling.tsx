@@ -143,8 +143,16 @@ const Counseling: React.FC = () => {
 
     const aiResponse = await generateLocalResponse(
       currentInput,
-      0, // streak placeholer
-      "Friend" // name placeholder
+      user?.streak || 0,
+      user?.name || "Friend",
+      "Mentor", // Generic mentor name or activeChat.name
+      undefined,
+      (() => {
+        try {
+          const data = localStorage.getItem(`daily_log_${new Date().toDateString()}`);
+          return data ? JSON.parse(data) : undefined;
+        } catch { return undefined; }
+      })()
     );
 
     const reply: MentorMessage = {

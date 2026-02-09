@@ -1,5 +1,6 @@
 import React from "react";
-import { MEDICAL_FAQS } from "../constants";
+import { MEDICAL_FAQS, COMMON_SYMPTOMS, RECOVERY_DOS, RECOVERY_DONTS } from "../constants";
+import * as Icons from "lucide-react";
 import {
   ShieldAlert,
   AlertCircle,
@@ -70,13 +71,18 @@ const Medical: React.FC = () => {
                 </span>
                 DO'S
               </p>
-              <ul className="space-y-3 text-slate-600 text-sm">
-                <li>• Maintain a consistent sleep schedule (7-9 hours).</li>
-                <li>
-                  • Communicate your symptoms to a trusted medical professional.
-                </li>
-                <li>• Practice deep breathing exercises when cravings peak.</li>
-                <li>• Surround yourself with positive, clean influences.</li>
+              <ul className="space-y-3">
+                {RECOVERY_DOS.map((item, i) => {
+                  const Icon = (Icons as any)[item.icon] || Icons.Check;
+                  return (
+                    <li key={i} className="flex items-start text-slate-600 text-sm">
+                      <div className="mr-3 mt-0.5 bg-emerald-50 p-1.5 rounded-lg text-emerald-600">
+                        <Icon size={14} />
+                      </div>
+                      <span className="mt-0.5">{item.text}</span>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
             <div className="pt-4 border-t border-slate-50">
@@ -86,16 +92,18 @@ const Medical: React.FC = () => {
                 </span>
                 DON'TS
               </p>
-              <ul className="space-y-3 text-slate-600 text-sm">
-                <li>
-                  • Avoid "cold turkey" without medical supervision if using
-                  high-risk substances.
-                </li>
-                <li>• Don't self-medicate with other substances or alcohol.</li>
-                <li>
-                  • Avoid isolating yourself when feelings of withdrawal arise.
-                </li>
-                <li>• Don't skip meals or neglect hydration.</li>
+              <ul className="space-y-3">
+                {RECOVERY_DONTS.map((item, i) => {
+                  const Icon = (Icons as any)[item.icon] || Icons.X;
+                  return (
+                    <li key={i} className="flex items-start text-slate-600 text-sm">
+                      <div className="mr-3 mt-0.5 bg-rose-50 p-1.5 rounded-lg text-rose-600">
+                        <Icon size={14} />
+                      </div>
+                      <span className="mt-0.5">{item.text}</span>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </div>
@@ -107,37 +115,33 @@ const Medical: React.FC = () => {
             <HeartPulse className="text-indigo-500" />
             <span>Withdrawal Knowledge</span>
           </h3>
+
+
           <div className="grid grid-cols-1 gap-4">
-            {[
-              {
-                title: "Sleep Disturbance",
-                icon: Pill,
-                desc: "Insomnia or vivid dreams are common as your brain recalibrates.",
-              },
-              {
-                title: "Physical Aches",
-                icon: AlertCircle,
-                desc: "Muscle tension and flu-like symptoms are typical early on.",
-              },
-              {
-                title: "Emotional Swings",
-                icon: HeartPulse,
-                desc: "Anxiety and irritability often peak within the first 72 hours.",
-              },
-            ].map((s, i) => (
-              <div
-                key={i}
-                className="bg-slate-50 p-5 rounded-2xl border border-slate-100 flex items-start space-x-4"
-              >
-                <div className="bg-white p-2 rounded-xl text-indigo-600 shadow-sm">
-                  <s.icon size={20} />
+            {COMMON_SYMPTOMS.map((s, i) => {
+              // Dynamic icon lookup
+              const IconComponent = (Icons as any)[s.icon] || Icons.HelpCircle;
+
+              return (
+                <div
+                  key={i}
+                  className="bg-slate-50 p-5 rounded-2xl border border-slate-100 flex items-start space-x-4"
+                >
+                  <div className="bg-white p-2 rounded-xl text-indigo-600 shadow-sm">
+                    <IconComponent size={20} />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-800 mb-1">{s.title}</h4>
+                    <p className="text-xs text-slate-500 mb-1">{s.desc}</p>
+                    {s.tip && (
+                      <p className="text-[10px] text-indigo-600 font-medium bg-indigo-50 px-2 py-1 rounded-lg inline-block">
+                        💡 Try: {s.tip}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-bold text-slate-800 mb-1">{s.title}</h4>
-                  <p className="text-xs text-slate-500">{s.desc}</p>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
 
           <div className="bg-indigo-600 p-6 rounded-2xl text-white">

@@ -57,7 +57,15 @@ export const FloatingChat = () => {
             const aiText = await generateLocalResponse(
                 userText,
                 user?.streak || 0,
-                user?.name || "Friend"
+                user?.name || "Friend",
+                undefined,
+                undefined,
+                (() => {
+                    try {
+                        const data = localStorage.getItem(`daily_log_${new Date().toDateString()}`);
+                        return data ? JSON.parse(data) : undefined;
+                    } catch { return undefined; }
+                })()
             );
 
             const aiMsg: ChatMessage = {

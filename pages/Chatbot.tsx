@@ -205,7 +205,15 @@ const Chatbot: React.FC = () => {
       const aiText = await generateLocalResponse(
         textToSend,
         user.streak || 0,
-        user.name
+        user.name || "Friend",
+        undefined,
+        undefined,
+        (() => {
+          try {
+            const data = localStorage.getItem(`daily_log_${new Date().toDateString()}`);
+            return data ? JSON.parse(data) : undefined;
+          } catch { return undefined; }
+        })()
       );
 
       const aiMsg: ChatMessage = {

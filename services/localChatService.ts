@@ -2,6 +2,12 @@ import { ChatMessage } from "../types";
 
 // --- Types ---
 
+export interface DailyContext {
+    meals: { breakfast: string; lunch: string; dinner: string };
+    water: number;
+    exercises: string[];
+}
+
 type IntentType =
     | "greeting"
     | "craving"
@@ -22,6 +28,10 @@ type IntentType =
     | "exercise"
     | "withdrawal_timeline"
     | "paws"
+    | "sleep_hygiene"
+    | "liver_health"
+    | "neuroplasticity"
+    | "dopamine"
     | "unknown";
 
 interface ConversationState {
@@ -41,7 +51,7 @@ const userStates = new Map<string, ConversationState>();
 interface ResponsePattern {
     intent: IntentType;
     patterns: RegExp[];
-    responses: (string | ((name: string) => string))[];
+    responses: (string | ((name: string, context?: DailyContext) => string))[];
     action?: "start_craving_flow" | "start_panic_flow" | "start_halt_flow" | "start_withdrawal_flow";
 }
 
@@ -50,10 +60,16 @@ const KNOWLEDGE_BASE: ResponsePattern[] = [
         intent: "nutrition",
         patterns: [/\b(food|eat|diet|nutrition|vitamin|supplement|sugar|hungry|snack)\b/i],
         responses: [
-            "Your brain is healing, and it needs fuel. Foods high in Omega-3s (like walnuts, fish) and antioxidants (berries, leafy greens) are great for checking repair.",
+            (name, ctx) => {
+                if (ctx && (!ctx.meals.breakfast && !ctx.meals.lunch)) return `You haven't logged any meals yet today, ${name}. Stable blood sugar is critical for willpower. Can you eat something small right now?`;
+                return "Your brain is healing, and it needs fuel. Foods high in Omega-3s (like walnuts, fish) and antioxidants (berries, leafy greens) are great for checking repair.";
+            },
             "Sugar cravings are common in early recovery as your dopamine levels adjust. Try to stick to complex carbs and protein to keep your blood sugar stable.",
             "Pro-Tip: Dark chocolate (70%+) triggers a small dopamine release and is packed with antioxidants. A healthy little treat!",
-            "Eating regular meals stabilizes your mood. Have you eaten something nutritious in the last 4 hours?",
+            (name, ctx) => {
+                if (ctx && ctx.meals.breakfast) return `Great job starting the day with breakfast (${ctx.meals.breakfast}). Keeping that rhythm going helps stabilize your mood.`;
+                return "Eating regular meals stabilizes your mood. Have you eaten something nutritious in the last 4 hours?";
+            },
             "Quick recovery snack: Apple slices with almond butter. The crunch helps with stress, and the healthy fats feed your brain.",
             "Try Greek yogurt with a handful of berries. The protein helps stabilize blood sugar, preventing mood swings.",
             "A handful of walnuts is great for brain repair. They are high in Omega-3 fatty acids which support emotional regulation."
@@ -63,7 +79,11 @@ const KNOWLEDGE_BASE: ResponsePattern[] = [
         intent: "hydration",
         patterns: [/\b(water|drink|thirst|hydrate|dehydrat)\b/i],
         responses: [
-            "Hydration is key for flushing out toxins. Aim for 3-4 liters a day. If you have a headache, start with a big glass of water.",
+            (name, ctx) => {
+                if (ctx && ctx.water < 4) return `You've only tracked ${ctx.water} glasses today. Dehydration worsens anxiety. Please go drink a large glass of water right now.`;
+                if (ctx && ctx.water >= 8) return `You're doing great on hydration (${ctx.water} glasses)! Your brain thanks you.`;
+                return "Hydration is key for flushing out toxins. Aim for 3-4 liters a day. If you have a headache, start with a big glass of water.";
+            },
             "Dehydration can mimic anxiety and fatigue. Before you panic, drink a glass of water.",
             "Water helps your liver and kidneys do their heavy lifting during detox. Keep a bottle with you everywhere."
         ]
@@ -72,7 +92,10 @@ const KNOWLEDGE_BASE: ResponsePattern[] = [
         intent: "exercise",
         patterns: [/\b(exercise|run|gym|walk|workout|activity|move)\b/i],
         responses: [
-            "Movement generates natural endorphins—the body's own painkillers. Even a 10-minute walk can shift your mood significantly.",
+            (name, ctx) => {
+                if (ctx && ctx.exercises.length > 0) return `I see you've already done ${ctx.exercises.join(", ")} today. That's fantastic! Physical movement is the fastest way to change your emotional state.`;
+                return "Movement generates natural endorphins—the body's own painkillers. Even a 10-minute walk can shift your mood significantly.";
+            },
             "You don't need a marathon. 'Green Exercise' (moving in nature) reduces cortisol levels faster than gym workouts.",
             "When you feel restless energy (akathisia), try to use it. Do pushups, dance, or walk until the energy settles."
         ]
@@ -96,12 +119,51 @@ const KNOWLEDGE_BASE: ResponsePattern[] = [
         ]
     },
     {
+        intent: "sleep_hygiene",
+        patterns: [/\b(insomnia|cant sleep|cycles|circadian|melatonin|rest)\b/i],
+        responses: [
+            "Sleep is when your brain cleans itself (via the glymphatic system). To help it: No screens 1 hour before bed. The blue light blocks melatonin.",
+            "Your circadian rhythm might be flipped from past use. Morning sunlight (10 mins) is the best way to reset your body clock.",
+            "If you can't sleep, don't stay in bed fighting it. Get up, do something boring in dim light, and try again when tired. This stops your bed from becoming a stress trigger."
+        ]
+    },
+    {
+        intent: "liver_health",
+        patterns: [/\b(liver|detox|organ|heal|damage|skin|eyes)\b/i],
+        responses: [
+            "The liver is incredible at regenerating. Coffee (black) has specifically been shown to support liver health and reduce scarring.",
+            "Foods like grapefruit, garlic, and turmeric are natural liver supporters. They help ramp up the enzymes needed to clear toxins.",
+            "Avoid processed foods with high fructose corn syrup. Your liver has enough work to do without processing excess sugar right now."
+        ]
+    },
+    {
+        intent: "neuroplasticity",
+        patterns: [/\b(brain|heal|rewire|smart|cognitive|damage|permanent)\b/i],
+        responses: [
+            "Good news: Your brain is plastic. Every time you say 'No' to a craving, you are physically strengthening a new neural pathway.",
+            "Learning a new skill (even just a card game) accelerates brain repair by forcing new connections to form across damaged areas.",
+            "Aerobic exercise increases BDNF (Brain-Derived Neurotrophic Factor), which is basically Miracle-Gro for your new brain cells."
+        ]
+    },
+    {
+        intent: "dopamine",
+        patterns: [/\b(dopamine|pleasure|numb|bored|flat|nothing|enjoy)\b/i],
+        responses: [
+            "Feeling 'flat' (anhedonia) is normal. Your brain turned down its dopamine receptors to protect itself. They *will* turn back up, but it takes time.",
+            "Don't chase high peaks of dopamine right now. Focus on 'slow release' dopamine: accomplishment, connection, and craft.",
+            "Cold showers (even just 30 seconds) have been shown to increase baseline dopamine levels for hours afterwards. Shocking, but effective!"
+        ]
+    },
+    {
         intent: "greeting",
         patterns: [/\b(hi|hello|hey|morning|afternoon|evening|greetings)\b/i, /^start$/i],
         responses: [
             (name) => `Hello ${name}! It's really good to see you. How are you feeling right now?`,
             "Hi there! I'm here and I'm listening. What's on your mind today?",
-            (name) => `Welcome back, ${name}. I'm ready to walk this path with you today. How can I help?`
+            (name, ctx) => {
+                if (ctx && ctx.exercises && ctx.exercises.length > 0) return `Welcome back, ${name}. I see you've already been active today! How can I help you keep that momentum?`;
+                return `Welcome back, ${name}. I'm ready to walk this path with you today. How can I help?`;
+            }
         ]
     },
     {
@@ -253,7 +315,8 @@ export const generateLocalResponse = async (
     userStreak: number = 0,
     userName: string = "Friend",
     mentorName?: string,
-    mentorGender?: "male" | "female" | "neutral"
+    mentorGender?: "male" | "female" | "neutral",
+    dailyContext?: DailyContext
 ): Promise<string> => {
     // Simulate natural delay
     await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 800));
@@ -327,7 +390,7 @@ export const generateLocalResponse = async (
             state.step = 0;
             userStates.set(userId, state);
             const resp = typeof matchedPattern.responses[0] === 'function'
-                ? matchedPattern.responses[0](userName)
+                ? matchedPattern.responses[0](userName, dailyContext)
                 : matchedPattern.responses[0] as string;
             return prefix + resp;
         }
@@ -336,7 +399,7 @@ export const generateLocalResponse = async (
             state.step = 0;
             userStates.set(userId, state);
             const resp = typeof matchedPattern.responses[0] === 'function'
-                ? matchedPattern.responses[0](userName)
+                ? matchedPattern.responses[0](userName, dailyContext)
                 : matchedPattern.responses[0] as string;
             return prefix + resp;
         }
@@ -346,14 +409,14 @@ export const generateLocalResponse = async (
             // state.step = 0;
             // userStates.set(userId, state);
             const resp = typeof matchedPattern.responses[0] === 'function'
-                ? matchedPattern.responses[0](userName)
+                ? matchedPattern.responses[0](userName, dailyContext)
                 : matchedPattern.responses[0] as string;
             return prefix + resp;
         }
         if (matchedPattern.action === "start_halt_flow") {
             // Example placeholder if we had a halt flow
             const resp = typeof matchedPattern.responses[0] === 'function'
-                ? matchedPattern.responses[0](userName)
+                ? matchedPattern.responses[0](userName, dailyContext)
                 : matchedPattern.responses[0] as string;
             return prefix + resp;
         }
@@ -366,7 +429,7 @@ export const generateLocalResponse = async (
         state.lastIntent = matchedIntent;
         userStates.set(userId, state);
 
-        const finalResp = typeof response === 'function' ? response(userName) : response;
+        const finalResp = typeof response === 'function' ? response(userName, dailyContext) : response;
         return prefix + finalResp;
     }
 
@@ -398,3 +461,4 @@ export const generateLocalResponse = async (
 
     return prefix + DEFAULT_RESPONSES[Math.floor(Math.random() * DEFAULT_RESPONSES.length)];
 };
+

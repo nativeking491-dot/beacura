@@ -1,5 +1,5 @@
 import React from "react";
-import { Shield, Award, Heart, Activity, Coffee, Brain } from "lucide-react";
+import { Shield, Award, Heart, Activity, Coffee, Brain, Pill, AlertCircle, HeartPulse, Zap, Thermometer, AlertTriangle } from "lucide-react";
 import { UserRole, Badge, Mentor, FoodTip } from "./types";
 
 export const MOCK_USER = {
@@ -104,13 +104,33 @@ export const FOOD_TIPS: FoodTip[] = [
   },
   {
     title: "Protein-Rich Snacks",
-    description: "Lean meats, nuts, and yogurt contain amino acids.",
+    description: "Lean meats, nuts, and yogurt contain amino acids (Tyrosine).",
     benefits: "Helps repair brain tissue and balances neurotransmitters.",
   },
   {
     title: "Hydration Focus",
     description: "Drink at least 12 glasses of water daily.",
     benefits: "Flushes out toxins and helps prevent headaches.",
+  },
+  {
+    title: "Gut-Brain Connection",
+    description: "Fermented foods like kimchi, sauerkraut, and yogurt.",
+    benefits: "90% of serotonin is made in the gut. A healthy gut means a stable mood.",
+  },
+  {
+    title: "Magnesium Boosters",
+    description: "Spinach, pumpkin seeds, and almonds.",
+    benefits: "Natural muscle relaxant that helps with insomnia and restless legs.",
+  },
+  {
+    title: "Antioxidant Power",
+    description: "Dark berries (blueberries, blackberries) and dark chocolate.",
+    benefits: "Protects brain cells from oxidative stress caused by past substance use.",
+  },
+  {
+    title: "Sugar Management",
+    description: "Avoid spikes by pairing fruit with fats (like nut butter).",
+    benefits: "Prevents the 'crash' that can often trigger cravings.",
   },
 ];
 
@@ -197,5 +217,163 @@ export const MEDICAL_FAQS = [
   {
     q: "When should I seek emergency medical help?",
     a: "If you experience seizures, high fever, severe chest pain, or hallucinations, call emergency services immediately.",
+  },
+  {
+    q: "Why can't I sleep? (Insomnia)",
+    a: "Your brain's ability to regulate sleep cycles was disrupted. It takes time to reset. Avoid caffeine after noon and screens 1 hour before bed.",
+  },
+  {
+    q: "What is PAWS (Post-Acute Withdrawal Syndrome)?",
+    a: "PAWS involves symptoms like brain fog, mood swings, and anxiety that can persist for months after quitting. It is a sign your brain is healing.",
+  },
+  {
+    q: "Is my liver permanently damaged?",
+    a: "The liver has amazing regenerative properties. Abstinence, a healthy diet, and avoiding processed foods allow it to heal significantly over time.",
+  },
+  {
+    q: "Why do I feel 'flat' or bored (Anhedonia)?",
+    a: "Your dopamine receptors were downregulated to protect the brain. They are currently 'numb'. They will regenerate, but it requires patience and small joys.",
+  },
+  {
+    q: "Can exercise really help?",
+    a: "Yes. Aerobic exercise increases BDNF (Brain-Derived Neurotrophic Factor), which repairs neurons and creates new neural pathways.",
+  },
+];
+
+export const COMMON_SYMPTOMS = [
+  {
+    title: "Sleep Disturbance",
+    icon: "Pill",
+    desc: "Insomnia or vivid dreams are common as your brain recalibrates.",
+    tip: "Try the 4-7-8 breathing technique before bed.",
+  },
+  {
+    title: "Physical Aches",
+    icon: "AlertCircle",
+    desc: "Muscle tension and flu-like symptoms are typical early on.",
+    tip: "Warm baths with Epsom salts can help relax muscles.",
+  },
+  {
+    title: "Emotional Swings",
+    icon: "HeartPulse",
+    desc: "Anxiety and irritability often peak within the first 72 hours.",
+    tip: "This is temporary. Distract yourself with 5 minutes of focused activity.",
+  },
+  {
+    title: "Brain Fog",
+    icon: "Brain",
+    desc: "Temporary difficulty focusing or remembering things.",
+    tip: "Write things down. Don't multitask. Your brain is healing.",
+  },
+  {
+    title: "Tremors & Shakes",
+    icon: "Activity",
+    desc: "Fine motor control issues caused by nervous system over-excitation.",
+    tip: "Avoid caffeine. Keep blood sugar stable with small, frequent meals.",
+  },
+  {
+    title: "Temperature Flashes",
+    icon: "Thermometer",
+    desc: "Sudden sweating or chills as your body regulates temperature.",
+    tip: "Dress in layers and stay hydrated to replace lost fluids.",
+  },
+  {
+    title: "Intense Cravings",
+    icon: "Zap",
+    desc: "Sudden urges to use, often triggered by stress or cues.",
+    tip: "Play the tape forward. How will you feel 1 hour after using?",
+  },
+];
+
+export const RECOVERY_DOS = [
+  { text: "Maintain a consistent sleep schedule (7-9 hours).", icon: "Moon" },
+  { text: "Communicate symptoms to a medical professional.", icon: "Stethoscope" },
+  { text: "Practice deep breathing when cravings peak.", icon: "Wind" },
+  { text: "Surround yourself with clean, positive influences.", icon: "ShieldCheck" },
+  { text: "Eat protein-rich meals to stabilize mood.", icon: "Utensils" },
+  { text: "Exercise daily to boost natural dopamine.", icon: "Activity" },
+  { text: "Connect with a mentor or support group.", icon: "Users" },
+];
+
+export const RECOVERY_DONTS = [
+  { text: "Don't go 'cold turkey' without medical supervision.", icon: "AlertTriangle" },
+  { text: "Don't self-medicate with other substances.", icon: "Pill" },
+  { text: "Avoid isolating yourself when feeling low.", icon: "UserX" },
+  { text: "Don't skip meals or neglect hydration.", icon: "Droplets" },
+  { text: "Don't visit old 'using spots' to test willpower.", icon: "MapPin" },
+  { text: "Don't keep secrets; honesty reduces shame.", icon: "Lock" },
+  { text: "Don't ignore HALT triggers (Hungry, Angry, Lonely, Tired).", icon: "BatteryWarning" },
+];
+
+export const WEEKLY_EXERCISE_PLAN = [
+  {
+    day: "Monday",
+    focus: "Cardio Kickstart",
+    benefit: "Boosts endorphins to combat 'Monday Blue' feelings.",
+    exercises: [
+      { name: "Brisk Walk/Jog", duration: "20 mins", instruction: "Keep a steady pace. Focus on your breathing." },
+      { name: "Jumping Jacks", duration: "3 sets of 15", instruction: "Full arm extension. Lands softly on balls of feet." },
+      { name: "High Knees", duration: "30 seconds", instruction: "Drive knees up to waist level while jogging in place." },
+    ]
+  },
+  {
+    day: "Tuesday",
+    focus: "Upper Body Strength",
+    benefit: "Rebuilding physical strength mirrors mental resilience.",
+    exercises: [
+      { name: "Push-ups (or Wall Push-ups)", duration: "3 sets of 10", instruction: "Keep core tight. Lower chest to floor/wall." },
+      { name: "Arm Circles", duration: "1 min each direction", instruction: "Keep arms straight at shoulder height. Small circles." },
+      { name: "Plank Shoulder Taps", duration: "20 taps", instruction: "Hold plank position, tap opposite shoulder with hand." },
+    ]
+  },
+  {
+    day: "Wednesday",
+    focus: "Yoga & Flexibility",
+    benefit: "Releases tension stored in muscles from anxiety.",
+    exercises: [
+      { name: "Child's Pose", duration: "Hold for 2 mins", instruction: "Kneel, sit back on heels, stretch arms forward on floor." },
+      { name: "Cat-Cow Stretch", duration: "10 reps", instruction: "On all fours, arch back up (Cat) then dip down (Cow)." },
+      { name: "Seated Forward Fold", duration: "Hold for 1 min", instruction: "Legs straight, reach for toes. Breathe deeply." },
+    ]
+  },
+  {
+    day: "Thursday",
+    focus: "Lower Body Stability",
+    benefit: "Grounding exercises help when feeling 'in your head'.",
+    exercises: [
+      { name: "Bodyweight Squats", duration: "3 sets of 12", instruction: "Feet shoulder-width. Sit back like into a chair." },
+      { name: "Lunges", duration: "10 per leg", instruction: "Step forward, lower back knee towards ground. Keep front knee behind toe." },
+      { name: "Calf Raises", duration: "3 sets of 15", instruction: "Stand tall, raise heels off ground, lower slowly." },
+    ]
+  },
+  {
+    day: "Friday",
+    focus: "Core & Balance",
+    benefit: "A strong core improves posture and confidence.",
+    exercises: [
+      { name: "Plank Hold", duration: "30-60 seconds", instruction: "Forearms on ground, body in straight line. Don't let hips sag." },
+      { name: "Bicycle Crunches", duration: "20 reps", instruction: "On back, elbow to opposite knee. Focus on rotation." },
+      { name: "Single Leg Stand", duration: "30 sec per leg", instruction: "Stand on one foot. Close eyes for extra challenge." },
+    ]
+  },
+  {
+    day: "Saturday",
+    focus: "Active Fun",
+    benefit: "Rediscovering joy in movement without strict regimen.",
+    exercises: [
+      { name: "Dance / Zumba", duration: "15 mins", instruction: "Put on your favorite upbeat song and just move." },
+      { name: "Nature Hike", duration: "30 mins", instruction: "Walk explicitly in a green area. Notice 3 birds/plants." },
+      { name: "Stretching", duration: "10 mins", instruction: "Gentle full body stretch to cool down." },
+    ]
+  },
+  {
+    day: "Sunday",
+    focus: "Rest & Recovery",
+    benefit: "Rest is when the muscles (and mind) actually repair.",
+    exercises: [
+      { name: "Deep Breathing", duration: "5 mins", instruction: "Inhale 4 counts, Hold 4, Exhale 4, Hold 4 (Box Breathing)." },
+      { name: "Gentle Neck Rolls", duration: "1 min", instruction: "Slowly roll head from side to side. Release jaw tension." },
+      { name: "Leisurely Stroll", duration: "15 mins", instruction: "Slow pace. No headphones. Listen to the world." },
+    ]
   },
 ];
