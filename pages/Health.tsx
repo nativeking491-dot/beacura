@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { FOOD_TIPS, WEEKLY_MEAL_PLAN, WEEKLY_EXERCISE_PLAN } from "../constants";
 import {
   Utensils,
@@ -27,6 +28,8 @@ import { generateLocalResponse } from "../services/localChatService";
 
 const Health: React.FC = () => {
   const { user } = useUser();
+  const navigate = useNavigate();
+
   // Get current day of week (0-6)
   const todayIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1; // Map Sun-Sat to Mon-Sun
 
@@ -201,7 +204,7 @@ const Health: React.FC = () => {
             return (
               <div
                 key={idx}
-                onClick={() => toggleExercise(ex.name)}
+                onClick={() => navigate(`/exercise-timer/${idx}`)}
                 className={`cursor-pointer p-5 rounded-2xl border transition-all duration-300 relative group overflow-hidden
                   ${isDone
                     ? "bg-emerald-500/20 border-emerald-500/50 hover:bg-emerald-500/30"
@@ -231,9 +234,9 @@ const Health: React.FC = () => {
       {/* --- DAILY INTAKE LOG --- */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Hydration */}
-        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+        <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="font-bold text-lg flex items-center space-x-2">
+            <h3 className="font-bold text-lg flex items-center space-x-2 text-slate-900 dark:text-slate-100">
               <Droplets className="text-blue-500" />
               <span>Hydration Tracker</span>
             </h3>
@@ -263,9 +266,9 @@ const Health: React.FC = () => {
         </div>
 
         {/* Meal Logging */}
-        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm space-y-4">
+        <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm space-y-4">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="font-bold text-lg flex items-center space-x-2">
+            <h3 className="font-bold text-lg flex items-center space-x-2 text-slate-900 dark:text-slate-100">
               <Utensils className="text-orange-500" />
               <span>Today's Intake</span>
             </h3>
@@ -274,33 +277,33 @@ const Health: React.FC = () => {
             </button>
           </div>
           <div>
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">Breakfast</label>
+            <label className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1 block">Breakfast</label>
             <input
               type="text"
               value={dailyMeals.breakfast}
               onChange={(e) => handleMealChange("breakfast", e.target.value)}
               placeholder={`e.g. ${currentPlan.meals.breakfast}`}
-              className="w-full bg-orange-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+              className="w-full bg-orange-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
             />
           </div>
           <div>
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">Lunch</label>
+            <label className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1 block">Lunch</label>
             <input
               type="text"
               value={dailyMeals.lunch}
               onChange={(e) => handleMealChange("lunch", e.target.value)}
               placeholder={`e.g. ${currentPlan.meals.lunch}`}
-              className="w-full bg-orange-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+              className="w-full bg-orange-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
             />
           </div>
           <div>
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 block">Dinner</label>
+            <label className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1 block">Dinner</label>
             <input
               type="text"
               value={dailyMeals.dinner}
               onChange={(e) => handleMealChange("dinner", e.target.value)}
               placeholder={`e.g. ${currentPlan.meals.dinner}`}
-              className="w-full bg-orange-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+              className="w-full bg-orange-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
             />
           </div>
         </div>

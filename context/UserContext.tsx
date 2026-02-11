@@ -74,11 +74,11 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
         // RETRY LOGIC: If profile is missing, it might be a race condition during sign up.
         // Wait and retry a few times before creating a new one or falling back.
-        if (retryCount < 3) {
+        if (retryCount < 2) {
           console.log(
-            `Profile not found, retrying in 1000ms... (Attempt ${retryCount + 1}/3)`,
+            `Profile not found, retrying in 300ms... (Attempt ${retryCount + 1}/2)`,
           );
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          await new Promise((resolve) => setTimeout(resolve, 300));
           return fetchUserProfile(retryCount + 1);
         }
 
@@ -125,7 +125,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
           points: 0,
         });
       } else if (profile) {
-        console.log("User profile found:", profile);
+        console.log("✅ User profile found:", profile);
+        console.log("🎭 User role from database:", profile.role);
+        console.log("👤 User name:", profile.name);
         // Check if this is a new user:
         // 1. Account created within last 30 minutes
         // 2. Has zero streak (hasn't started their journey yet)
@@ -136,6 +138,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         const isRecentlyCreated = minutesSinceCreation < 30; // 30 minutes window
 
         setUser(profile);
+        console.log("🔄 User state updated with profile, role:", profile.role);
         // Mark as new user if account is recent AND hasn't built any streak yet
         const isFirstTimeUser = isRecentlyCreated && profile.streak === 0;
         setIsNewUser(isFirstTimeUser);
@@ -169,7 +172,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         console.error("Session fallback failed:", innerError);
       }
     } finally {
-      if (retryCount === 0 || retryCount === 3) {
+      if (retryCount === 0 || retryCount === 2) {
         setLoading(false);
       }
     }

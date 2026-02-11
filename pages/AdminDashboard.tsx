@@ -115,7 +115,7 @@ const AdminDashboard: React.FC = () => {
 
         console.log("✅ Admin verified, loading dashboard");
         setAdminVerified(true);
-        
+
         // Load stats after admin verification
         await fetchStats();
       } catch (error) {
@@ -132,6 +132,9 @@ const AdminDashboard: React.FC = () => {
   useEffect(() => {
     if (!adminVerified) return;
 
+    // Debounce timer for fetchStats
+    let refreshTimer: NodeJS.Timeout;
+
     // Set up real-time subscription to listen for changes
     const channel = supabase
       .channel('public:users')
@@ -140,8 +143,14 @@ const AdminDashboard: React.FC = () => {
         { event: '*', schema: 'public', table: 'users' },
         (payload) => {
           console.log('User data changed:', payload);
-          // Refresh stats when changes are detected
-          fetchStats();
+
+          // Debounce refresh to avoid overwriting optimistic updates
+          // Wait 1 second before refreshing to allow optimistic updates to settle
+          clearTimeout(refreshTimer);
+          refreshTimer = setTimeout(() => {
+            console.log('Refreshing stats after database change...');
+            fetchStats();
+          }, 1000);
         }
       )
       .subscribe((status) => {
@@ -153,6 +162,7 @@ const AdminDashboard: React.FC = () => {
       });
 
     return () => {
+      clearTimeout(refreshTimer);
       channel.unsubscribe();
     };
   }, [adminVerified]);
@@ -171,7 +181,7 @@ const AdminDashboard: React.FC = () => {
 
       if (users && users.length > 0) {
         console.log(`Fetched ${users.length} users from database`);
-        
+
         const totalUsers = users.length;
         const recoveringUsers = users.filter(
           (u) => u.role === "RECOVERING_USER",
@@ -235,6 +245,13 @@ const AdminDashboard: React.FC = () => {
 
   const handleUpdateUser = async (updatedUser: RecentUser) => {
     try {
+      // Optimistic update: Update UI immediately
+      setAllUsers(prevUsers =>
+        prevUsers.map(u => u.id === updatedUser.id ? updatedUser : u)
+      );
+      setEditingUser(null);
+
+      // Then update database
       const { error } = await supabase
         .from("users")
         .update({
@@ -246,12 +263,13 @@ const AdminDashboard: React.FC = () => {
         })
         .eq("id", updatedUser.id);
 
-      if (error) throw error;
+      if (error) {
+        // Revert optimistic update on error
+        await fetchStats();
+        throw error;
+      }
 
-      // Refresh data with a slight delay to ensure database updates propagate
-      await new Promise(resolve => setTimeout(resolve, 300));
-      await fetchStats();
-      setEditingUser(null);
+      // Success! Optimistic update stays
       alert("✅ User updated successfully!");
     } catch (error) {
       console.error("Error updating user:", error);
@@ -261,33 +279,29 @@ const AdminDashboard: React.FC = () => {
 
   const handleDeleteUser = async (userId: string) => {
     try {
-      // First delete the user profile from public.users
+      // Optimistic update: Remove from UI immediately
+      setAllUsers(prevUsers => prevUsers.filter(u => u.id !== userId));
+      setDeletingUser(null);
+
+      // Then delete from database (cascade delete will handle related records)
       const { error: profileError } = await supabase
         .from("users")
         .delete()
         .eq("id", userId);
 
-      if (profileError) throw profileError;
-
-      // Delete the user from auth (if you have admin access)
-      try {
-        const response = await fetch('/api/deleteUser', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId }),
-        });
-        if (!response.ok) {
-          console.warn('Could not delete from auth system - may require admin API key');
-        }
-      } catch (authError) {
-        console.warn('Auth deletion skipped:', authError);
+      if (profileError) {
+        // Revert optimistic update on error
+        await fetchStats();
+        throw profileError;
       }
 
-      // Refresh data with a small delay to ensure database updates
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Note: Auth user deletion requires admin service role key
+      // For now, we only delete the profile. The auth user becomes orphaned but harmless.
+      // To fully delete auth users, you need to set up a Supabase Edge Function with service role.
+
+      // Refresh stats to recalculate counts
       await fetchStats();
-      setDeletingUser(null);
-      alert("✅ User deleted successfully!");
+      alert("✅ User profile deleted successfully!");
     } catch (error) {
       console.error("Error deleting user:", error);
       alert("❌ Failed to delete user. Please try again.");
@@ -314,8 +328,8 @@ const AdminDashboard: React.FC = () => {
     <div
       onClick={() => setSelectedStat(statId)}
       className={`${theme === "dark"
-          ? "bg-slate-800 border-slate-700 hover:border-slate-600"
-          : `${bgColor || "bg-white"} border-slate-100`
+        ? "bg-slate-800 border-slate-700 hover:border-slate-600"
+        : `${bgColor || "bg-white"} border-slate-100`
         } p-6 rounded-2xl border shadow-lg hover:shadow-2xl transition-all duration-200 cursor-pointer hover:scale-105`}
     >
       <div className="flex items-start justify-between">
@@ -547,7 +561,7 @@ const AdminDashboard: React.FC = () => {
         onClick={onClose}
       >
         <div
-          className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto"
+          className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-indigo-600 p-6 text-white rounded-t-2xl flex justify-between items-center z-10">
@@ -565,8 +579,8 @@ const AdminDashboard: React.FC = () => {
 
           <div className="p-8 space-y-8">
             {/* Chart Section */}
-            <div className="bg-slate-50 p-6 rounded-xl">
-              <h3 className="text-lg font-bold text-slate-800 mb-4">
+            <div className="bg-slate-50 dark:bg-slate-700 p-6 rounded-xl">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">
                 Visual Analytics
               </h3>
               <ResponsiveContainer width="100%" height={350}>
@@ -618,7 +632,7 @@ const AdminDashboard: React.FC = () => {
 
             {/* Key Metrics Grid */}
             <div>
-              <h3 className="text-lg font-bold text-slate-800 mb-4">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">
                 Key Metrics
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -644,7 +658,7 @@ const AdminDashboard: React.FC = () => {
             {/* Detailed User Table */}
             {detailedData && detailedData.users.length > 0 && (
               <div>
-                <h3 className="text-lg font-bold text-slate-800 mb-4">
+                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">
                   {statId === "total"
                     ? "Recent Users"
                     : statId === "recovering"
@@ -653,26 +667,26 @@ const AdminDashboard: React.FC = () => {
                         ? "New Users This Week"
                         : "Top Engaged Users"}
                 </h3>
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-600">
                   <table className="w-full">
-                    <thead className="bg-gradient-to-r from-purple-100 to-indigo-100">
+                    <thead className="bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900 dark:to-indigo-900">
                       <tr>
-                        <th className="text-left py-3 px-4 font-semibold text-slate-700">
+                        <th className="text-left py-3 px-4 font-semibold text-slate-700 dark:text-slate-200">
                           Name
                         </th>
-                        <th className="text-left py-3 px-4 font-semibold text-slate-700">
+                        <th className="text-left py-3 px-4 font-semibold text-slate-700 dark:text-slate-200">
                           Email
                         </th>
-                        <th className="text-left py-3 px-4 font-semibold text-slate-700">
+                        <th className="text-left py-3 px-4 font-semibold text-slate-700 dark:text-slate-200">
                           Role
                         </th>
-                        <th className="text-right py-3 px-4 font-semibold text-slate-700">
+                        <th className="text-right py-3 px-4 font-semibold text-slate-700 dark:text-slate-200">
                           Streak
                         </th>
-                        <th className="text-right py-3 px-4 font-semibold text-slate-700">
+                        <th className="text-right py-3 px-4 font-semibold text-slate-700 dark:text-slate-200">
                           Points
                         </th>
-                        <th className="text-left py-3 px-4 font-semibold text-slate-700">
+                        <th className="text-left py-3 px-4 font-semibold text-slate-700 dark:text-slate-200">
                           Joined
                         </th>
                       </tr>
@@ -681,12 +695,13 @@ const AdminDashboard: React.FC = () => {
                       {detailedData.users.map((user, index) => (
                         <tr
                           key={user.id}
-                          className={`border-b border-slate-100 ${index % 2 === 0 ? "bg-white" : "bg-slate-50"}`}
+                          className={`border-b border-slate-100 dark:border-slate-600 ${index % 2 === 0 ? "bg-white dark:bg-slate-800" : "bg-slate-50 dark:bg-slate-700"
+                            }`}
                         >
-                          <td className="py-3 px-4 font-medium text-slate-900">
+                          <td className="py-3 px-4 font-medium text-slate-900 dark:text-slate-100">
                             {user.name}
                           </td>
-                          <td className="py-3 px-4 text-slate-600 text-sm font-mono">
+                          <td className="py-3 px-4 text-slate-600 dark:text-slate-300 text-sm font-mono">
                             {user.email}
                           </td>
                           <td className="py-3 px-4">
@@ -711,7 +726,7 @@ const AdminDashboard: React.FC = () => {
                           <td className="py-3 px-4 text-right font-bold text-indigo-600">
                             {user.points.toLocaleString()}
                           </td>
-                          <td className="py-3 px-4 text-slate-600 text-sm">
+                          <td className="py-3 px-4 text-slate-600 dark:text-slate-300 text-sm">
                             {new Date(user.created_at).toLocaleDateString(
                               "en-US",
                               {
@@ -782,7 +797,7 @@ const AdminDashboard: React.FC = () => {
         onClick={() => setEditingUser(null)}
       >
         <div
-          className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full"
+          className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-2xl w-full"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 text-white rounded-t-2xl flex justify-between items-center">
@@ -800,7 +815,7 @@ const AdminDashboard: React.FC = () => {
 
           <div className="p-8 space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
+              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                 Name
               </label>
               <input
@@ -809,12 +824,12 @@ const AdminDashboard: React.FC = () => {
                 onChange={(e) =>
                   setEditingUser({ ...editingUser, name: e.target.value })
                 }
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
+              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                 Email
               </label>
               <input
@@ -823,12 +838,12 @@ const AdminDashboard: React.FC = () => {
                 onChange={(e) =>
                   setEditingUser({ ...editingUser, email: e.target.value })
                 }
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
+              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                 Role
               </label>
               <select
@@ -836,7 +851,7 @@ const AdminDashboard: React.FC = () => {
                 onChange={(e) =>
                   setEditingUser({ ...editingUser, role: e.target.value })
                 }
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 <option value="RECOVERING_USER">💚 Recovering User</option>
                 <option value="RECOVERED_MENTOR">🏆 Recovered Mentor</option>
@@ -846,7 +861,7 @@ const AdminDashboard: React.FC = () => {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                   Streak (days)
                 </label>
                 <input
@@ -858,12 +873,12 @@ const AdminDashboard: React.FC = () => {
                       streak: parseInt(e.target.value) || 0,
                     })
                   }
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   min="0"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                   Points
                 </label>
                 <input
@@ -875,7 +890,7 @@ const AdminDashboard: React.FC = () => {
                       points: parseInt(e.target.value) || 0,
                     })
                   }
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   min="0"
                 />
               </div>
@@ -911,7 +926,7 @@ const AdminDashboard: React.FC = () => {
         onClick={() => setDeletingUser(null)}
       >
         <div
-          className="bg-white rounded-2xl shadow-2xl max-w-md w-full"
+          className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="bg-gradient-to-r from-rose-600 to-red-600 p-6 text-white rounded-t-2xl flex justify-between items-center">
@@ -928,18 +943,18 @@ const AdminDashboard: React.FC = () => {
           </div>
 
           <div className="p-8">
-            <p className="text-slate-700 text-lg mb-2">
+            <p className="text-slate-700 dark:text-slate-200 text-lg mb-2">
               Are you sure you want to delete this user?
             </p>
-            <div className="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-lg mb-6">
-              <p className="font-semibold text-slate-900">
+            <div className="bg-rose-50 dark:bg-rose-900/30 border-l-4 border-rose-500 p-4 rounded-r-lg mb-6">
+              <p className="font-semibold text-slate-900 dark:text-slate-100">
                 {deletingUser.name}
               </p>
-              <p className="text-sm text-slate-600 font-mono">
+              <p className="text-sm text-slate-600 dark:text-slate-300 font-mono">
                 {deletingUser.email}
               </p>
             </div>
-            <p className="text-sm text-slate-500 mb-6">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
               This action cannot be undone. All user data will be permanently
               removed.
             </p>

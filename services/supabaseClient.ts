@@ -43,6 +43,21 @@ export const authService = {
     return data;
   },
 
+  // Check if email exists
+  async checkEmailExists(email: string): Promise<boolean> {
+    const { data, error } = await supabase.rpc('check_email_exists', {
+      email_to_check: email,
+    });
+
+    if (error) {
+      console.error("Error checking email:", error);
+      // If RPC fails (e.g. function doesn't exist), fall back to safe default
+      return true;
+    }
+
+    return !!data;
+  },
+
   // Sign in with email and password
   async signIn(email: string, password: string) {
     // Attempt to sign in directly - Supabase Auth will handle if user doesn't exist

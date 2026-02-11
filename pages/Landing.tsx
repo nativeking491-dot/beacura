@@ -20,12 +20,11 @@ const Landing: React.FC = () => {
           <span>🌅 There is hope for a better tomorrow</span>
         </div>
         <h1 className="text-5xl md:text-7xl font-extrabold text-slate-900 mb-6 leading-tight">
-          Your Journey to <span className="bg-gradient-to-r from-amber-500 via-orange-400 to-rose-500 bg-clip-text text-transparent">Recovery & Joy</span> <br />{" "}
-          Starts Here.
+          <span className="bg-gradient-to-r from-amber-500 via-orange-400 to-rose-500 bg-clip-text text-transparent">Recovery is a journey.</span> <br />{" "}
+          We provide the compass.
         </h1>
         <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed">
-          Beacura provides a compassionate community, professional guidance, and
-          AI-powered tools to help you reclaim your life from addiction.
+          A comprehensive digital ecosystem designed to bridge the gap between clinical treatment and long-term sustainable recovery.
         </p>
         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center">
           <Link
@@ -52,17 +51,30 @@ const Landing: React.FC = () => {
         ].map((stat, i) => (
           <div
             key={i}
-            className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 text-center"
+            className="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 text-center"
           >
-            <div className="bg-gradient-to-br from-amber-50 to-orange-50 text-amber-600 w-12 h-12 flex items-center justify-center rounded-xl mx-auto mb-4 shadow-sm">
+            <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 text-amber-600 w-12 h-12 flex items-center justify-center rounded-xl mx-auto mb-4 shadow-sm">
               <stat.icon size={24} />
             </div>
-            <div className="text-3xl font-bold text-slate-900">
+            <div className="text-3xl font-bold text-slate-900 dark:text-slate-100">
               {stat.label}
             </div>
-            <div className="text-slate-500">{stat.sub}</div>
+            <div className="text-slate-500 dark:text-slate-400">{stat.sub}</div>
           </div>
         ))}
+      </section>
+
+
+      {/* About the Project */}
+      <section className="py-20 w-full max-w-5xl">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+            About the Project
+          </h2>
+          <p className="text-lg text-slate-700 max-w-3xl mx-auto leading-relaxed px-4">
+            Beacura was born from a simple realization: <span className="font-semibold text-amber-600">the hardest part of recovery happens between therapy sessions</span>. We built this platform to ensure that no one has to navigate the complexities of addiction alone. By combining real-time progress tracking with a supportive digital community, Beacura transforms recovery from a solitary struggle into a shared success.
+          </p>
+        </div>
       </section>
 
       {/* Features */}
@@ -79,9 +91,19 @@ const Landing: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
           {[
             {
-              title: "Peer Counseling",
-              desc: "Connect with mentors who have walked the path you're on.",
+              title: "Wellness Milestones",
+              desc: "Track more than just days sober—monitor sleep quality, mood patterns, and social reintegration.",
+              icon: Award,
+            },
+            {
+              title: "Safe-Space Community",
+              desc: "A moderated, anonymous environment where you can share experiences without stigma.",
               icon: Users,
+            },
+            {
+              title: "Crisis Mode",
+              desc: "One-tap access to emergency hotlines and localized support centers when you need them most.",
+              icon: PhoneCall,
             },
             {
               title: "AI Companion",
@@ -94,16 +116,6 @@ const Landing: React.FC = () => {
               icon: Shield,
             },
             {
-              title: "Daily Rewards",
-              desc: "Stay motivated with badges, levels, and streak tracking.",
-              icon: Award,
-            },
-            {
-              title: "Medical Guidance",
-              desc: "Expert tips for managing withdrawal symptoms safely.",
-              icon: ShieldAlert,
-            },
-            {
               title: "Private & Secure",
               desc: "Your data is encrypted. Optional anonymous mode.",
               icon: Shield,
@@ -111,15 +123,15 @@ const Landing: React.FC = () => {
           ].map((f, i) => (
             <div
               key={i}
-              className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-slate-100"
+              className="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-slate-100 dark:border-slate-700"
             >
-              <div className="bg-gradient-to-br from-amber-50 to-orange-100 text-amber-600 w-10 h-10 flex items-center justify-center rounded-lg mb-4 shadow-sm">
+              <div className="bg-gradient-to-br from-amber-50 to-orange-100 dark:from-amber-900/20 dark:to-orange-900/30 text-amber-600 w-10 h-10 flex items-center justify-center rounded-lg mb-4 shadow-sm">
                 <f.icon size={20} />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">
                 {f.title}
               </h3>
-              <p className="text-slate-600 leading-relaxed">{f.desc}</p>
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{f.desc}</p>
             </div>
           ))}
         </div>

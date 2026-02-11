@@ -65,24 +65,24 @@ export const CravingLogger: React.FC<CravingLoggerProps> = ({
 
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-8 rounded-2xl max-w-md w-full shadow-2xl animate-in zoom-in">
+          <div className="bg-white dark:bg-slate-800 p-8 rounded-2xl max-w-md w-full shadow-2xl animate-in zoom-in">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-slate-900">Log Craving</h2>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Log Craving</h2>
               <button
                 onClick={() => setShowModal(false)}
-                className="p-1 hover:bg-slate-100 rounded-lg transition"
+                className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition"
               >
-                <X size={24} />
+                <X size={24} className="text-slate-900 dark:text-slate-100" />
               </button>
             </div>
 
             <div className="space-y-6">
               <div>
                 <div className="flex justify-between items-center mb-3">
-                  <label className="block text-sm font-semibold text-slate-700">
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
                     Severity Level
                   </label>
-                  <span className="text-lg font-bold text-rose-600 bg-rose-50 px-3 py-1 rounded-lg">
+                  <span className="text-lg font-bold text-rose-600 bg-rose-50 dark:bg-rose-900/30 px-3 py-1 rounded-lg">
                     {severity}/10
                   </span>
                 </div>
@@ -92,16 +92,16 @@ export const CravingLogger: React.FC<CravingLoggerProps> = ({
                   max="10"
                   value={severity}
                   onChange={(e) => setSeverity(parseInt(e.target.value))}
-                  className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-rose-600"
+                  className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-rose-600"
                 />
-                <div className="flex justify-between text-xs text-slate-500 mt-2">
+                <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mt-2">
                   <span>Mild</span>
                   <span>Intense</span>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                   What triggered this craving?
                 </label>
                 <input
@@ -109,12 +109,12 @@ export const CravingLogger: React.FC<CravingLoggerProps> = ({
                   value={trigger}
                   onChange={(e) => setTrigger(e.target.value)}
                   placeholder="e.g., stressful day, saw old friend..."
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                   What coping strategy are you using? (optional)
                 </label>
                 <textarea
@@ -122,7 +122,7 @@ export const CravingLogger: React.FC<CravingLoggerProps> = ({
                   onChange={(e) => setStrategy(e.target.value)}
                   placeholder="e.g., called mentor, went for run, meditated..."
                   rows={3}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent resize-none"
+                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent resize-none"
                 />
               </div>
 
@@ -134,7 +134,7 @@ export const CravingLogger: React.FC<CravingLoggerProps> = ({
                 {loading ? "Logging..." : "Log Craving"}
               </button>
 
-              <p className="text-xs text-slate-500 text-center">
+              <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
                 ✨ Logging cravings helps you understand your patterns and build strength
               </p>
             </div>

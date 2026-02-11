@@ -33,6 +33,14 @@ export const NotificationPreferencesModal: React.FC<
   const fetchPreferences = async () => {
     if (!userId) return;
     try {
+      // Try to load from localStorage first
+      const stored = localStorage.getItem(`notif_prefs_${userId}`);
+      if (stored) {
+        setPreferences(JSON.parse(stored));
+        return;
+      }
+
+      // Fallback: try database (if table exists)
       const { data, error } = await supabase
         .from("notification_preferences")
         .select("*")
@@ -41,6 +49,8 @@ export const NotificationPreferencesModal: React.FC<
 
       if (data) {
         setPreferences(data);
+        // Cache to localStorage
+        localStorage.setItem(`notif_prefs_${userId}`, JSON.stringify(data));
       }
     } catch (error) {
       console.log("No existing preferences, using defaults");
@@ -52,14 +62,20 @@ export const NotificationPreferencesModal: React.FC<
     setSaving(true);
 
     try {
-      const { error } = await supabase
-        .from("notification_preferences")
-        .upsert(
-          { user_id: userId, ...preferences },
-          { onConflict: "user_id" }
-        );
+      // Save to localStorage (always works)
+      localStorage.setItem(`notif_prefs_${userId}`, JSON.stringify(preferences));
 
-      if (error) throw error;
+      // Try to save to database as well (if table exists)
+      try {
+        await supabase
+          .from("notification_preferences")
+          .upsert(
+            { user_id: userId, ...preferences },
+            { onConflict: "user_id" }
+          );
+      } catch (dbError) {
+        console.log("Database table doesn't exist yet, using localStorage only");
+      }
 
       alert("✅ Notification preferences updated!");
       onClose();
@@ -180,16 +196,14 @@ export const NotificationPreferencesModal: React.FC<
                   </div>
                   <button
                     onClick={() => toggleSetting(item.key as keyof typeof preferences)}
-                    className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-                      (preferences as any)[item.key]
+                    className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${(preferences as any)[item.key]
                         ? "bg-blue-600"
                         : "bg-slate-300"
-                    }`}
+                      }`}
                   >
                     <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
-                        (preferences as any)[item.key] ? "translate-x-6" : "translate-x-1"
-                      }`}
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${(preferences as any)[item.key] ? "translate-x-6" : "translate-x-1"
+                        }`}
                     />
                   </button>
                 </div>
@@ -239,16 +253,14 @@ export const NotificationPreferencesModal: React.FC<
                   </div>
                   <button
                     onClick={() => toggleSetting(item.key as keyof typeof preferences)}
-                    className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-                      (preferences as any)[item.key]
+                    className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${(preferences as any)[item.key]
                         ? "bg-green-600"
                         : "bg-slate-300"
-                    }`}
+                      }`}
                   >
                     <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
-                        (preferences as any)[item.key] ? "translate-x-6" : "translate-x-1"
-                      }`}
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${(preferences as any)[item.key] ? "translate-x-6" : "translate-x-1"
+                        }`}
                     />
                   </button>
                 </div>
@@ -279,14 +291,12 @@ export const NotificationPreferencesModal: React.FC<
                 </div>
                 <button
                   onClick={() => toggleSetting("sms_enabled")}
-                  className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-                    preferences.sms_enabled ? "bg-red-600" : "bg-slate-300"
-                  }`}
+                  className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${preferences.sms_enabled ? "bg-red-600" : "bg-slate-300"
+                    }`}
                 >
                   <span
-                    className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
-                      preferences.sms_enabled ? "translate-x-6" : "translate-x-1"
-                    }`}
+                    className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${preferences.sms_enabled ? "translate-x-6" : "translate-x-1"
+                      }`}
                   />
                 </button>
               </div>

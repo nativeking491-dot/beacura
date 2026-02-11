@@ -17,7 +17,7 @@ const LearnMore: React.FC = () => {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(0);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-200">
       {/* Header Section */}
       <section className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white py-16 px-4">
         <div className="max-w-4xl mx-auto">
@@ -39,25 +39,25 @@ const LearnMore: React.FC = () => {
       {/* Our Mission */}
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-slate-900 mb-8">Our Mission</h2>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">Our Mission</h2>
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white p-8 rounded-2xl border border-slate-200">
+            <div className="bg-white dark:bg-slate-800 p-8 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
               <Heart className="text-rose-500 mb-4" size={32} />
-              <h3 className="text-xl font-bold text-slate-900 mb-3">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">
                 Compassionate Support
               </h3>
-              <p className="text-slate-600 leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 We believe recovery is a journey, not a destination. Our platform combines
                 the warmth of human connection with the power of technology to provide
                 judgment-free support 24/7.
               </p>
             </div>
-            <div className="bg-white p-8 rounded-2xl border border-slate-200">
+            <div className="bg-white dark:bg-slate-800 p-8 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
               <Brain className="text-indigo-500 mb-4" size={32} />
-              <h3 className="text-xl font-bold text-slate-900 mb-3">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">
                 Evidence-Based Methods
               </h3>
-              <p className="text-slate-600 leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 Our tools and guidance are built on scientific research and proven
                 addiction recovery methodologies. We combine cognitive behavioral therapy
                 principles with modern wellness practices.
@@ -68,9 +68,9 @@ const LearnMore: React.FC = () => {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 px-4 bg-white">
+      <section className="py-16 px-4 bg-white dark:bg-slate-900">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-slate-900 mb-12">How Beacura Works</h2>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-12">How Beacura Works</h2>
           <div className="space-y-8">
             {[
               {
@@ -117,10 +117,10 @@ const LearnMore: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex-grow">
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
                     {item.title}
                   </h3>
-                  <p className="text-slate-600">{item.desc}</p>
+                  <p className="text-slate-600 dark:text-slate-300">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -129,9 +129,9 @@ const LearnMore: React.FC = () => {
       </section>
 
       {/* Key Features Deep Dive */}
-      <section className="py-16 px-4 bg-slate-50">
+      <section className="py-16 px-4 bg-slate-50 dark:bg-slate-800">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-slate-900 mb-12">
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-12">
             Core Features Explained
           </h2>
           <div className="grid md:grid-cols-2 gap-8">
@@ -181,15 +181,15 @@ const LearnMore: React.FC = () => {
                 ],
               },
             ].map((feature, idx) => (
-              <div key={idx} className="bg-white p-8 rounded-2xl border border-slate-200">
-                <h3 className="text-xl font-bold text-slate-900 mb-6">
+              <div key={idx} className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
                   {feature.title}
                 </h3>
                 <ul className="space-y-3">
                   {feature.features.map((f, i) => (
                     <li key={i} className="flex items-start gap-3">
                       <Check className="text-amber-600 flex-shrink-0 mt-1" size={20} />
-                      <span className="text-slate-600">{f}</span>
+                      <span className="text-slate-600 dark:text-slate-300">{f}</span>
                     </li>
                   ))}
                 </ul>
@@ -200,9 +200,9 @@ const LearnMore: React.FC = () => {
       </section>
 
       {/* Benefits */}
-      <section className="py-16 px-4 bg-white">
+      <section className="py-16 px-4 bg-white dark:bg-slate-900">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-slate-900 mb-12">
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-12">
             Why Choose Beacura
           </h2>
           <div className="grid md:grid-cols-2 gap-8">
@@ -232,11 +232,58 @@ const LearnMore: React.FC = () => {
                 desc: "Need help at 3 AM? Our AI companion and crisis support are available whenever you need them.",
               },
             ].map((benefit, idx) => (
-              <div key={idx} className="p-6 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-200">
-                <h3 className="text-lg font-bold text-slate-900 mb-2">
+              <div key={idx} className="p-6 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-slate-800 dark:to-slate-800 rounded-xl border border-amber-200 dark:border-slate-700 shadow-sm">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
                   {benefit.title}
                 </h3>
-                <p className="text-slate-600">{benefit.desc}</p>
+                <p className="text-slate-600 dark:text-slate-300">{benefit.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Next-Gen Features - Coming Soon */}
+      <section className="py-16 px-4 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-block bg-amber-500/20 text-amber-300 px-4 py-2 rounded-full text-sm font-bold mb-4">
+              🚀 Coming Soon
+            </div>
+            <h2 className="text-3xl font-bold mb-4">
+              Next-Generation Features
+            </h2>
+            <p className="text-slate-300 max-w-2xl mx-auto">
+              We're constantly innovating to provide even more powerful tools for your recovery journey.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: "🧠",
+                title: "AI-Powered Sentiment Analysis",
+                desc: "Advanced machine learning to detect early signs of potential relapse based on your journal entries, providing proactive support when you need it most.",
+              },
+              {
+                icon: "🎮",
+                title: "Gamified Milestones",
+                desc: "Earn digital badges and rewards for consistent check-ins, creating healthy dopamine pathways that support long-term recovery success.",
+              },
+              {
+                icon: "👨‍👩‍👧",
+                title: "Family Portal",
+                desc: "A privacy-preserving view for loved ones to see your progress and milestones without accessing personal details, strengthening your support network.",
+              },
+            ].map((feature, idx) => (
+              <div
+                key={idx}
+                className="bg-white/5 backdrop-blur-sm p-8 rounded-2xl border border-white/10 hover:border-amber-500/50 transition-all"
+              >
+                <div className="text-4xl mb-4">{feature.icon}</div>
+                <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
+                <p className="text-slate-300 leading-relaxed text-sm">
+                  {feature.desc}
+                </p>
               </div>
             ))}
           </div>
@@ -244,9 +291,9 @@ const LearnMore: React.FC = () => {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-16 px-4 bg-slate-50">
+      <section className="py-16 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-slate-900 mb-12">
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-12">
             Frequently Asked Questions
           </h2>
           <div className="space-y-4">
@@ -278,27 +325,26 @@ const LearnMore: React.FC = () => {
             ].map((faq, idx) => (
               <div
                 key={idx}
-                className="bg-white border border-slate-200 rounded-xl overflow-hidden"
+                className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm"
               >
                 <button
                   onClick={() =>
                     setExpandedFaq(expandedFaq === idx ? null : idx)
                   }
-                  className="w-full p-6 flex items-center justify-between hover:bg-slate-50 transition"
+                  className="w-full p-6 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 transition"
                 >
-                  <h3 className="text-lg font-semibold text-slate-900 text-left">
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white text-left">
                     {faq.q}
                   </h3>
                   <ChevronDown
                     size={24}
-                    className={`text-amber-600 transition ${
-                      expandedFaq === idx ? "rotate-180" : ""
-                    }`}
+                    className={`text-amber-600 transition ${expandedFaq === idx ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
                 {expandedFaq === idx && (
-                  <div className="px-6 pb-6 bg-slate-50 border-t border-slate-200">
-                    <p className="text-slate-600 leading-relaxed">{faq.a}</p>
+                  <div className="px-6 pb-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-700">
+                    <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{faq.a}</p>
                   </div>
                 )}
               </div>
@@ -308,9 +354,9 @@ const LearnMore: React.FC = () => {
       </section>
 
       {/* Recovery Tips */}
-      <section className="py-16 px-4 bg-white">
+      <section className="py-16 px-4 bg-white dark:bg-slate-800">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-slate-900 mb-12">
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-12">
             Recovery Tips & Resources
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
@@ -345,16 +391,16 @@ const LearnMore: React.FC = () => {
             ].map((section, idx) => (
               <div
                 key={idx}
-                className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 rounded-2xl border border-blue-200"
+                className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-900 p-8 rounded-2xl border border-blue-200 dark:border-slate-700"
               >
-                <h3 className="text-lg font-bold text-slate-900 mb-4">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
                   {section.title}
                 </h3>
                 <ul className="space-y-3">
                   {section.tips.map((tip, i) => (
                     <li key={i} className="flex items-start gap-3">
-                      <span className="inline-block w-1.5 h-1.5 bg-indigo-600 rounded-full mt-2" />
-                      <span className="text-slate-700">{tip}</span>
+                      <span className="inline-block w-1.5 h-1.5 bg-indigo-600 dark:bg-indigo-400 rounded-full mt-2" />
+                      <span className="text-slate-700 dark:text-slate-300">{tip}</span>
                     </li>
                   ))}
                 </ul>

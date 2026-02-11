@@ -88,7 +88,7 @@ const Dashboard: React.FC = () => {
         ...item,
         cravings: Math.round(
           item.cravings.reduce((a: number, b: number) => a + b, 0) /
-            item.cravings.length
+          item.cravings.length
         ),
       }))
       .slice(-7);
@@ -97,13 +97,13 @@ const Dashboard: React.FC = () => {
   const data = isNewUser ? [] : cravingData;
 
   const StatCard = ({ icon: Icon, label, value, color }: any) => (
-    <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center space-x-4">
+    <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm flex items-center space-x-4">
       <div className={`p-4 rounded-xl ${color}`}>
         <Icon size={24} />
       </div>
       <div>
-        <p className="text-sm font-medium text-slate-500">{label}</p>
-        <p className="text-2xl font-bold text-slate-900">{value}</p>
+        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{label}</p>
+        <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{value}</p>
       </div>
     </div>
   );
@@ -186,13 +186,13 @@ const Dashboard: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Progress Chart */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-slate-900 flex items-center space-x-2">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center space-x-2">
               <TrendingUp size={20} className="text-amber-600" />
               <span>Cravings Frequency</span>
             </h2>
-            <select className="text-sm border-none bg-slate-50 rounded-lg p-1">
+            <select className="text-sm border-none bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-lg p-1">
               <option>Last 7 Days</option>
               <option>Last 30 Days</option>
             </select>
@@ -248,8 +248,8 @@ const Dashboard: React.FC = () => {
               </ResponsiveContainer>
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-center p-4">
-                <Brain size={40} className="text-slate-200 mb-3" />
-                <h3 className="text-base font-bold text-slate-600 mb-1">
+                <Brain size={40} className="text-slate-200 dark:text-slate-600 mb-3" />
+                <h3 className="text-base font-bold text-slate-600 dark:text-slate-400 mb-1">
                   No Cravings Logged Yet
                 </h3>
                 <p className="text-xs text-slate-400 max-w-[200px] mb-3">
@@ -267,8 +267,8 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Badges & Rewards */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-          <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center space-x-2">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center space-x-2">
             <Award size={20} className="text-amber-500" />
             <span>Achievements</span>
           </h2>
@@ -276,16 +276,16 @@ const Dashboard: React.FC = () => {
             {defaultBadges.map((badge) => (
               <div
                 key={badge.id}
-                className="flex items-center p-3 rounded-xl bg-slate-50 border border-slate-100"
+                className="flex items-center p-3 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-600"
               >
                 <div
-                  className={`w-10 h-10 rounded-full bg-white flex items-center justify-center mr-3 shadow-sm ${badge.color}`}
+                  className={`w-10 h-10 rounded-full bg-white dark:bg-slate-600 flex items-center justify-center mr-3 shadow-sm ${badge.color}`}
                 >
                   <Award size={20} />
                 </div>
                 <div>
-                  <p className="font-bold text-slate-900">{badge.name}</p>
-                  <p className="text-xs text-slate-500">Unlocked 3 days ago</p>
+                  <p className="font-bold text-slate-900 dark:text-slate-100">{badge.name}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Unlocked 3 days ago</p>
                 </div>
               </div>
             ))}

@@ -44,6 +44,20 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 
         try {
             if (isLogin) {
+                // Check if email exists first (requested feature)
+                try {
+                    const exists = await authService.checkEmailExists(email);
+                    if (!exists) {
+                        throw new Error("Email not registered");
+                    }
+                } catch (checkError: any) {
+                    if (checkError.message === "Email not registered") {
+                        throw checkError;
+                    }
+                    // If check fails silently, proceed to try login anyway
+                    console.log("Email check skipped:", checkError);
+                }
+
                 // Sign In
                 const { user } = await authService.signIn(email, password);
 
@@ -81,14 +95,15 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 
             // Enhanced error messages
             if (msg.includes("Rate limit")) {
-                setError("Too many attempts. Please wait a few moments before trying again.");
+                setError("Security Alert: Too many attempts. Please wait 15-60 minutes or use a different email address.");
             } else if (msg.includes("Invalid login credentials")) {
                 // Supabase generic error for security, covering both cases
-                setError("Entered wrong password or No Account Found. Please Sign Up if you are new.");
-            } else if (msg.includes("User not found") || msg.includes("not registered")) {
-                setError("No account found. Please Sign Up.");
+                setError("Login Failed: Incorrect password.");
+            } else if (msg.includes("Email not registered") || msg.includes("User not found") || msg.includes("not registered")) {
+                setError("Email not registered. Please sign up.");
             } else if (msg.includes("Incorrect password") || msg.includes("password")) {
-                setError("Entered wrong password.");
+                // Catch-all for password related errors
+                setError("Login Failed: Incorrect password.");
             } else if (msg.includes("already registered") || msg.includes("already exists")) {
                 setError("An account with this email already exists. Please sign in instead.");
             } else {
@@ -217,8 +232,8 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                                                 type="button"
                                                 onClick={() => setGender(option.id as any)}
                                                 className={`p-3 rounded-lg border-2 transition-all text-center ${gender === option.id
-                                                        ? "border-amber-500 bg-amber-500/20 text-amber-300"
-                                                        : "border-slate-600 bg-slate-800 text-slate-300 hover:border-slate-500"
+                                                    ? "border-amber-500 bg-amber-500/20 text-amber-300"
+                                                    : "border-slate-600 bg-slate-800 text-slate-300 hover:border-slate-500"
                                                     }`}
                                             >
                                                 <div className="text-xl mb-1">{option.icon}</div>
