@@ -14,9 +14,8 @@ import {
     EyeOff,
     Sparkles,
     Users,
+    CheckCircle,
 } from "lucide-react";
-import { getMealReminder, MealReminder } from "../services/mealReminder";
-import { MealReminderModal } from "../components/MealReminderModal";
 
 interface AuthProps {
     onLogin: (role: UserRole) => void;
@@ -30,8 +29,8 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     const [password, setPassword] = useState("");
     const [name, setName] = useState("");
     const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState(false);
-    const [mealReminder, setMealReminder] = useState<MealReminder | null>(null);
     const [selectedRole, setSelectedRole] = useState<
         "RECOVERING_USER" | "MENTOR"
     >("RECOVERING_USER");
@@ -40,11 +39,12 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
+        setSuccess(null);
         setLoading(true);
 
         try {
             if (isLogin) {
-                // Check if email exists first (requested feature)
+                // Check if email exists first
                 try {
                     const exists = await authService.checkEmailExists(email);
                     if (!exists) {
@@ -54,18 +54,14 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                     if (checkError.message === "Email not registered") {
                         throw checkError;
                     }
-                    // If check fails silently, proceed to try login anyway
                     console.log("Email check skipped:", checkError);
                 }
 
-                // Sign In
                 const { user } = await authService.signIn(email, password);
 
                 if (user) {
                     onLogin(UserRole.RECOVERING);
-                    // Show meal reminder before navigating
-                    const reminder = getMealReminder();
-                    setMealReminder(reminder);
+                    navigate("/dashboard");
                 }
             } else {
                 // Sign Up
@@ -73,36 +69,39 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                     throw new Error("Password must be at least 6 characters long");
                 }
 
-                const { user } = await authService.signUp(
+                const { user, session } = await authService.signUp(
                     email,
                     password,
                     name,
                     selectedRole
                 );
 
-                if (user) {
+                if (user && !session) {
+                    setSuccess("Account created! Please check your email to confirm your account before signing in.");
+                    setIsLogin(true); // Switch to login mode
+                    return;
+                }
+
+                if (user && session) {
                     onLogin(
                         selectedRole === "MENTOR" ? UserRole.MENTOR : UserRole.RECOVERING,
                     );
-                    // Show meal reminder before navigating
-                    const reminder = getMealReminder();
-                    setMealReminder(reminder);
+                    navigate("/dashboard");
                 }
             }
         } catch (err: any) {
             console.error("Auth error:", err);
             const msg = err.message || "";
 
-            // Enhanced error messages
             if (msg.includes("Rate limit")) {
-                setError("Security Alert: Too many attempts. Please wait 15-60 minutes or use a different email address.");
+                setError("Security Alert: Too many attempts. Please wait 15-60 minutes.");
             } else if (msg.includes("Invalid login credentials")) {
-                // Supabase generic error for security, covering both cases
                 setError("Login Failed: Incorrect password.");
+            } else if (msg.includes("Email not confirmed")) {
+                setError("Please verify your email address before logging in. Check your inbox (and spam folder).");
             } else if (msg.includes("Email not registered") || msg.includes("User not found") || msg.includes("not registered")) {
                 setError("Email not registered. Please sign up.");
             } else if (msg.includes("Incorrect password") || msg.includes("password")) {
-                // Catch-all for password related errors
                 setError("Login Failed: Incorrect password.");
             } else if (msg.includes("already registered") || msg.includes("already exists")) {
                 setError("An account with this email already exists. Please sign in instead.");
@@ -114,24 +113,16 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
         }
     };
 
-    const handleReminderClose = () => {
-        setMealReminder(null);
-        // Navigate to dashboard after reminder is closed
-        navigate("/dashboard");
-    };
+
+
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-black flex flex-col justify-center items-center p-0">
             {/* Diagonal gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 via-transparent to-orange-500/10 pointer-events-none"></div>
 
-            {/* Meal Reminder Modal */}
-            {mealReminder && (
-                <MealReminderModal
-                    reminder={mealReminder}
-                    onClose={handleReminderClose}
-                />
-            )}
+
+
 
             <div className="w-full h-screen md:w-auto md:h-auto md:max-w-md relative z-10 bg-gradient-to-b from-slate-900 to-slate-800 md:rounded-3xl md:shadow-2xl md:overflow-hidden md:border md:border-slate-700 flex flex-col">
                 {/* Header Section */}
@@ -157,6 +148,13 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                         <div className="bg-rose-900/30 border-l-4 border-rose-500 text-rose-200 px-4 py-3 rounded-lg mb-6 flex items-start space-x-3 animate-in fade-in duration-200">
                             <AlertCircle size={20} className="mt-0.5 flex-shrink-0" />
                             <span className="text-sm">{error}</span>
+                        </div>
+                    )}
+
+                    {success && (
+                        <div className="bg-emerald-900/30 border-l-4 border-emerald-500 text-emerald-200 px-4 py-3 rounded-lg mb-6 flex items-start space-x-3 animate-in fade-in duration-200">
+                            <CheckCircle size={20} className="mt-0.5 flex-shrink-0" />
+                            <span className="text-sm">{success}</span>
                         </div>
                     )}
 

@@ -6,6 +6,7 @@ import {
   downloadDataAsJSON,
   downloadDataAsCSV,
 } from "../services/dataExport";
+import { useToast } from "../context/ToastContext";
 
 interface ExportDataModalProps {
   userId: string | undefined;
@@ -23,6 +24,7 @@ export const ExportDataModal: React.FC<ExportDataModalProps> = ({
   const [exporting, setExporting] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const { showToast } = useToast();
 
   const handleExportJSON = async () => {
     if (!userId) return;
@@ -33,10 +35,10 @@ export const ExportDataModal: React.FC<ExportDataModalProps> = ({
       if (!data) throw new Error("Failed to export data");
 
       downloadDataAsJSON(data, userName);
-      alert("✅ Data exported as JSON!");
+      showToast("Data exported as JSON!", "success");
     } catch (error) {
       console.error("Error exporting:", error);
-      alert("Failed to export data");
+      showToast("Failed to export data", "error");
     } finally {
       setExporting(false);
     }
@@ -51,10 +53,10 @@ export const ExportDataModal: React.FC<ExportDataModalProps> = ({
       if (!data) throw new Error("Failed to export data");
 
       downloadDataAsCSV(data, userName);
-      alert("✅ Data exported as CSV!");
+      showToast("Data exported as CSV!", "success");
     } catch (error) {
       console.error("Error exporting:", error);
-      alert("Failed to export data");
+      showToast("Failed to export data", "error");
     } finally {
       setExporting(false);
     }
@@ -84,16 +86,20 @@ export const ExportDataModal: React.FC<ExportDataModalProps> = ({
       // Then delete auth user
       await supabase.auth.admin.deleteUser(userId);
 
-      alert(
-        "✅ Your account and all data have been permanently deleted. Redirecting..."
+      showToast(
+        "Your account and all data have been permanently deleted. Redirecting...",
+        "success",
+        4000
       );
       setTimeout(() => {
         window.location.href = "/";
       }, 2000);
     } catch (error) {
       console.error("Error deleting account:", error);
-      alert(
-        "Failed to delete account. Please contact support@recovery.com for assistance."
+      showToast(
+        "Failed to delete account. Please contact support for assistance.",
+        "error",
+        5000
       );
     } finally {
       setDeleting(false);

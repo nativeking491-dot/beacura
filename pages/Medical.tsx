@@ -6,8 +6,8 @@ import {
   AlertCircle,
   Phone,
   HeartPulse,
-  Pill,
   CheckCircle,
+  Sparkles,
 } from "lucide-react";
 
 const Medical: React.FC = () => {
@@ -16,91 +16,108 @@ const Medical: React.FC = () => {
   };
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-500">
-      <header>
-        <h1 className="text-3xl font-bold text-slate-900">Medical Guidance</h1>
-        <p className="text-slate-500">
-          Essential information for a safe and healthy recovery process.
-        </p>
+    <div className="space-y-6 animate-in pb-8">
+
+      {/* =================== HEADER =================== */}
+      <header className="relative overflow-hidden bento-card rounded-2xl p-6">
+        <div className="absolute -top-8 -right-8 w-40 h-40 bg-rose-300 rounded-full blur-3xl opacity-20" />
+        <div className="relative z-10">
+          <div className="flex items-center space-x-2 mb-1">
+            <div className="w-2 h-2 rounded-full bg-rose-400 animate-glow-pulse" />
+            <span className="text-xs font-bold text-rose-500 uppercase tracking-widest">Safety First</span>
+          </div>
+          <h1 style={{ fontFamily: 'Sora, sans-serif' }} className="text-3xl font-extrabold text-slate-900 dark:text-slate-100">
+            Medical <span className="gradient-text-amber">Guidance</span>
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium">
+            Essential information for a safe and healthy recovery process.
+          </p>
+        </div>
       </header>
 
-      {/* Urgent Alert */}
-      <div className="bg-rose-50 border-2 border-rose-200 p-8 rounded-3xl flex flex-col md:flex-row items-center gap-6">
-        <div className="bg-rose-100 p-5 rounded-full">
-          <ShieldAlert size={48} className="text-rose-600" />
-        </div>
-        <div className="flex-1 text-center md:text-left">
-          <h2 className="text-2xl font-bold text-rose-900 mb-2">
-            Emergency? Don't Wait.
-          </h2>
-          <p className="text-rose-800 mb-4 max-w-xl">
-            If you experience seizures, loss of consciousness, hallucinations,
-            or severe chest pain, seek immediate professional medical attention.
-          </p>
-          <div className="flex flex-wrap justify-center md:justify-start gap-4">
-            <a
-              href="tel:911"
-              className="bg-rose-600 text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-lg shadow-rose-200"
-            >
-              <Phone size={18} />
-              <span>Call Emergency (911)</span>
-            </a>
-            <button
-              onClick={handleCrisisHotline}
-              className="bg-white text-rose-600 border border-rose-200 px-6 py-3 rounded-xl font-bold flex items-center space-x-2 hover:bg-rose-50 transition-colors"
-            >
-              <AlertCircle size={18} />
-              <span>Crisis Hotline</span>
-            </button>
+      {/* =================== CRISIS BANNER =================== */}
+      <div className="relative overflow-hidden rounded-2xl p-6 md:p-8"
+        style={{ background: 'linear-gradient(135deg, #7f1d1d, #991b1b, #7f1d1d)' }}>
+        <div className="absolute top-0 right-0 w-56 h-56 bg-red-400 rounded-full blur-[100px] opacity-15" />
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-orange-500 rounded-full blur-[80px] opacity-15" />
+
+        <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
+          <div className="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center flex-shrink-0 shadow-xl">
+            <ShieldAlert size={32} className="text-white" />
+          </div>
+          <div className="flex-1 text-center md:text-left">
+            <h2 style={{ fontFamily: 'Sora, sans-serif' }} className="text-xl font-bold text-white mb-1">
+              Emergency? Don't Wait.
+            </h2>
+            <p className="text-red-200 text-sm mb-4 max-w-xl leading-relaxed">
+              Seizures, loss of consciousness, hallucinations, or severe chest pain require
+              <strong className="text-white"> immediate professional medical attention</strong>.
+            </p>
+            <div className="flex flex-wrap justify-center md:justify-start gap-3">
+              <a href="tel:911" className="btn-primary flex items-center space-x-2 px-5 py-2.5 text-sm">
+                <Phone size={15} />
+                <span>Call 911</span>
+              </a>
+              <button
+                onClick={handleCrisisHotline}
+                className="btn-glass flex items-center space-x-2 px-5 py-2.5 text-sm"
+              >
+                <AlertCircle size={15} />
+                <span>Crisis Hotline (988)</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {/* =================== DOS / SYMPTOMS GRID =================== */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
         {/* Do's and Don'ts */}
-        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
-          <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center space-x-2">
-            <CheckCircle className="text-emerald-500" />
-            <span>The Daily Guide</span>
-          </h3>
-          <div className="space-y-6">
+        <div className="bento-card rounded-2xl p-6">
+          <div className="flex items-center space-x-2 mb-5">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-md">
+              <CheckCircle size={18} className="text-white" />
+            </div>
+            <h3 style={{ fontFamily: 'Sora, sans-serif' }} className="font-bold text-slate-900 dark:text-slate-100 text-base">The Daily Guide</h3>
+          </div>
+
+          <div className="space-y-5">
+            {/* DOs */}
             <div>
-              <p className="text-emerald-700 font-bold mb-3 flex items-center">
-                <span className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs mr-2">
-                  ✓
-                </span>
-                DO'S
+              <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <span className="w-5 h-5 bg-emerald-50 dark:bg-emerald-500/20 rounded-full flex items-center justify-center text-[10px]">✓</span>
+                Do's
               </p>
-              <ul className="space-y-3">
-                {RECOVERY_DOS.map((item, i) => {
+              <ul className="space-y-2">
+                {RECOVERY_DOS.map((item: any, i: number) => {
                   const Icon = (Icons as any)[item.icon] || Icons.Check;
                   return (
-                    <li key={i} className="flex items-start text-slate-600 text-sm">
-                      <div className="mr-3 mt-0.5 bg-emerald-50 p-1.5 rounded-lg text-emerald-600">
-                        <Icon size={14} />
+                    <li key={i} className="flex items-start text-sm text-slate-600 dark:text-slate-300 group">
+                      <div className="mr-2.5 mt-0.5 w-6 h-6 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-600 flex-shrink-0 group-hover:scale-110 transition-transform">
+                        <Icon size={12} />
                       </div>
-                      <span className="mt-0.5">{item.text}</span>
+                      <span className="leading-relaxed">{item.text}</span>
                     </li>
                   );
                 })}
               </ul>
             </div>
-            <div className="pt-4 border-t border-slate-50">
-              <p className="text-rose-700 font-bold mb-3 flex items-center">
-                <span className="w-6 h-6 bg-rose-100 rounded-full flex items-center justify-center text-xs mr-2">
-                  ✕
-                </span>
-                DON'TS
+
+            <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
+              <p className="text-xs font-bold text-rose-600 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <span className="w-5 h-5 bg-rose-50 dark:bg-rose-500/20 rounded-full flex items-center justify-center text-[10px]">✕</span>
+                Don'ts
               </p>
-              <ul className="space-y-3">
-                {RECOVERY_DONTS.map((item, i) => {
+              <ul className="space-y-2">
+                {RECOVERY_DONTS.map((item: any, i: number) => {
                   const Icon = (Icons as any)[item.icon] || Icons.X;
                   return (
-                    <li key={i} className="flex items-start text-slate-600 text-sm">
-                      <div className="mr-3 mt-0.5 bg-rose-50 p-1.5 rounded-lg text-rose-600">
-                        <Icon size={14} />
+                    <li key={i} className="flex items-start text-sm text-slate-600 dark:text-slate-300 group">
+                      <div className="mr-2.5 mt-0.5 w-6 h-6 rounded-lg bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center text-rose-600 flex-shrink-0 group-hover:scale-110 transition-transform">
+                        <Icon size={12} />
                       </div>
-                      <span className="mt-0.5">{item.text}</span>
+                      <span className="leading-relaxed">{item.text}</span>
                     </li>
                   );
                 })}
@@ -110,68 +127,70 @@ const Medical: React.FC = () => {
         </div>
 
         {/* Common Symptoms */}
-        <div className="space-y-6">
-          <h3 className="text-xl font-bold text-slate-900 flex items-center space-x-2">
-            <HeartPulse className="text-indigo-500" />
-            <span>Withdrawal Knowledge</span>
-          </h3>
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-md">
+              <HeartPulse size={18} className="text-white" />
+            </div>
+            <h3 style={{ fontFamily: 'Sora, sans-serif' }} className="font-bold text-slate-900 dark:text-slate-100 text-base">Withdrawal Knowledge</h3>
+          </div>
 
-
-          <div className="grid grid-cols-1 gap-4">
-            {COMMON_SYMPTOMS.map((s, i) => {
-              // Dynamic icon lookup
+          <div className="space-y-3">
+            {COMMON_SYMPTOMS.map((s: any, i: number) => {
               const IconComponent = (Icons as any)[s.icon] || Icons.HelpCircle;
-
               return (
-                <div
-                  key={i}
-                  className="bg-slate-50 p-5 rounded-2xl border border-slate-100 flex items-start space-x-4"
-                >
-                  <div className="bg-white p-2 rounded-xl text-indigo-600 shadow-sm">
-                    <IconComponent size={20} />
+                <div key={i} className="bento-card rounded-2xl p-4 flex items-start space-x-3 group hover-lift">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-50 to-violet-50 dark:from-indigo-500/15 dark:to-violet-500/15 flex items-center justify-center text-indigo-600 flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform border border-indigo-100 dark:border-indigo-500/20">
+                    <IconComponent size={17} />
                   </div>
-                  <div>
-                    <h4 className="font-bold text-slate-800 mb-1">{s.title}</h4>
-                    <p className="text-xs text-slate-500 mb-1">{s.desc}</p>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm mb-0.5">{s.title}</h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-1.5">{s.desc}</p>
                     {s.tip && (
-                      <p className="text-[10px] text-indigo-600 font-medium bg-indigo-50 px-2 py-1 rounded-lg inline-block">
-                        💡 Try: {s.tip}
-                      </p>
+                      <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50 dark:bg-indigo-500/10 px-2.5 py-1 rounded-full border border-indigo-100 dark:border-indigo-500/20">
+                        💡 {s.tip}
+                      </span>
                     )}
                   </div>
                 </div>
-              )
+              );
             })}
           </div>
 
-          <div className="bg-indigo-600 p-6 rounded-2xl text-white">
-            <h4 className="font-bold mb-2">Need a Doctor?</h4>
-            <p className="text-indigo-100 text-sm mb-4">
-              We can help you find addiction-specialized clinics in your area.
-            </p>
-            <button onClick={() => alert('Not implemented yet')}>
-              Search Nearby Clinics
-            </button>
+          {/* Find Doctor CTA */}
+          <div className="relative overflow-hidden rounded-2xl p-5 text-white"
+            style={{ background: 'linear-gradient(135deg, #4338ca, #6d28d9)' }}>
+            <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full" />
+            <div className="relative z-10">
+              <h4 style={{ fontFamily: 'Sora, sans-serif' }} className="font-bold mb-1 text-sm">Need a Doctor?</h4>
+              <p className="text-indigo-100 text-xs mb-3 leading-relaxed">
+                Find addiction-specialized clinics in your area.
+              </p>
+              <button className="btn-glass text-xs px-4 py-2 flex items-center space-x-1.5">
+                <Sparkles size={12} />
+                <span>Search Nearby Clinics</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* FAQ */}
-      <section className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
-        <h3 className="text-xl font-bold text-slate-900 mb-8 text-center">
-          Frequently Asked Medical Questions
-        </h3>
-        <div className="space-y-8 max-w-3xl mx-auto">
-          {MEDICAL_FAQS.map((faq, i) => (
-            <div
-              key={i}
-              className="border-b border-slate-50 pb-6 last:border-0"
-            >
-              <h4 className="font-bold text-slate-800 mb-2 flex items-start">
-                <span className="text-teal-600 mr-2">Q:</span> {faq.q}
+      {/* =================== FAQ =================== */}
+      <section className="bento-card rounded-2xl p-6 md:p-8">
+        <div className="text-center mb-6">
+          <h3 style={{ fontFamily: 'Sora, sans-serif' }} className="text-xl font-bold text-slate-900 dark:text-slate-100">
+            Frequently Asked Medical Questions
+          </h3>
+        </div>
+        <div className="space-y-0 max-w-3xl mx-auto divide-y divide-slate-100 dark:divide-slate-800">
+          {MEDICAL_FAQS.map((faq: any, i: number) => (
+            <div key={i} className="py-5 first:pt-0 last:pb-0 group">
+              <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm mb-2 flex items-start gap-2">
+                <span className="text-xs font-extrabold text-teal-500 bg-teal-50 dark:bg-teal-500/10 w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5">Q</span>
+                {faq.q}
               </h4>
-              <p className="text-slate-600 text-sm pl-6 leading-relaxed">
-                <span className="text-indigo-600 font-bold mr-2">A:</span>{" "}
+              <p className="text-slate-500 dark:text-slate-400 text-sm pl-7 leading-relaxed">
+                <span className="font-bold text-indigo-500 mr-1">A:</span>
                 {faq.a}
               </p>
             </div>
@@ -179,17 +198,16 @@ const Medical: React.FC = () => {
         </div>
       </section>
 
-      {/* Official Disclaimer */}
-      <div className="text-center text-slate-400 text-xs px-8 italic">
-        Disclaimer: Recovery provides information for educational purposes only.
-        We are not doctors, and this content should not be considered
-        professional medical advice, diagnosis, or treatment. Always seek the
-        advice of your physician or other qualified health provider with any
-        questions regarding a medical condition.
+      {/* =================== DISCLAIMER =================== */}
+      <div className="glass-subtle rounded-2xl px-6 py-4 border border-slate-200/50 dark:border-white/5 text-center">
+        <p className="text-xs text-slate-400 dark:text-slate-500 leading-relaxed italic">
+          ⚕️ <strong>Disclaimer:</strong> Beacura provides information for educational purposes only. We are not doctors,
+          and this content should not be considered professional medical advice, diagnosis, or treatment. Always seek
+          the advice of your physician or other qualified health provider with any questions regarding a medical condition.
+        </p>
       </div>
     </div>
   );
 };
 
 export default Medical;
-

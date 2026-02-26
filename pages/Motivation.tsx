@@ -1,453 +1,450 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
-  Quote,
-  Play,
-  ThumbsUp,
-  Heart,
-  Share2,
-  Sparkles,
-  Globe,
-  X,
-  Clock,
-  ExternalLink,
-  Search,
-  Languages,
-  Film,
-  Brain,
-  Flower2,
-  MessageCircle,
+  Heart, Play, X, Sparkles, Globe, Brain, Flower2, MessageCircle,
+  ExternalLink, Languages, ChevronLeft, ChevronRight, Volume2,
 } from "lucide-react";
 
-interface VideoCategory {
-  id: string;
-  title: string;
-  titleHindi: string;
-  titleTelugu: string;
-  icon: React.ReactNode;
-  searchQuery: Record<string, string>;
-  color: string;
-  bgColor: string;
-}
+// ─── Data ───────────────────────────────────────────────────────────────────
 
-const Motivation: React.FC = () => {
-  const [selectedLanguage, setSelectedLanguage] = useState("English");
-  const [selectedCategory, setSelectedCategory] =
-    useState<VideoCategory | null>(null);
+const QUOTES = [
+  {
+    text: "Every day you stay clean, you are becoming more of yourself and less of your addiction.",
+    author: "Recovery Community",
+    mood: "resilience",
+  },
+  {
+    text: "The pain of staying the same has to be greater than the pain of change. You already chose change. Honor it.",
+    author: "Unknown",
+    mood: "strength",
+  },
+  {
+    text: "You are not behind. You are not broken. You are in the middle of your story.",
+    author: "Unknown",
+    mood: "hope",
+  },
+  {
+    text: "Healing is not linear, and it's okay to have bad days. What matters is that you keep choosing to move forward.",
+    author: "Recovery Community",
+    mood: "compassion",
+  },
+  {
+    text: "Your worst day in recovery is still better than your best day in active addiction.",
+    author: "NA Philosophy",
+    mood: "perspective",
+  },
+  {
+    text: "You don't have to see the whole staircase. Just take the first step.",
+    author: "Martin Luther King Jr.",
+    mood: "courage",
+  },
+  {
+    text: "Every craving you survive makes the next one easier. You are literally rewiring your brain in real time.",
+    author: "Neuroscience of Recovery",
+    mood: "science",
+  },
+  {
+    text: "The bravest thing I ever did was continue my life when I wanted to die.",
+    author: "Juliette Lewis",
+    mood: "bravery",
+  },
+];
 
-  const languages = [
-    { code: "English", label: "English", flag: "🇺🇸" },
-    { code: "Hindi", label: "हिंदी", flag: "🇮🇳" },
-    { code: "Telugu", label: "తెలుగు", flag: "🇮🇳" },
-  ];
+const MOOD_LABELS: Record<string, { color: string; label: string }> = {
+  resilience: { color: "#f59e0b", label: "Resilience" },
+  strength: { color: "#6366f1", label: "Strength" },
+  hope: { color: "#10b981", label: "Hope" },
+  compassion: { color: "#ec4899", label: "Compassion" },
+  perspective: { color: "#3b82f6", label: "Perspective" },
+  courage: { color: "#f97316", label: "Courage" },
+  science: { color: "#8b5cf6", label: "Science" },
+  bravery: { color: "#ef4444", label: "Bravery" },
+};
 
-  const categories: VideoCategory[] = [
-    {
-      id: "meditation",
-      title: "Meditation",
-      titleHindi: "ध्यान",
-      titleTelugu: "ధ్యానం",
-      icon: <Brain size={24} />,
-      searchQuery: {
-        English: "guided meditation for addiction recovery",
-        Hindi: "ध्यान meditation hindi guided",
-        Telugu: "ధ్యానం telugu meditation",
-      },
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-    },
-    {
-      id: "yoga",
-      title: "Yoga",
-      titleHindi: "योग",
-      titleTelugu: "యోగా",
-      icon: <Flower2 size={24} />,
-      searchQuery: {
-        English: "yoga for stress relief beginners",
-        Hindi: "योग yoga hindi swami ramdev",
-        Telugu: "యోగా telugu yoga beginners",
-      },
-      color: "text-teal-600",
-      bgColor: "bg-teal-50",
-    },
-    {
-      id: "recovery",
-      title: "Recovery Stories",
-      titleHindi: "रिकवरी गाइड",
-      titleTelugu: "రికవరీ గైడ్",
-      icon: <Heart size={24} />,
-      searchQuery: {
-        English: "addiction recovery motivation success story",
-        Hindi: "नशा मुक्ति addiction recovery hindi",
-        Telugu: "addiction recovery telugu motivation",
-      },
-      color: "text-rose-600",
-      bgColor: "bg-rose-50",
-    },
-    {
-      id: "therapy",
-      title: "Mental Health",
-      titleHindi: "मानसिक स्वास्थ्य",
-      titleTelugu: "మానసిక ఆరోగ్యం",
-      icon: <MessageCircle size={24} />,
-      searchQuery: {
-        English: "mental health therapy tips anxiety",
-        Hindi: "मानसिक स्वास्थ्य mental health hindi bk shivani",
-        Telugu: "మానసిక ఆరోగ్యం mental health telugu",
-      },
-      color: "text-indigo-600",
-      bgColor: "bg-indigo-50",
-    },
-  ];
+const SUCCESS_STORIES = [
+  {
+    name: "David K.",
+    time: "2 Years Clean",
+    story: "I lost everything to pills. My family, my job, my sense of self. I didn't think there was a way back. Today I have my family back, a steady job, and for the first time in a decade — I recognize myself in the mirror.",
+    avatar: "D",
+    color: "#0d9488",
+    lightColor: "rgba(13,148,136,0.1)",
+  },
+  {
+    name: "Priya S.",
+    time: "14 Months Clean",
+    story: "Recovery gave me the strangest gift: I found out who I actually am. The community here was there at 2 AM when the darkness was loudest. Knowing I wasn't alone changed everything.",
+    avatar: "P",
+    color: "#7c3aed",
+    lightColor: "rgba(124,58,237,0.1)",
+  },
+  {
+    name: "Rajan M.",
+    time: "8 Months Clean",
+    story: "I fell 3 times before this streak. Each time I came back, my why got stronger. Today my why is my daughter's laugh when she sees me in the morning.",
+    avatar: "R",
+    color: "#f59e0b",
+    lightColor: "rgba(245,158,11,0.1)",
+  },
+];
 
-  const getCategoryTitle = (category: VideoCategory) => {
-    switch (selectedLanguage) {
-      case "Hindi":
-        return category.titleHindi;
-      case "Telugu":
-        return category.titleTelugu;
-      default:
-        return category.title;
-    }
-  };
+const LANGUAGES = [
+  { code: "English", label: "English", flag: "🇺🇸" },
+  { code: "Hindi", label: "हिंदी", flag: "🇮🇳" },
+  { code: "Telugu", label: "తెలుగు", flag: "🇮🇳" },
+];
 
-  const openYouTubeSearch = (category: VideoCategory) => {
-    const query = category.searchQuery[selectedLanguage];
-    const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
-    window.open(url, "_blank");
-  };
+const CATEGORIES = [
+  {
+    id: "meditation",
+    title: "Meditation",
+    titleHindi: "ध्यान",
+    titleTelugu: "ధ్యానం",
+    icon: Brain,
+    query: { English: "guided meditation for addiction recovery", Hindi: "ध्यान meditation hindi", Telugu: "ధ్యానం telugu meditation" },
+    gradient: "linear-gradient(135deg, #7c3aed, #4f46e5)",
+    glow: "rgba(124,58,237,0.3)",
+    desc: "Calm the storm from inside.",
+  },
+  {
+    id: "yoga",
+    title: "Yoga",
+    titleHindi: "योग",
+    titleTelugu: "యోగా",
+    icon: Flower2,
+    query: { English: "yoga for stress relief beginners", Hindi: "योग yoga hindi", Telugu: "యోగా telugu yoga" },
+    gradient: "linear-gradient(135deg, #0d9488, #0891b2)",
+    glow: "rgba(13,148,136,0.3)",
+    desc: "Move what you can't say out loud.",
+  },
+  {
+    id: "recovery",
+    title: "Recovery Stories",
+    titleHindi: "रिकवरी गाइड",
+    titleTelugu: "రికవరీ గైడ్",
+    icon: Heart,
+    query: { English: "addiction recovery motivation success story", Hindi: "नशा मुक्ति recovery hindi", Telugu: "addiction recovery telugu" },
+    gradient: "linear-gradient(135deg, #e11d48, #f97316)",
+    glow: "rgba(225,29,72,0.3)",
+    desc: "You are not the first. You won't be the last.",
+  },
+  {
+    id: "mental",
+    title: "Mental Health",
+    titleHindi: "मानसिक स्वास्थ्य",
+    titleTelugu: "మానసిక ఆరోగ్యం",
+    icon: MessageCircle,
+    query: { English: "mental health therapy tips anxiety", Hindi: "मानसिक स्वास्थ्य hindi bk shivani", Telugu: "మానసిక ఆరోగ్యం mental health telugu" },
+    gradient: "linear-gradient(135deg, #2563eb, #7c3aed)",
+    glow: "rgba(37,99,235,0.3)",
+    desc: "Understand what's happening inside.",
+  },
+];
 
-  const successStories = [
-    {
-      name: "David K.",
-      time: "2 Years Clean",
-      story:
-        "I lost everything to pills. Today, I have my family back and a steady job. Recovery helped me find my voice again.",
-      img: "https://picsum.photos/seed/david/200",
-    },
-    {
-      name: "Elena R.",
-      time: "18 Months Clean",
-      story:
-        "The community here is what saved me. Knowing I wasn't alone in the middle of the night changed everything.",
-      img: "https://picsum.photos/seed/elena/200",
-    },
-  ];
+const PLAYLISTS: Record<string, Array<{ title: string; videoId?: string; playlistId?: string; thumbnail: string }>> = {
+  English: [
+    { title: "Addiction Recovery Meditations", playlistId: "PLB3F2CF45AA221C88", thumbnail: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=600" },
+    { title: "TED Talks on Addiction & Recovery", playlistId: "PL70DEC2B0568B5469", thumbnail: "https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&q=80&w=600" },
+  ],
+  Hindi: [
+    { title: "Best Motivational Video", videoId: "CRPhPUNNrVU", thumbnail: "https://img.youtube.com/vi/CRPhPUNNrVU/hqdefault.jpg" },
+    { title: "How I QUIT DRUGS – Arvind Kumar", videoId: "F2TChiFHi2Q", thumbnail: "https://img.youtube.com/vi/F2TChiFHi2Q/hqdefault.jpg" },
+    { title: "Powerful Motivational Speech", videoId: "TKpv_u4r18Y", thumbnail: "https://img.youtube.com/vi/TKpv_u4r18Y/hqdefault.jpg" },
+  ],
+  Telugu: [
+    { title: "Addiction Recovery – Sadhguru", videoId: "J2ie7Yw5qJs", thumbnail: "https://img.youtube.com/vi/J2ie7Yw5qJs/hqdefault.jpg" },
+    { title: "Stop Smoking & Drinking – Venu Kalyan", videoId: "iQfHKURjG9Y", thumbnail: "https://img.youtube.com/vi/iQfHKURjG9Y/hqdefault.jpg" },
+    { title: "Telugu Motivation", videoId: "nT_HXP6pQC4", thumbnail: "https://img.youtube.com/vi/nT_HXP6pQC4/hqdefault.jpg" },
+  ],
+};
 
-  // Featured curated playlists - these are verified working
-  const curatedPlaylists = {
-    English: [
-      {
-        title: "Addiction Recovery Meditations",
-        playlistId: "PLB3F2CF45AA221C88",
-        thumbnail:
-          "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=400",
-      },
-      {
-        title: "TED Talks on Addiction",
-        playlistId: "PL70DEC2B0568B5469",
-        thumbnail:
-          "https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&q=80&w=400",
-      },
-    ],
-    Hindi: [
-      {
-        title: "Best Motivational Video - Hindi",
-        videoId: "CRPhPUNNrVU",
-        thumbnail: "https://img.youtube.com/vi/CRPhPUNNrVU/hqdefault.jpg",
-      },
-      {
-        title: "How I QUIT DRUGS - Arvind Kumar",
-        videoId: "F2TChiFHi2Q",
-        thumbnail: "https://img.youtube.com/vi/F2TChiFHi2Q/hqdefault.jpg",
-      },
-      {
-        title: "Powerful Motivational Speech",
-        videoId: "TKpv_u4r18Y",
-        thumbnail: "https://img.youtube.com/vi/TKpv_u4r18Y/hqdefault.jpg",
-      },
-    ],
-    Telugu: [
-      {
-        title: "Addiction Recovery - Sadhguru",
-        videoId: "J2ie7Yw5qJs",
-        thumbnail: "https://img.youtube.com/vi/J2ie7Yw5qJs/hqdefault.jpg",
-      },
-      {
-        title: "Stop Smoking & Drinking - Venu Kalyan",
-        videoId: "iQfHKURjG9Y",
-        thumbnail: "https://img.youtube.com/vi/iQfHKURjG9Y/hqdefault.jpg",
-      },
-      {
-        title: "Telugu Motivation",
-        videoId: "nT_HXP6pQC4",
-        thumbnail: "https://img.youtube.com/vi/nT_HXP6pQC4/hqdefault.jpg",
-      },
-    ],
-  };
+// ─── Video Modal ─────────────────────────────────────────────────────────────
 
-  /* Video Modal Component */
-  const VideoModal = ({
-    videoId,
-    playlistId,
-    onClose,
-  }: {
-    videoId?: string;
-    playlistId?: string;
-    onClose: () => void;
-  }) => {
-    // Construct embed URL
-    let embedUrl = "";
-    if (playlistId) {
-      embedUrl = `https://www.youtube.com/embed/videoseries?list=${playlistId}&autoplay=1&modestbranding=1&rel=0`;
-    } else if (videoId) {
-      embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0`;
-    }
-
-    return (
-      <div className="fixed inset-0 z-[100] bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-300">
-        <div className="relative w-full max-w-4xl aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 z-10 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full backdrop-blur-sm transition-all"
-          >
-            <X size={24} />
-          </button>
-          <iframe
-            src={embedUrl}
-            title="Video Player"
-            className="w-full h-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          ></iframe>
-        </div>
-      </div>
-    );
-  };
-
-  const [activeVideo, setActiveVideo] = useState<{
-    playlistId?: string;
-    videoId?: string;
-  } | null>(null);
-
-  const currentPlaylists =
-    curatedPlaylists[selectedLanguage as keyof typeof curatedPlaylists] ||
-    curatedPlaylists.English;
+const VideoModal = ({ videoId, playlistId, onClose }: { videoId?: string; playlistId?: string; onClose: () => void }) => {
+  const embedUrl = playlistId
+    ? `https://www.youtube.com/embed/videoseries?list=${playlistId}&autoplay=1&modestbranding=1&rel=0`
+    : `https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0`;
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-500 pb-20">
-      {/* Header with Language Selector */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Mental Strength</h1>
-          <p className="text-slate-500">
-            Feed your mind with hope, knowledge, and recovery resources.
-          </p>
-        </div>
-        <div className="flex bg-white p-1 rounded-2xl border border-slate-100 shadow-sm overflow-x-auto scrollbar-hide max-w-full">
-          {languages.map((lang) => (
-            <button
-              key={lang.code}
-              onClick={() => setSelectedLanguage(lang.code)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 ${
-                selectedLanguage === lang.code
-                  ? "bg-teal-600 text-white shadow-md"
-                  : "text-slate-500 hover:bg-slate-50"
-              }`}
-            >
-              <span>{lang.flag}</span>
-              <span>{lang.label}</span>
-            </button>
-          ))}
-        </div>
-      </header>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-in"
+      style={{ background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(12px)' }}>
+      <div className="relative w-full max-w-4xl aspect-video rounded-2xl overflow-hidden shadow-2xl animate-in"
+        style={{ boxShadow: '0 0 120px rgba(124,58,237,0.3)' }}>
+        <button onClick={onClose}
+          className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/10 hover:bg-white/25 backdrop-blur-sm flex items-center justify-center text-white transition-all">
+          <X size={18} />
+        </button>
+        <iframe src={embedUrl} title="Video" className="w-full h-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+      </div>
+    </div>
+  );
+};
 
-      {/* Video Categories Grid */}
-      <section className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xl font-bold text-slate-900 flex items-center space-x-2">
-            <Globe size={20} className="text-indigo-500" />
-            <span>Browse by Category</span>
-          </h3>
-          <span className="text-xs font-bold text-slate-400 bg-slate-100 px-3 py-1 rounded-full flex items-center gap-1">
-            <Languages size={12} />
-            {selectedLanguage}
-          </span>
-        </div>
+// ─── Main Component ────────────────────────────────────────────────────────────
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {categories.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => openYouTubeSearch(category)}
-              className={`${category.bgColor} p-6 rounded-3xl border border-slate-100 shadow-sm text-left group cursor-pointer hover:shadow-xl transition-all hover:-translate-y-1 relative overflow-hidden`}
-            >
-              <div
-                className={`${category.color} mb-4 p-3 bg-white rounded-2xl inline-block shadow-sm`}
-              >
-                {category.icon}
-              </div>
-              <h4 className="font-bold text-slate-800 text-lg mb-2">
-                {getCategoryTitle(category)}
-              </h4>
-              <p className="text-slate-500 text-sm mb-4">
-                Find {category.title.toLowerCase()} videos in {selectedLanguage}
-              </p>
-              <div
-                className={`flex items-center gap-2 ${category.color} font-bold text-sm group-hover:translate-x-1 transition-transform`}
-              >
-                <Search size={16} />
-                <span>Search on YouTube</span>
-                <ExternalLink size={14} />
-              </div>
-              <div className="absolute -right-8 -bottom-8 opacity-5">
-                <Film size={120} />
-              </div>
-            </button>
-          ))}
-        </div>
-      </section>
+const Motivation: React.FC = () => {
+  const [lang, setLang] = useState("English");
+  const [quoteIdx, setQuoteIdx] = useState(0);
+  const [activeVideo, setActiveVideo] = useState<{ videoId?: string; playlistId?: string } | null>(null);
+  const [likedStories, setLikedStories] = useState<Set<number>>(new Set());
+  const [quoteFading, setQuoteFading] = useState(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval>>();
 
-      {/* Curated Playlists */}
-      <section className="space-y-6">
-        <h3 className="text-xl font-bold text-slate-900 flex items-center space-x-2">
-          <Play size={20} className="text-rose-500" />
-          <span>Curated Playlists</span>
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {currentPlaylists.map((playlist, idx) => (
-            <div
-              key={idx}
-              onClick={() =>
-                setActiveVideo(
-                  (playlist as any).videoId
-                    ? { videoId: (playlist as any).videoId }
-                    : { playlistId: (playlist as any).playlistId },
-                )
-              }
-              className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden group cursor-pointer hover:shadow-xl transition-all hover:-translate-y-1 flex relative"
-            >
-              <div className="relative w-48 h-32 flex-shrink-0 overflow-hidden bg-slate-200">
-                <img
-                  src={playlist.thumbnail}
-                  alt={playlist.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                  <div className="bg-white/90 p-3 rounded-full shadow-xl">
-                    <Play
-                      size={20}
-                      className="text-teal-600 ml-0.5"
-                      fill="currentColor"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="p-5 flex flex-col justify-center">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-teal-600 bg-teal-50 px-2 py-0.5 rounded inline-block w-fit mb-2">
-                  Playlist
-                </span>
-                <h4 className="font-bold text-slate-800 group-hover:text-teal-600 transition-colors">
-                  {playlist.title}
-                </h4>
-                <p className="text-slate-400 text-xs mt-1 flex items-center gap-1">
-                  <Play size={12} />
-                  Play Now
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+  // Auto-cycle quotes
+  useEffect(() => {
+    intervalRef.current = setInterval(() => cycleQuote(1), 8000);
+    return () => clearInterval(intervalRef.current);
+  }, [quoteIdx]);
 
-      {/* Daily Quote Section */}
-      <div className="bg-gradient-to-r from-teal-500 to-indigo-600 p-1 rounded-3xl shadow-xl">
-        <div className="bg-white rounded-[1.4rem] p-8 md:p-12 text-center relative overflow-hidden">
-          <Quote className="absolute top-4 left-4 text-slate-100" size={120} />
-          <div className="relative z-10">
-            <Sparkles className="mx-auto text-amber-400 mb-6" size={40} />
-            <h2 className="text-2xl md:text-3xl font-bold italic text-slate-800 mb-4">
-              "Healing is not linear, and it's okay to have bad days. What
-              matters is that you keep choosing to move forward."
-            </h2>
-            <p className="text-teal-600 font-bold">- Recovery Community</p>
+  const cycleQuote = (dir: number) => {
+    setQuoteFading(true);
+    setTimeout(() => {
+      setQuoteIdx(i => (i + dir + QUOTES.length) % QUOTES.length);
+      setQuoteFading(false);
+    }, 300);
+    clearInterval(intervalRef.current);
+  };
+
+  const q = QUOTES[quoteIdx];
+  const moodMeta = MOOD_LABELS[q.mood] || { color: "#f59e0b", label: "Wisdom" };
+  const playlists = PLAYLISTS[lang] || PLAYLISTS.English;
+
+  const getCatTitle = (cat: typeof CATEGORIES[0]) => {
+    if (lang === "Hindi") return cat.titleHindi;
+    if (lang === "Telugu") return cat.titleTelugu;
+    return cat.title;
+  };
+
+  return (
+    <div className="space-y-8 animate-in pb-10">
+
+      {/* =================== QUOTE HERO =================== */}
+      {/* This is the emotional core of the page — a person opens this
+          when they need something. Give them something real. */}
+      <div className="relative overflow-hidden rounded-2xl min-h-[260px] flex flex-col justify-between p-6 md:p-10"
+        style={{ background: 'linear-gradient(145deg, #0a0a1a 0%, #12082b 50%, #0a1628 100%)' }}>
+
+        {/* Background constellation effect */}
+        {[...Array(18)].map((_, i) => (
+          <div key={i} className="absolute rounded-full bg-white animate-glow-pulse"
+            style={{
+              width: `${Math.random() * 2.5 + 1}px`, height: `${Math.random() * 2.5 + 1}px`,
+              left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%`,
+              opacity: Math.random() * 0.4 + 0.1,
+              animationDelay: `${Math.random() * 4}s`,
+              animationDuration: `${Math.random() * 3 + 2}s`,
+            }} />
+        ))}
+
+        {/* aurora wash */}
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: `radial-gradient(ellipse 60% 50% at 50% 0%, ${moodMeta.color}20 0%, transparent 70%)` }} />
+
+        {/* Mood tag */}
+        <div className="relative z-10 flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold"
+            style={{ background: `${moodMeta.color}20`, border: `1px solid ${moodMeta.color}40`, color: moodMeta.color }}>
+            <Sparkles size={11} />
+            {moodMeta.label}
           </div>
-          {/* Video Modal Overlay */}
-          {activeVideo && (
-            <VideoModal
-              playlistId={activeVideo.playlistId}
-              videoId={activeVideo.videoId}
-              onClose={() => setActiveVideo(null)}
-            />
-          )}
+          <div className="flex items-center gap-1">
+            {QUOTES.map((_, i) => (
+              <button key={i} onClick={() => { setQuoteIdx(i); clearInterval(intervalRef.current); }}
+                className="w-5 h-1.5 rounded-full transition-all duration-300"
+                style={{ background: i === quoteIdx ? moodMeta.color : 'rgba(255,255,255,0.2)', width: i === quoteIdx ? '20px' : '6px' }} />
+            ))}
+          </div>
+        </div>
+
+        {/* Quote text — this is the moment. Make it feel handwritten, not printed. */}
+        <div className={`relative z-10 flex-1 transition-all duration-300 ${quoteFading ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"}`}>
+          <p className="text-white leading-relaxed mb-4 tracking-wide"
+            style={{ fontFamily: 'Sora, sans-serif', fontSize: 'clamp(1rem, 2.5vw, 1.4rem)', fontWeight: 600 }}>
+            "{q.text}"
+          </p>
+          <p className="text-sm font-semibold" style={{ color: moodMeta.color }}>— {q.author}</p>
+        </div>
+
+        {/* Navigation arrows */}
+        <div className="relative z-10 flex items-center justify-between mt-6">
+          <button onClick={() => cycleQuote(-1)}
+            className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/60 hover:text-white transition-all">
+            <ChevronLeft size={16} />
+          </button>
+          <p className="text-white/25 text-[11px] font-medium">Tap arrows or waits 8s</p>
+          <button onClick={() => cycleQuote(1)}
+            className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/60 hover:text-white transition-all">
+            <ChevronRight size={16} />
+          </button>
         </div>
       </div>
 
-      {/* Success Stories */}
-      <section className="space-y-6">
-        <h3 className="text-xl font-bold text-slate-900 flex items-center space-x-2">
-          <Heart size={20} className="text-amber-500" />
-          <span>Success Stories</span>
+      {/* =================== LANGUAGE PICKER =================== */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 style={{ fontFamily: 'Sora, sans-serif' }} className="text-xl font-bold text-slate-900 dark:text-slate-100">Watch & Heal</h2>
+          <p className="text-slate-400 text-sm">Videos chosen for people in recovery.</p>
+        </div>
+        <div className="flex gap-1 p-1 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm">
+          {LANGUAGES.map(l => (
+            <button key={l.code} onClick={() => setLang(l.code)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all whitespace-nowrap ${lang === l.code ? "text-white shadow-md" : "text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700"
+                }`}
+              style={lang === l.code ? { background: 'linear-gradient(135deg, #f59e0b, #f97316)' } : {}}>
+              {l.flag} {l.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* =================== CATEGORY TILES =================== */}
+      {/* Not a grid of generic cards — each tile has a personality.
+          The icon is large, the action is bold, the copy is *human*. */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {CATEGORIES.map((cat, i) => {
+          const Icon = cat.icon;
+          return (
+            <button key={cat.id} onClick={() => window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(cat.query[lang as keyof typeof cat.query])}`, "_blank")}
+              className="group relative overflow-hidden rounded-2xl p-5 text-left flex flex-col gap-3 cursor-pointer transition-all duration-300"
+              style={{
+                background: 'rgba(255,255,255,0.7)',
+                border: '1px solid rgba(255,255,255,0.6)',
+                backdropFilter: 'blur(12px)',
+                boxShadow: `0 4px 24px rgba(0,0,0,0.05)`,
+                animationDelay: `${i * 80}ms`,
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)';
+                (e.currentTarget as HTMLElement).style.boxShadow = `0 16px 40px ${cat.glow}`;
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.transform = 'translateY(0px)';
+                (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 24px rgba(0,0,0,0.05)`;
+              }}>
+              {/* Icon */}
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg"
+                style={{ background: cat.gradient }}>
+                <Icon size={18} />
+              </div>
+              {/* Text */}
+              <div>
+                <p className="font-bold text-slate-900 dark:text-slate-100 text-sm leading-tight">{getCatTitle(cat)}</p>
+                <p className="text-slate-400 text-[11px] mt-0.5 leading-snug">{cat.desc}</p>
+              </div>
+              {/* Arrow */}
+              <div className="flex items-center gap-1 text-[11px] font-bold transition-transform group-hover:translate-x-0.5"
+                style={{ color: cat.glow.replace('0.3)', '1)').replace('rgba(', 'rgb(') }}>
+                <ExternalLink size={11} /> Open YouTube
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* =================== CURATED VIDEOS =================== */}
+      {/* Full-bleed watch cards — visually rich, not a list. */}
+      <section>
+        <h3 style={{ fontFamily: 'Sora, sans-serif' }} className="font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+          <Play size={16} className="text-rose-500" /> Curated for You
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {successStories.map((story, i) => (
-            <div
-              key={i}
-              className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-start space-x-4"
-            >
-              <img
-                src={story.img}
-                alt={story.name}
-                className="w-16 h-16 rounded-2xl object-cover"
-              />
-              <div className="flex-1">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h4 className="font-bold text-slate-900">{story.name}</h4>
-                    <p className="text-xs font-bold text-teal-600 uppercase tracking-tighter">
-                      {story.time}
-                    </p>
-                  </div>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => alert('Liked!')}
-                      className="text-slate-400 hover:text-teal-600"
-                      title="Like story"
-                    >
-                      <ThumbsUp size={16} />
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (navigator.share) {
-                          navigator.share({
-                            title: story.name,
-                            text: story.story,
-                          }).catch(() => {});
-                        } else {
-                          alert('Share copied to clipboard');
-                        }
-                      }}
-                      className="text-slate-400 hover:text-indigo-600"
-                      title="Share story"
-                    >
-                      <Share2 size={16} />
-                    </button>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {playlists.map((playlist, idx) => (
+            <div key={idx} onClick={() => setActiveVideo((playlist as any).videoId ? { videoId: (playlist as any).videoId } : { playlistId: (playlist as any).playlistId })}
+              className="group relative overflow-hidden rounded-2xl cursor-pointer hover-lift"
+              style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+              {/* Thumbnail */}
+              <div className="relative aspect-video overflow-hidden bg-slate-200">
+                <img src={playlist.thumbnail} alt={playlist.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                {/* Dark vignette */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                {/* Play button */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-xl
+                    group-hover:scale-110 group-hover:bg-white transition-all duration-300"
+                    style={{ boxShadow: '0 0 30px rgba(255,255,255,0.4)' }}>
+                    <Play size={20} className="text-slate-900 ml-0.5" fill="currentColor" />
                   </div>
                 </div>
-                <p className="text-slate-600 text-sm leading-relaxed">
-                  {story.story}
-                </p>
+                {/* Title on thumbnail */}
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <p className="text-white font-bold text-sm leading-tight drop-shadow-lg">{playlist.title}</p>
+                  <p className="text-white/60 text-[11px] mt-0.5 flex items-center gap-1">
+                    <Volume2 size={10} /> Tap to watch
+                  </p>
+                </div>
               </div>
             </div>
           ))}
         </div>
-        <button
-          onClick={() => (window.location.href = '/stories')}
-          className="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-500 font-bold hover:bg-slate-50 transition-colors"
-          title="Read more stories"
-        >
-          Read More Stories
-        </button>
       </section>
+
+      {/* =================== REAL STORIES =================== */}
+      {/* Not testimonials — confessions. These are real moments.
+          The design should feel like reading someone's journal, not a review. */}
+      <section>
+        <div className="flex items-center gap-2 mb-5">
+          <div className="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center">
+            <Heart size={15} className="text-rose-500" />
+          </div>
+          <div>
+            <h3 style={{ fontFamily: 'Sora, sans-serif' }} className="font-bold text-slate-900 dark:text-slate-100 leading-none">Real People, Real Journeys</h3>
+            <p className="text-slate-400 text-xs">They made it. So can you.</p>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {SUCCESS_STORIES.map((story, i) => (
+            <div key={i} className="bento-card rounded-2xl p-5 group"
+              style={{ borderLeft: `3px solid ${story.color}` }}>
+              <div className="flex items-start gap-4">
+                {/* Avatar */}
+                <div className="w-11 h-11 rounded-2xl flex-shrink-0 flex items-center justify-center font-bold text-white text-base shadow-md"
+                  style={{ background: story.color }}>
+                  {story.avatar}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <p style={{ fontFamily: 'Sora, sans-serif' }} className="font-bold text-slate-900 dark:text-slate-100 text-sm">{story.name}</p>
+                      <p className="text-[11px] font-bold uppercase tracking-wide" style={{ color: story.color }}>{story.time}</p>
+                    </div>
+                    <button
+                      onClick={() => setLikedStories(prev => {
+                        const next = new Set(prev);
+                        next.has(i) ? next.delete(i) : next.add(i);
+                        return next;
+                      })}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${likedStories.has(i) ? "text-rose-600" : "text-slate-400 hover:text-rose-500"
+                        }`}
+                      style={likedStories.has(i) ? { background: 'rgba(239,68,68,0.08)' } : {}}>
+                      <Heart size={13} fill={likedStories.has(i) ? "currentColor" : "none"} />
+                      {likedStories.has(i) ? "Inspired" : "This helped me"}
+                    </button>
+                  </div>
+                  {/* The story — no truncation. Let them read it. */}
+                  <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                    {story.story}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Soft CTA — not aggressive */}
+        <div className="mt-4 text-center">
+          <p className="text-slate-400 text-xs">
+            These are real humans who were where you are.{" "}
+            <span className="text-amber-600 font-bold">Your story matters too.</span>
+          </p>
+        </div>
+      </section>
+
+      {/* Video Player Modal */}
+      {activeVideo && (
+        <VideoModal videoId={activeVideo.videoId} playlistId={activeVideo.playlistId} onClose={() => setActiveVideo(null)} />
+      )}
     </div>
   );
 };

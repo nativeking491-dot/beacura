@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { supabase } from "../services/supabaseClient";
 import { Zap, X } from "lucide-react";
+import { useToast } from "../context/ToastContext";
 
 interface CravingLoggerProps {
   userId: string | undefined;
@@ -16,15 +17,16 @@ export const CravingLogger: React.FC<CravingLoggerProps> = ({
   const [trigger, setTrigger] = useState("");
   const [strategy, setStrategy] = useState("");
   const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
 
   const handleSubmit = async () => {
     if (!userId) {
-      alert("Please sign in first");
+      showToast("Please sign in first", "warning");
       return;
     }
 
     if (!trigger.trim()) {
-      alert("Please describe the trigger");
+      showToast("Please describe the trigger", "warning");
       return;
     }
 
@@ -41,13 +43,13 @@ export const CravingLogger: React.FC<CravingLoggerProps> = ({
 
       setShowModal(false);
       onSuccess?.();
-      alert("✅ Craving logged! You're doing great!");
+      showToast("Craving logged — you're doing great!", "success");
       setSeverity(5);
       setTrigger("");
       setStrategy("");
     } catch (error) {
       console.error("Error logging craving:", error);
-      alert("Failed to log craving");
+      showToast("Failed to log craving", "error");
     } finally {
       setLoading(false);
     }

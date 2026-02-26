@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { X, Heart, CheckCircle2, AlertCircle } from "lucide-react";
 import { supabase } from "../services/supabaseClient";
+import { useToast } from "../context/ToastContext";
 
 interface BecameMentorModalProps {
   userId: string | undefined;
@@ -26,6 +27,7 @@ export const BecomeMentorModal: React.FC<BecameMentorModalProps> = ({
     specialties: [] as string[],
   });
   const [submitting, setSubmitting] = useState(false);
+  const { showToast } = useToast();
 
   const daysUntilEligible = Math.max(0, 365 - userStreak);
   const isEligible = userStreak >= 365;
@@ -54,17 +56,17 @@ export const BecomeMentorModal: React.FC<BecameMentorModalProps> = ({
     if (!userId) return;
 
     if (!formData.why_mentor.trim()) {
-      alert("Please tell us why you want to mentor");
+      showToast("Please tell us why you want to mentor", "warning");
       return;
     }
 
     if (!formData.experience_text.trim()) {
-      alert("Please share your recovery experience");
+      showToast("Please share your recovery experience", "warning");
       return;
     }
 
     if (formData.specialties.length === 0) {
-      alert("Please select at least one specialty");
+      showToast("Please select at least one specialty", "warning");
       return;
     }
 
@@ -87,7 +89,7 @@ export const BecomeMentorModal: React.FC<BecameMentorModalProps> = ({
       onSuccess?.();
     } catch (error) {
       console.error("Error submitting application:", error);
-      alert("Failed to submit application. Please try again.");
+      showToast("Failed to submit application. Please try again.", "error");
     } finally {
       setSubmitting(false);
     }
@@ -230,8 +232,8 @@ export const BecomeMentorModal: React.FC<BecameMentorModalProps> = ({
                       key={specialty}
                       onClick={() => handleToggleSpecialty(specialty)}
                       className={`p-3 rounded-lg border-2 font-semibold text-sm transition ${formData.specialties.includes(specialty)
-                          ? "border-purple-600 bg-purple-50 text-purple-700"
-                          : "border-slate-300 bg-white text-slate-700 hover:border-purple-300"
+                        ? "border-purple-600 bg-purple-50 text-purple-700"
+                        : "border-slate-300 bg-white text-slate-700 hover:border-purple-300"
                         }`}
                     >
                       {formData.specialties.includes(specialty) && (

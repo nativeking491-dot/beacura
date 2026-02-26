@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Bell } from "lucide-react";
 import { supabase } from "../services/supabaseClient";
+import { useToast } from "../context/ToastContext";
 
 interface NotificationPreferencesModalProps {
   userId: string | undefined;
@@ -24,6 +25,7 @@ export const NotificationPreferencesModal: React.FC<
     frequency: "daily", // daily, weekly, never
   });
   const [saving, setSaving] = useState(false);
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (!userId) return;
@@ -77,11 +79,11 @@ export const NotificationPreferencesModal: React.FC<
         console.log("Database table doesn't exist yet, using localStorage only");
       }
 
-      alert("✅ Notification preferences updated!");
+      showToast("Notification preferences updated!", "success");
       onClose();
     } catch (error) {
       console.error("Error saving preferences:", error);
-      alert("Failed to save preferences");
+      showToast("Failed to save preferences", "error");
     } finally {
       setSaving(false);
     }
@@ -197,8 +199,8 @@ export const NotificationPreferencesModal: React.FC<
                   <button
                     onClick={() => toggleSetting(item.key as keyof typeof preferences)}
                     className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${(preferences as any)[item.key]
-                        ? "bg-blue-600"
-                        : "bg-slate-300"
+                      ? "bg-blue-600"
+                      : "bg-slate-300"
                       }`}
                   >
                     <span
@@ -254,8 +256,8 @@ export const NotificationPreferencesModal: React.FC<
                   <button
                     onClick={() => toggleSetting(item.key as keyof typeof preferences)}
                     className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${(preferences as any)[item.key]
-                        ? "bg-green-600"
-                        : "bg-slate-300"
+                      ? "bg-green-600"
+                      : "bg-slate-300"
                       }`}
                   >
                     <span

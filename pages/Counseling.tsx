@@ -188,131 +188,111 @@ const Counseling: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
-      <header>
-        <h1 className="text-3xl font-bold text-slate-900">Counseling Center</h1>
-        <p className="text-slate-500">
-          Professional peer support and community circles.
-        </p>
-      </header>
+    <div className="space-y-6 animate-in pb-8">
 
-      {/* Anonymous Feature */}
-      <div className="bg-slate-900 text-white p-6 rounded-3xl flex items-center justify-between shadow-xl shadow-slate-200">
-        <div className="flex items-center space-x-4">
-          <div className="bg-amber-500/20 p-3 rounded-2xl border border-amber-500/30">
-            <ShieldCheck size={24} className="text-amber-400" />
-          </div>
+      {/* =================== HERO HEADER =================== */}
+      <div className="relative overflow-hidden rounded-2xl p-6 md:p-8 text-white"
+        style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #0f172a 100%)' }}>
+        <div className="absolute -top-12 -right-12 w-56 h-56 bg-violet-500 rounded-full blur-3xl opacity-20" />
+        <div className="absolute -bottom-8 left-16 w-40 h-40 bg-indigo-400 rounded-full blur-3xl opacity-15" />
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
-            <h3 className="font-bold text-lg">Identity Protection Active</h3>
-            <p className="text-slate-400 text-sm">
-              Your real identity is only shared if you choose to.
-            </p>
+            <h1 style={{ fontFamily: 'Sora, sans-serif' }} className="text-2xl md:text-3xl font-extrabold mb-1">Counseling Center</h1>
+            <p className="text-slate-400 text-sm">Professional peer support and community circles.</p>
+          </div>
+          {/* Identity shield badge */}
+          <div className="flex items-center gap-3 px-4 py-3 rounded-2xl" style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.25)' }}>
+            <div className="w-9 h-9 rounded-xl bg-amber-500/20 flex items-center justify-center">
+              <ShieldCheck size={18} className="text-amber-400" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-amber-300">Identity Protection Active</p>
+              <p className="text-[11px] text-slate-400">Your identity stays private.</p>
+            </div>
           </div>
         </div>
-        <button
-          onClick={() => (window.location.href = "/counseling/settings")}
-          className="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl text-sm font-bold transition-all border border-white/10"
-          title="Counseling settings"
-        >
-          Settings
-        </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Featured Tool: AI Craving Intervention */}
-        <div className="md:col-span-2 lg:col-span-3 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {/* Featured Tool */}
+        <div className="md:col-span-2 lg:col-span-3">
           <CravingGeneratorTool />
         </div>
 
         {MOCK_MENTORS.map((mentor) => (
-          <div
-            key={mentor.id}
-            className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-xl transition-all group"
-          >
-            <div className="p-6">
-              <div className="flex items-center space-x-4 mb-5">
-                <div className="relative">
-                  <img
-                    src={mentor.avatar}
-                    alt={mentor.name}
-                    className="w-16 h-16 rounded-2xl border-2 border-slate-50 object-cover shadow-sm group-hover:scale-105 transition-transform"
+          <div key={mentor.id} className="bento-card rounded-2xl overflow-hidden group hover-lift">
+            {/* Card top accent bar */}
+            <div className="h-1.5 w-full" style={{ background: 'linear-gradient(90deg, #f59e0b, #f97316, #ec4899)' }} />
+            <div className="p-5">
+
+              {/* Avatar + name */}
+              <div className="flex items-center gap-4 mb-4">
+                <div className="relative flex-shrink-0">
+                  <div className="absolute inset-0 rounded-2xl bg-amber-400 blur-xl opacity-0 group-hover:opacity-40 transition-opacity" />
+                  <img src={mentor.avatar} alt={mentor.name}
+                    className="relative w-14 h-14 rounded-2xl object-cover shadow-md border-2 border-white/80 dark:border-slate-700"
                   />
-                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full"></div>
+                  <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-400 border-2 border-white dark:border-slate-900 rounded-full animate-glow-pulse" />
                 </div>
-                <div>
-                  <h3 className="font-bold text-slate-900 text-lg">
-                    {mentor.name}
-                  </h3>
-                  <div className="flex items-center text-amber-500">
-                    <Star size={14} fill="currentColor" />
-                    <span className="text-xs font-bold ml-1">
-                      {mentor.rating}
-                    </span>
-                    <span className="text-slate-400 font-normal ml-2">
-                      {mentor.experience}
-                    </span>
+                <div className="flex-1 min-w-0">
+                  <h3 style={{ fontFamily: 'Sora, sans-serif' }} className="font-bold text-slate-900 dark:text-slate-100 text-[15px] leading-tight">{mentor.name}</h3>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <Star size={11} fill="#f59e0b" className="text-amber-500" />
+                    <span className="text-xs font-bold text-amber-600">{mentor.rating}</span>
+                    <span className="text-slate-400 text-xs">· {mentor.experience}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-2 mb-6">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  Focus Areas
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {mentor.specialty.map((s, i) => (
-                    <span
-                      key={i}
-                      className="px-2.5 py-1 bg-slate-50 text-slate-600 text-[10px] font-bold rounded-lg border border-slate-100"
-                    >
-                      {s}
-                    </span>
-                  ))}
-                </div>
+              {/* Specialty pills */}
+              <div className="flex flex-wrap gap-1.5 mb-5">
+                {mentor.specialty.map((s: string, i: number) => (
+                  <span key={i} className="px-2.5 py-1 text-[10px] font-bold rounded-lg"
+                    style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.15)', color: '#b45309' }}>
+                    {s}
+                  </span>
+                ))}
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => handleStartChat(mentor)}
-                  className="flex items-center justify-center space-x-2 bg-slate-50 text-slate-700 py-3 rounded-2xl text-sm font-bold hover:bg-amber-50 hover:text-amber-700 transition-all border border-slate-100"
-                >
-                  <MessageCircle size={18} />
+              {/* Action buttons */}
+              <div className="grid grid-cols-2 gap-2">
+                <button onClick={() => handleStartChat(mentor)}
+                  className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-bold transition-all border border-slate-200 dark:border-slate-700 hover:border-amber-300 dark:hover:border-amber-500/40 text-slate-700 dark:text-slate-200 hover:text-amber-700 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/5">
+                  <MessageCircle size={15} />
                   <span>Chat</span>
                 </button>
-                <button
-                  onClick={() => handleBookSession(mentor)}
-                  className="flex items-center justify-center space-x-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white py-3 rounded-2xl text-sm font-bold hover:shadow-lg transition-all shadow-lg shadow-amber-200"
-                >
-                  <Video size={18} />
-                  <span>Video Call</span>
+                <button onClick={() => handleBookSession(mentor)}
+                  className="btn-primary flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm">
+                  <Video size={15} />
+                  <span>Book</span>
                 </button>
               </div>
             </div>
-            <div className="bg-slate-50/50 px-6 py-4 border-t border-slate-100 flex items-center justify-between">
-              <div className="flex items-center space-x-2 text-slate-500 text-[10px] font-bold uppercase">
-                <Clock size={12} className="text-amber-500" />
-                <span>Next Slot: 2 PM</span>
+
+            {/* Footer chip */}
+            <div className="px-5 py-3 border-t border-slate-100 dark:border-slate-700/50 flex items-center justify-between"
+              style={{ background: 'rgba(248,250,252,0.6)' }}>
+              <div className="flex items-center gap-1.5 text-slate-400 text-[10px] font-bold uppercase">
+                <Clock size={10} className="text-amber-500" />
+                Next Slot: 2 PM
               </div>
-              <span className="text-[10px] font-black text-amber-600">
+              <span className="text-[10px] font-black tracking-wide"
+                style={{ background: 'linear-gradient(90deg, #f59e0b, #f97316)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 BOOK NOW
               </span>
             </div>
           </div>
         ))}
 
-        <div className="border-2 border-dashed border-slate-200 rounded-[2rem] flex flex-col items-center justify-center p-8 text-center bg-slate-50/30 group hover:bg-white transition-colors">
-          <div className="bg-white p-4 rounded-full shadow-sm mb-4 group-hover:scale-110 transition-transform">
-            <Users size={32} className="text-slate-300" />
+        {/* Group circles card */}
+        <div className="bento-card rounded-2xl flex flex-col items-center justify-center p-8 text-center border-2 border-dashed border-slate-200 dark:border-slate-700 hover:border-teal-300 dark:hover:border-teal-500/40 transition-colors group bg-transparent shadow-none">
+          <div className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <Users size={26} className="text-slate-300 dark:text-slate-600 group-hover:text-teal-500 transition-colors" />
           </div>
-          <h3 className="font-bold text-slate-700">Group Support Circle</h3>
-          <p className="text-slate-500 text-xs mb-4 max-w-[200px] mx-auto">
-            Join others in a moderated group healing session.
-          </p>
-          <button
-            onClick={() => (window.location.href = "/circles")}
-            className="bg-white border border-slate-200 px-6 py-2.5 rounded-xl text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm"
-            title="Browse support circles"
-          >
+          <h3 className="font-bold text-slate-700 dark:text-slate-300 text-sm mb-1.5">Group Support Circle</h3>
+          <p className="text-slate-400 text-xs mb-4 max-w-[180px] leading-relaxed">Join a moderated group healing session.</p>
+          <button onClick={() => (window.location.href = "/circles")}
+            className="px-5 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-teal-300 text-slate-600 dark:text-slate-300 transition-colors shadow-sm">
             Browse Circles
           </button>
         </div>

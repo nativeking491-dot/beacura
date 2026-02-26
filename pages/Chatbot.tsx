@@ -21,6 +21,7 @@ import { CrisisModal } from "../components/CrisisModal";
 import { ChatMessage } from "../types";
 import { useUser } from "../context/UserContext";
 import { supabase, chatService } from "../services/supabaseClient";
+import { useToast } from "../context/ToastContext";
 
 // Quick action prompts for common recovery scenarios
 const QUICK_PROMPTS = [
@@ -41,6 +42,7 @@ const Chatbot: React.FC = () => {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { showToast } = useToast();
 
   // Load chat history on mount
   useEffect(() => {
@@ -161,13 +163,13 @@ const Chatbot: React.FC = () => {
 
     if (!user?.id) {
       console.error("❌ No user ID - user not logged in");
-      alert("Please log in to use the chatbot");
+      showToast("Please log in to use the chatbot", "warning");
       return;
     }
 
     if (!currentSessionId) {
       console.error("❌ No session ID - session not initialized");
-      alert("Chat session not ready. Please refresh the page.");
+      showToast("Chat session not ready. Please refresh the page.", "warning");
       return;
     }
 

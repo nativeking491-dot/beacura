@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Eye, EyeOff, Lock } from "lucide-react";
 import { supabase } from "../services/supabaseClient";
+import { useToast } from "../context/ToastContext";
 
 interface PrivacySettingsModalProps {
   userId: string | undefined;
@@ -21,6 +22,7 @@ export const PrivacySettingsModal: React.FC<PrivacySettingsModalProps> = ({
     allow_contact: true,
   });
   const [saving, setSaving] = useState(false);
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (!userId) return;
@@ -58,11 +60,11 @@ export const PrivacySettingsModal: React.FC<PrivacySettingsModalProps> = ({
 
       if (error) throw error;
 
-      alert("✅ Privacy settings saved successfully!");
+      showToast("Privacy settings saved!", "success");
       onClose();
     } catch (error) {
       console.error("Error saving privacy settings:", error);
-      alert("Failed to save privacy settings");
+      showToast("Failed to save privacy settings", "error");
     } finally {
       setSaving(false);
     }
@@ -182,16 +184,14 @@ export const PrivacySettingsModal: React.FC<PrivacySettingsModalProps> = ({
                 </div>
                 <button
                   onClick={() => toggleSetting(item.key as keyof typeof settings)}
-                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
-                    (settings as any)[item.key]
+                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${(settings as any)[item.key]
                       ? "bg-amber-500"
                       : "bg-slate-300"
-                  }`}
+                    }`}
                 >
                   <span
-                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
-                      (settings as any)[item.key] ? "translate-x-7" : "translate-x-1"
-                    }`}
+                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${(settings as any)[item.key] ? "translate-x-7" : "translate-x-1"
+                      }`}
                   />
                 </button>
               </div>

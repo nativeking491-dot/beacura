@@ -17,12 +17,23 @@
     content="Comprehensive digital ecosystem for addiction recovery. Connect with community, track wellness milestones, and access 24/7 AI support." />
   <meta property="og:type" content="website" />
 
+  <!-- Premium Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Sora:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            display: ['Sora', 'sans-serif'],
+          },
           colors: {
             teal: {
               50: 'var(--primary-50)',
@@ -37,13 +48,83 @@
               900: 'var(--primary-900)',
               950: 'var(--primary-950)',
             }
+          },
+          animation: {
+            'aurora': 'aurora-shift 12s ease infinite',
+            'float': 'float 6s ease-in-out infinite',
+            'float-slow': 'float 9s ease-in-out infinite',
+            'float-fast': 'float 4s ease-in-out infinite',
+            'glow-pulse': 'glow-pulse 3s ease-in-out infinite',
+            'shimmer': 'shimmer 2.5s linear infinite',
+            'spin-slow': 'spin 8s linear infinite',
+            'slide-up': 'slide-up 0.6s ease-out',
+            'fade-scale': 'fade-scale 0.4s ease-out',
+            'gradient-x': 'gradient-x 4s ease infinite',
+          },
+          keyframes: {
+            'aurora-shift': {
+              '0%, 100%': { backgroundPosition: '0% 50%' },
+              '50%': { backgroundPosition: '100% 50%' },
+            },
+            'float': {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-16px)' },
+            },
+            'glow-pulse': {
+              '0%, 100%': { opacity: '0.6', transform: 'scale(1)' },
+              '50%': { opacity: '1', transform: 'scale(1.05)' },
+            },
+            'shimmer': {
+              '0%': { backgroundPosition: '-200% 0' },
+              '100%': { backgroundPosition: '200% 0' },
+            },
+            'slide-up': {
+              '0%': { opacity: '0', transform: 'translateY(24px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            'fade-scale': {
+              '0%': { opacity: '0', transform: 'scale(0.95)' },
+              '100%': { opacity: '1', transform: 'scale(1)' },
+            },
+            'gradient-x': {
+              '0%, 100%': { backgroundPosition: '0% 50%' },
+              '50%': { backgroundPosition: '100% 50%' },
+            },
+          },
+          backdropBlur: {
+            xs: '2px',
           }
         }
       }
     }
   </script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.39.0",
+    "recharts": "https://esm.sh/recharts@^3.7.0",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.13.0"
+  }
+}
+  </script>
+  <link rel="stylesheet" href="/index.css">
   <style>
+    @keyframes toast-in {
+      0% {
+        opacity: 0;
+        transform: translateY(16px) scale(0.96);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
     :root {
       /* Default Theme (Teal) */
       --primary-50: #f0fdfa;
@@ -57,113 +138,353 @@
       --primary-800: #115e59;
       --primary-900: #134e4a;
       --primary-950: #042f2e;
+
+      /* Design Tokens */
+      --glass-bg: rgba(255, 255, 255, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.4);
+      --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+      --glow-amber: 0 0 30px rgba(245, 158, 11, 0.3);
+      --glow-teal: 0 0 30px rgba(20, 184, 166, 0.3);
+      --glow-rose: 0 0 30px rgba(244, 63, 94, 0.3);
+      --gradient-aurora: linear-gradient(135deg, #f0fdf4 0%, #fef9f0 30%, #fdf2f8 60%, #eff6ff 100%);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       background-color: #f8fafc;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    .dark body {
-      background-color: #0f172a;
+    /* ===================== AURORA BACKGROUND ===================== */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% -5%, rgba(251, 191, 36, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 100%, rgba(20, 184, 166, 0.10) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 90% 20%, rgba(244, 63, 94, 0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 70% 60% at 10% 80%, rgba(99, 102, 241, 0.07) 0%, transparent 60%);
+      pointer-events: none;
     }
 
+    /* ===================== GLASSMORPHISM ===================== */
     .glass {
-      background: rgba(255, 255, 255, 0.7);
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+    }
+
+    .glass-dark {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .glass-subtle {
+      background: rgba(255, 255, 255, 0.4);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.5);
     }
 
-    /* GLOBAL DARK MODE OVERRIDES */
+    /* ===================== GRADIENT BORDER ===================== */
+    .gradient-border {
+      position: relative;
+    }
+
+    .gradient-border::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.5), rgba(20, 184, 166, 0.3), rgba(99, 102, 241, 0.4));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* ===================== GLOW EFFECTS ===================== */
+    .glow-amber {
+      box-shadow: var(--glow-amber);
+    }
+
+    .glow-teal {
+      box-shadow: var(--glow-teal);
+    }
+
+    .glow-rose {
+      box-shadow: var(--glow-rose);
+    }
+
+    /* ===================== SHIMMER EFFECT ===================== */
+    .shimmer-effect {
+      background: linear-gradient(90deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.4) 50%,
+          transparent 100%);
+      background-size: 200% 100%;
+      animation: shimmer 2.5s linear infinite;
+    }
+
+    /* ===================== GRADIENT TEXT ===================== */
+    .gradient-text-amber {
+      background: linear-gradient(135deg, #f59e0b, #ef4444, #f97316);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradient-x 4s ease infinite;
+    }
+
+    .gradient-text-teal {
+      background: linear-gradient(135deg, #14b8a6, #3b82f6, #8b5cf6);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradient-x 4s ease infinite;
+    }
+
+    /* ===================== BENTO CARDS ===================== */
+    .bento-card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .bento-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+    }
+
+    /* ===================== PREMIUM BUTTONS ===================== */
+    .btn-primary {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: white;
+      font-weight: 700;
+      border-radius: 14px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(245, 158, 11, 0.35);
+    }
+
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-primary:hover::after {
+      left: 100%;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(245, 158, 11, 0.5);
+    }
+
+    .btn-glass {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      font-weight: 600;
+      border-radius: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-glass:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+    }
+
+    /* ===================== FLOATING ORBS ===================== */
+    .orb {
+      position: absolute;
+      border-radius: 9999px;
+      filter: blur(64px);
+      opacity: 0.4;
+      animation: float 8s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    /* ===================== NAV ACTIVE STATE ===================== */
+    .nav-item-active {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(249, 115, 22, 0.10));
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      color: #d97706;
+    }
+
+    .nav-item-active-admin {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(99, 102, 241, 0.15));
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      color: #a78bfa;
+    }
+
+    /* ===================== SCROLLBAR ===================== */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 99px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.25);
+    }
+
+    /* ===================== DARK MODE ===================== */
+    .dark body {
+      background-color: #030712;
+    }
+
+    .dark body::before {
+      background:
+        radial-gradient(ellipse 80% 60% at 20% -5%, rgba(251, 191, 36, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 100%, rgba(20, 184, 166, 0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 90% 20%, rgba(244, 63, 94, 0.05) 0%, transparent 60%),
+        radial-gradient(ellipse 70% 60% at 10% 80%, rgba(99, 102, 241, 0.05) 0%, transparent 60%);
+    }
+
+    .dark .bento-card {
+      background: rgba(15, 23, 42, 0.75);
+      border-color: rgba(255, 255, 255, 0.06);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .dark .bento-card:hover {
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .dark .glass {
+      background: rgba(15, 23, 42, 0.65);
+      border-color: rgba(255, 255, 255, 0.07);
+    }
+
     .dark .bg-white {
-      background-color: #1e293b !important;
-      /* slate-800 */
-      border-color: #334155 !important;
-      /* slate-700 */
+      background-color: rgba(15, 23, 42, 0.8) !important;
+      border-color: rgba(255, 255, 255, 0.07) !important;
       color: #e2e8f0;
-      /* slate-200 */
     }
 
     .dark .text-slate-900 {
       color: #f1f5f9 !important;
     }
 
-    /* slate-100 */
     .dark .text-slate-800 {
       color: #e2e8f0 !important;
     }
 
-    /* slate-200 */
     .dark .text-slate-700 {
       color: #cbd5e1 !important;
     }
 
-    /* slate-300 */
     .dark .text-slate-600 {
       color: #94a3b8 !important;
     }
 
-    /* slate-400 */
     .dark .text-slate-500 {
       color: #94a3b8 !important;
     }
 
-    /* slate-400 */
-
     .dark .bg-slate-50 {
-      background-color: #0f172a !important;
+      background-color: #030712 !important;
     }
 
-    /* slate-900 */
     .dark .border-slate-100 {
-      border-color: #1e293b !important;
+      border-color: rgba(255, 255, 255, 0.06) !important;
     }
 
-    /* slate-800 */
-
-    /* Fix Glass in Dark Mode */
-    .dark .glass {
-      background: rgba(15, 17, 23, 0.6) !important;
-      border-color: rgba(255, 255, 255, 0.05) !important;
+    .dark .border-slate-200 {
+      border-color: rgba(255, 255, 255, 0.09) !important;
     }
 
-    /* --- GREY MODE OVERRIDES --- */
+    /* ===================== THEME OVERRIDES ===================== */
+    /* Grey Mode */
     .grey body {
-      background-color: #27272a !important;
+      background-color: #18181b !important;
       color: #e4e4e7 !important;
+    }
+
+    .grey .bento-card {
+      background: rgba(39, 39, 42, 0.8) !important;
+      border-color: rgba(255, 255, 255, 0.08) !important;
     }
 
     .grey .bg-slate-50,
     .grey .bg-slate-900 {
-      background-color: #27272a !important;
+      background-color: #18181b !important;
     }
 
     .grey .bg-white {
-      background-color: #3f3f46 !important;
-      border-color: #52525b !important;
+      background-color: #27272a !important;
+      border-color: #3f3f46 !important;
       color: #f4f4f5 !important;
     }
 
-    /* --- MIDNIGHT MODE OVERRIDES --- */
+    /* Midnight Mode */
     .midnight body {
-      background-color: #000000 !important;
+      background-color: #000 !important;
+    }
+
+    .midnight .bento-card {
+      background: rgba(10, 10, 10, 0.9) !important;
+      border-color: rgba(255, 255, 255, 0.04) !important;
     }
 
     .midnight .bg-slate-50,
     .midnight .bg-slate-900 {
-      background-color: #000000 !important;
+      background-color: #000 !important;
     }
 
     .midnight .bg-white {
-      background-color: #000000 !important;
-      border-color: #1e1e1e !important;
+      background-color: #0a0a0a !important;
+      border-color: #1a1a1a !important;
     }
 
-    /* --- SEPIA MODE OVERRIDES --- */
+    /* Sepia Mode */
     .sepia body {
       background-color: #fdf6e3 !important;
       color: #5c4b37 !important;
+    }
+
+    .sepia .bento-card {
+      background: rgba(253, 246, 227, 0.9) !important;
+      border-color: rgba(92, 75, 55, 0.15) !important;
     }
 
     .sepia .bg-slate-50,
@@ -182,27 +503,164 @@
     .sepia .text-slate-600 {
       color: #5c4b37 !important;
     }
+
+    /* ===================== ANIMATIONS ===================== */
+    @keyframes aurora-shift {
+
+      0%,
+      100% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-16px);
+      }
+    }
+
+    @keyframes glow-pulse {
+
+      0%,
+      100% {
+        opacity: 0.6;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1.05);
+      }
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -200% 0;
+      }
+
+      100% {
+        background-position: 200% 0;
+      }
+    }
+
+    @keyframes slide-up {
+      0% {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fade-scale {
+      0% {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes gradient-x {
+
+      0%,
+      100% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+    }
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ===================== UTILITY ===================== */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .animate-in {
+      animation: slide-up 0.5s ease-out both;
+    }
+
+    .fade-in {
+      animation: fade-scale 0.4s ease-out both;
+    }
+
+    /* Number shine on hover */
+    .stat-val {
+      font-family: 'Sora', sans-serif;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Liquid fill for water tracker */
+    @keyframes liquid-fill {
+      0% {
+        transform: scaleX(0);
+      }
+
+      100% {
+        transform: scaleX(1);
+      }
+    }
+
+    .liquid-fill {
+      transform-origin: left center;
+      animation: liquid-fill 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+
+    /* Neon border glow on focus */
+    .input-glow:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3), 0 0 20px rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.5);
+    }
+
+    /* Card hover lift */
+    .hover-lift {
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .hover-lift:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    }
   </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react/": "https://esm.sh/react@^19.2.4/",
-    "react": "https://esm.sh/react@^19.2.4",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
-    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
-    "@google/genai": "https://esm.sh/@google/genai@^1.39.0",
-    "recharts": "https://esm.sh/recharts@^3.7.0",
-    "react-router-dom": "https://esm.sh/react-router-dom@^7.13.0"
-  }
-}
-</script>
-  <link rel="stylesheet" href="/index.css">
 </head>
 
 <body>
   <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
-
 </body>
 
 </html>

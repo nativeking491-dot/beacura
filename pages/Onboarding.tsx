@@ -3,12 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { OnboardingContext } from "../context/OnboardingContext";
 import { supabase } from "../services/supabaseClient";
 import { ArrowRight, ArrowLeft, Check } from "lucide-react";
+import { useToast } from "../context/ToastContext";
 
 const Onboarding: React.FC = () => {
   const navigate = useNavigate();
   const { onboarding, updateOnboarding } = useContext(OnboardingContext);
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
   const totalSteps = 5;
 
   interface Question {
@@ -145,7 +147,7 @@ const Onboarding: React.FC = () => {
     try {
       const session = await supabase.auth.getSession();
       if (!session.data.session) {
-        alert("Please sign in first");
+        showToast("Please sign in first", "warning");
         navigate("/auth");
         return;
       }
@@ -161,13 +163,14 @@ const Onboarding: React.FC = () => {
 
       if (error) throw error;
 
-      alert(
-        "✅ Onboarding complete! Welcome to your recovery journey! 💪"
+      showToast(
+        "Onboarding complete! Welcome to your recovery journey! 💪",
+        "success"
       );
       navigate("/dashboard");
     } catch (error) {
       console.error("Error saving onboarding:", error);
-      alert("Failed to save preferences. Please try again.");
+      showToast("Failed to save preferences. Please try again.", "error");
     } finally {
       setLoading(false);
     }
@@ -308,7 +311,7 @@ const Onboarding: React.FC = () => {
                   handleSubmit();
                 } else {
                   if (isStepComplete) setStep(step + 1);
-                  else alert("Please complete all fields before continuing");
+                  else showToast("Please complete all fields before continuing", "warning");
                 }
               }}
               disabled={loading || !isStepComplete}

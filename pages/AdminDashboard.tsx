@@ -21,6 +21,7 @@ import {
   Save,
   AlertTriangle,
 } from "lucide-react";
+import { useToast } from "../context/ToastContext";
 import {
   LineChart,
   Line,
@@ -70,6 +71,7 @@ const AdminDashboard: React.FC = () => {
   const [selectedStat, setSelectedStat] = useState<string | null>(null);
   const [editingUser, setEditingUser] = useState<RecentUser | null>(null);
   const [deletingUser, setDeletingUser] = useState<RecentUser | null>(null);
+  const { showToast } = useToast();
   const [stats, setStats] = useState<UserStats>({
     totalUsers: 0,
     recoveringUsers: 0,
@@ -270,10 +272,10 @@ const AdminDashboard: React.FC = () => {
       }
 
       // Success! Optimistic update stays
-      alert("✅ User updated successfully!");
+      showToast("User updated successfully!", "success");
     } catch (error) {
       console.error("Error updating user:", error);
-      alert("❌ Failed to update user. Please try again.");
+      showToast("Failed to update user. Please try again.", "error");
     }
   };
 
@@ -301,10 +303,10 @@ const AdminDashboard: React.FC = () => {
 
       // Refresh stats to recalculate counts
       await fetchStats();
-      alert("✅ User profile deleted successfully!");
+      showToast("User profile deleted successfully!", "success");
     } catch (error) {
       console.error("Error deleting user:", error);
-      alert("❌ Failed to delete user. Please try again.");
+      showToast("Failed to delete user. Please try again.", "error");
     }
   };
 

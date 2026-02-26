@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../services/supabaseClient";
 import { useUser } from "../context/UserContext";
 import { Calendar, Users, Star, Clock, ArrowLeft } from "lucide-react";
+import { useToast } from "../context/ToastContext";
 
 interface MentorProfile {
   id: string;
@@ -41,6 +42,7 @@ const MentorDashboard: React.FC = () => {
     current_users: 0,
   });
   const [loading, setLoading] = useState(true);
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (!user?.id) return;
@@ -88,9 +90,9 @@ const MentorDashboard: React.FC = () => {
       const avgRating =
         completedSessions && completedSessions.length > 0
           ? (
-              completedSessions.reduce((sum, s) => sum + (s.user_rating || 0), 0) /
-              completedSessions.length
-            ).toFixed(1)
+            completedSessions.reduce((sum, s) => sum + (s.user_rating || 0), 0) /
+            completedSessions.length
+          ).toFixed(1)
           : 0;
 
       setStats({
@@ -100,7 +102,7 @@ const MentorDashboard: React.FC = () => {
       });
     } catch (error) {
       console.error("Error loading mentor data:", error);
-      alert("Error loading mentor dashboard");
+      showToast("Error loading mentor dashboard", "error");
       navigate("/dashboard");
     } finally {
       setLoading(false);

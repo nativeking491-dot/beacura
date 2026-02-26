@@ -1,11 +1,25 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useUser } from "../context/UserContext";
 import AdminDashboard from "./AdminDashboard";
 import Dashboard from "./Dashboard";
 import { Navigate } from "react-router-dom";
+import { getMealReminder, MealReminder } from "../services/mealReminder";
+import { MealReminderModal } from "../components/MealReminderModal";
 
 const DashboardRouter: React.FC = () => {
     const { user, loading } = useUser();
+    const [mealReminder, setMealReminder] = useState<MealReminder | null>(null);
+
+    useEffect(() => {
+        if (user && !loading) {
+            const reminder = getMealReminder();
+            setMealReminder(reminder);
+        }
+    }, [user, loading]);
+
+    const handleReminderClose = () => {
+        setMealReminder(null);
+    };
 
     // Show loading while user context is loading
     if (loading) {
@@ -30,7 +44,17 @@ const DashboardRouter: React.FC = () => {
     console.log("🎯 DashboardRouter - User role:", user.role, "isAdmin:", isAdmin);
 
     // Render appropriate dashboard based on role
-    return isAdmin ? <AdminDashboard /> : <Dashboard />;
+    return (
+        <>
+            {mealReminder && (
+                <MealReminderModal
+                    reminder={mealReminder}
+                    onClose={handleReminderClose}
+                />
+            )}
+            {isAdmin ? <AdminDashboard /> : <Dashboard />}
+        </>
+    );
 };
 
 export default DashboardRouter;

@@ -1,6 +1,7 @@
 import React from "react";
 import { AlertTriangle, Phone, MessageSquare, Smile } from "lucide-react";
 import { getCrisisResponse } from "../services/crisisDetection";
+import { useToast } from "../context/ToastContext";
 
 interface CrisisModalProps {
   onDismiss: () => void;
@@ -8,13 +9,14 @@ interface CrisisModalProps {
 
 export const CrisisModal: React.FC<CrisisModalProps> = ({ onDismiss }) => {
   const crisisInfo = getCrisisResponse();
+  const { showToast } = useToast();
 
   const handleCall988 = () => {
     window.location.href = "tel:988";
   };
 
   const handleText = () => {
-    alert("📱 Crisis Text Line\n\nText the word 'HOME' to 741741\n\nAvailable 24/7");
+    showToast("Text the word 'HOME' to 741741 — available 24/7", "info", 6000);
   };
 
   const handleCall911 = () => {
