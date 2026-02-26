@@ -87,6 +87,31 @@ export const authService = {
     if (error) throw error;
   },
 
+  // Sign in with Google OAuth
+  async signInWithGoogle() {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  // Resend email verification
+  async resendVerificationEmail(email: string) {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+    });
+    if (error) throw error;
+  },
+
   // Get current session
   async getSession() {
     const {
