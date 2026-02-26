@@ -103,8 +103,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   const [theme, setTheme] = useState<ThemeMode>(() => {
     const savedTheme = localStorage.getItem("themeMode") as ThemeMode;
     if (savedTheme) return savedTheme;
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
-    return "light";
+    // Default to dark theme as requested
+    return "dark";
   });
 
   const [colorTheme, setColorTheme] = useState<ColorTheme>(() => {
