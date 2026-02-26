@@ -146,7 +146,12 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
             await authService.signInWithGoogle();
             // Supabase redirects to /dashboard automatically after OAuth
         } catch (err: any) {
-            setError("Could not start Google sign-in. Please try again.");
+            const msg = err.message || "";
+            if (msg.includes("provider is not enabled") || msg.includes("validation_failed") || msg.includes("Unsupported provider")) {
+                setError("Google sign-in is not configured yet. Please use email & password for now.");
+            } else {
+                setError("Could not start Google sign-in. Please try again or use email below.");
+            }
             setGoogleLoading(false);
         }
     };
