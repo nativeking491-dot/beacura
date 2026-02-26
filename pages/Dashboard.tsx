@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
+
 import {
   LineChart,
   Line,
@@ -170,9 +171,9 @@ const Dashboard: React.FC = () => {
   }
 
   if (!user) {
-    navigate("/auth");
-    return null;
+    return <Navigate to="/auth" replace />;
   }
+
 
   const userName = user.name || "User";
   const userStreak = user.streak || 0;
