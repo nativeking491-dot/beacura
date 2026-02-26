@@ -29,6 +29,7 @@ import { useUser } from "../context/UserContext";
 import { supabase } from "../services/supabaseClient";
 import { CravingLogger } from "../components/CravingLogger";
 import { MoodLogger } from "../components/MoodLogger";
+import { computeRiskScore, RiskScore } from "../services/riskScoreService";
 
 interface CravingData {
   day: string;
@@ -64,12 +65,14 @@ const Dashboard: React.FC = () => {
   const [loadingChart, setLoadingChart] = useState(false);
   const [badges, setBadges] = useState<Badge[]>([]);
   const [moodScore, setMoodScore] = useState<string>("Stable");
+  const [riskScore, setRiskScore] = useState<RiskScore | null>(null);
 
   useEffect(() => {
     if (!user?.id || isNewUser) return;
     fetchCravingData();
     fetchBadges();
     fetchMoodData();
+    computeRiskScore(user.id).then(setRiskScore);
   }, [user?.id, isNewUser]);
 
   const fetchBadges = async () => {
@@ -264,19 +267,28 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Daily Goal */}
+        {/* Risk Score */}
         <div className="bento-card rounded-2xl p-5 relative overflow-hidden group">
           <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-indigo-300 rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition-opacity" />
           <div className="relative z-10">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center mb-3 shadow-md group-hover:scale-110 transition-transform">
-              <Zap size={18} className="text-white" />
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 shadow-md group-hover:scale-110 transition-transform
+              ${!riskScore || riskScore.level === 'low' ? 'bg-gradient-to-br from-emerald-400 to-teal-500' : ''}
+              ${riskScore?.level === 'moderate' ? 'bg-gradient-to-br from-amber-400 to-orange-500' : ''}
+              ${riskScore?.level === 'high' ? 'bg-gradient-to-br from-rose-500 to-red-600 animate-pulse' : ''}
+            `}>
+              <Target size={18} className="text-white" />
             </div>
-            <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-1">Daily Goal</p>
-            <p style={{ fontFamily: 'Sora, sans-serif' }} className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 stat-val">80<span className="text-sm font-semibold text-slate-400">%</span></p>
-            {/* Mini progress bar */}
-            <div className="mt-2 h-1 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-              <div className="h-full w-4/5 bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full liquid-fill" />
-            </div>
+            <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-1">Risk Score</p>
+            {riskScore ? (
+              <>
+                <p style={{ fontFamily: 'Sora, sans-serif' }} className={`text-2xl font-extrabold stat-val ${riskScore.color}`}>
+                  {riskScore.score}<span className="text-sm font-semibold text-slate-400 ml-1">/100</span>
+                </p>
+                <p className={`text-xs font-bold mt-1 ${riskScore.color}`}>{riskScore.label}</p>
+              </>
+            ) : (
+              <p style={{ fontFamily: 'Sora, sans-serif' }} className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 stat-val">—</p>
+            )}
           </div>
         </div>
       </div>

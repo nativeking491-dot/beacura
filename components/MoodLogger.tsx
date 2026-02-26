@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { supabase } from "../services/supabaseClient";
 import { Smile, X, Meh, Frown, CheckCircle2, Loader2 } from "lucide-react";
+import { useToast } from "../context/ToastContext";
 
 interface MoodLoggerProps {
     userId: string | undefined;
@@ -15,6 +16,7 @@ export const MoodLogger: React.FC<MoodLoggerProps> = ({ userId, onSuccess }) => 
     const [notes, setNotes] = useState("");
     const [loading, setLoading] = useState(false);
     const [saved, setSaved] = useState(false);
+    const { showToast } = useToast();
 
     const handleSubmit = async () => {
         if (!userId) return;
@@ -37,6 +39,7 @@ export const MoodLogger: React.FC<MoodLoggerProps> = ({ userId, onSuccess }) => 
             }, 1400);
         } catch (err) {
             console.error("Error logging mood:", err);
+            showToast("Failed to save mood log. Please try again.", "error");
         } finally {
             setLoading(false);
         }
