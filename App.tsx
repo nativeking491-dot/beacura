@@ -18,6 +18,7 @@ import {
   Moon,
   Sun,
   Sparkles,
+  BookOpen, // Added for Journal
 } from "lucide-react";
 import { useTheme } from "./context/ThemeContext";
 
@@ -25,6 +26,7 @@ import { useTheme } from "./context/ThemeContext";
 const Landing = lazy(() => import("./pages/Landing"));
 const Auth = lazy(() => import("./pages/Auth"));
 import { FloatingChat } from "./components/FloatingChat";
+import { SOSModal } from "./components/SOSModal";
 
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Counseling = lazy(() => import("./pages/Counseling"));
@@ -41,6 +43,7 @@ const LearnMore = lazy(() => import("./pages/LearnMore"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
 const MentorDashboard = lazy(() => import("./pages/MentorDashboard"));
 const DatabaseTest = lazy(() => import("./pages/DatabaseTest"));
+const Journal = lazy(() => import("./pages/Journal"));
 const ExerciseTimer = lazy(() => import("./pages/ExerciseTimer"));
 const DashboardRouter = lazy(() => import("./pages/DashboardRouter"));
 
@@ -54,6 +57,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 const AppContent: React.FC = () => {
   const { user, loading: userLoading } = useUser();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSOSOpen, setIsSOSOpen] = useState(false);
   const { theme } = useTheme();
 
   const isAuthenticated = !!user;
@@ -227,6 +231,7 @@ const AppContent: React.FC = () => {
                   <NavItem to="/exercise" icon={Dumbbell} label="Exercise" />
                   <NavItem to="/motivation" icon={Award} label="Motivation" />
                   <NavItem to="/medical" icon={ShieldAlert} label="Medical Tips" />
+                  <NavItem to="/journal" icon={BookOpen} label="Journal" />
                   <NavItem to="/chat" icon={Brain} label="AI Support" />
                   <NavItem to="/profile" icon={User} label="My Profile" />
                 </>
@@ -281,6 +286,7 @@ const AppContent: React.FC = () => {
               <Route path="/exercise-timer/:exerciseIndex" element={isAuthenticated ? <ExerciseTimer /> : <Navigate to="/auth" />} />
               <Route path="/motivation" element={isAuthenticated ? <Motivation /> : <Navigate to="/auth" />} />
               <Route path="/medical" element={isAuthenticated ? <Medical /> : <Navigate to="/auth" />} />
+              <Route path="/journal" element={isAuthenticated ? <Journal /> : <Navigate to="/auth" />} />
               <Route path="/chat" element={isAuthenticated ? <Chatbot /> : <Navigate to="/auth" />} />
               <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/auth" />} />
               <Route path="/theme-settings" element={isAuthenticated ? <ThemeSettings /> : <Navigate to="/auth" />} />
@@ -290,7 +296,28 @@ const AppContent: React.FC = () => {
         </div>
       </main>
 
-      {isAuthenticated && <FloatingChat />}
+      {isAuthenticated && (
+        <>
+          <FloatingChat />
+          {/* Floating SOS Button */}
+          <button
+            onClick={() => setIsSOSOpen(true)}
+            className="fixed bottom-6 left-6 md:left-auto md:right-28 z-40 bg-rose-600 hover:bg-rose-700 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg shadow-rose-500/30 transition-transform hover:scale-110 animate-pulse-slow"
+            title="Emergency SOS"
+          >
+            <ShieldAlert size={28} />
+          </button>
+
+          <SOSModal
+            isOpen={isSOSOpen}
+            onClose={() => setIsSOSOpen(false)}
+            onOpenChat={() => {
+              // Custom event to trigger chat opening in crisis mode
+              window.dispatchEvent(new CustomEvent('open-crisis-chat'));
+            }}
+          />
+        </>
+      )}
     </div>
   );
 };

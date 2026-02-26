@@ -50,6 +50,20 @@ export const FloatingChat = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages, isTyping]);
 
+    // Listen for crisis mode from SOSModal
+    useEffect(() => {
+        const handleCrisis = () => {
+            setIsOpen(true);
+            setTimeout(() => {
+                // Pre-fill and send a crisis message on behalf of the user to get immediate specialized help
+                const crisisMsg = "I need help right now. I am fighting a severe urge and feeling overwhelmed.";
+                handleSend(crisisMsg);
+            }, 600);
+        };
+        window.addEventListener('open-crisis-chat', handleCrisis);
+        return () => window.removeEventListener('open-crisis-chat', handleCrisis);
+    }, []);
+
     const handleSend = async (text?: string) => {
         const userText = (text || input).trim();
         if (!userText) return;
@@ -173,8 +187,8 @@ export const FloatingChat = () => {
                                 <div className="max-w-[78%] space-y-0.5">
                                     <div
                                         className={`px-3.5 py-2.5 text-[13px] leading-relaxed ${msg.sender === "user"
-                                                ? "rounded-2xl rounded-br-md text-white"
-                                                : "rounded-2xl rounded-bl-md text-slate-100"
+                                            ? "rounded-2xl rounded-br-md text-white"
+                                            : "rounded-2xl rounded-bl-md text-slate-100"
                                             }`}
                                         style={msg.sender === "user" ? {
                                             background: 'linear-gradient(135deg, #7c3aed, #4f46e5)',

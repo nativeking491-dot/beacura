@@ -34,7 +34,6 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     const [selectedRole, setSelectedRole] = useState<
         "RECOVERING_USER" | "MENTOR"
     >("RECOVERING_USER");
-    const [gender, setGender] = useState<"male" | "female" | "other" | "prefer_not_to_say" | "">("");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -117,66 +116,62 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-black flex flex-col justify-center items-center p-0">
-            {/* Diagonal gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 via-transparent to-orange-500/10 pointer-events-none"></div>
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col justify-center items-center p-4 relative overflow-hidden transition-colors duration-500">
+            {/* Calming animated background blobs */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-teal-400/20 dark:bg-teal-500/10 blur-[120px] animate-pulse-slow" />
+                <div className="absolute top-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-emerald-400/20 dark:bg-emerald-500/10 blur-[140px] animate-pulse-slow" style={{ animationDelay: '2s' }} />
+                <div className="absolute -bottom-[20%] left-[10%] w-[50%] h-[50%] rounded-full bg-blue-400/20 dark:bg-blue-500/10 blur-[120px] animate-pulse-slow" style={{ animationDelay: '4s' }} />
+            </div>
 
-
-
-
-            <div className="w-full h-screen md:w-auto md:h-auto md:max-w-md relative z-10 bg-gradient-to-b from-slate-900 to-slate-800 md:rounded-3xl md:shadow-2xl md:overflow-hidden md:border md:border-slate-700 flex flex-col">
+            <div className="w-full max-w-md relative z-10 bg-white/70 dark:bg-slate-800/70 backdrop-blur-2xl rounded-3xl md:rounded-[2.5rem] shadow-2xl shadow-teal-900/5 dark:shadow-black/40 border border-white/50 dark:border-slate-700/50 flex flex-col overflow-hidden">
                 {/* Header Section */}
-                <div className="bg-gradient-to-r from-amber-500 to-orange-500 p-8 md:p-8 text-white md:rounded-t-3xl">
-                    <div className="flex justify-center mb-4">
-                        <div className="bg-white/20 backdrop-blur-sm p-4 rounded-full">
-                            <Heart className="text-white" size={40} fill="currentColor" />
-                        </div>
+                <div className="px-8 pt-10 pb-6 text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-400 to-emerald-500 text-white mb-6 shadow-lg shadow-teal-500/30 transform hover:scale-105 transition-transform duration-300">
+                        <Heart size={32} fill="currentColor" />
                     </div>
-                    <h2 className="text-4xl md:text-3xl font-bold text-center mb-2">
-                        {isLogin ? "Welcome Back!" : "Start Your Journey"}
+                    <h2 style={{ fontFamily: 'Sora, sans-serif' }} className="text-3xl font-extrabold text-slate-800 dark:text-white mb-2 tracking-tight">
+                        {isLogin ? "Welcome Back" : "Start Your Journey"}
                     </h2>
-                    <p className="text-center text-amber-100">
+                    <p className="text-slate-500 dark:text-slate-400 font-medium">
                         {isLogin
-                            ? "Continue your path to recovery"
-                            : "Join our supportive community"}
+                            ? "Continue your path to recovery in a safe space"
+                            : "Join our supportive and healing community"}
                     </p>
                 </div>
 
                 {/* Form Section */}
-                <div className="flex-1 p-6 md:p-8 overflow-y-auto">
+                <div className="px-8 pb-8">
                     {error && (
-                        <div className="bg-rose-900/30 border-l-4 border-rose-500 text-rose-200 px-4 py-3 rounded-lg mb-6 flex items-start space-x-3 animate-in fade-in duration-200">
+                        <div className="bg-rose-50 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-300 px-4 py-3 rounded-xl mb-6 flex items-start space-x-3 animate-in fade-in zoom-in-95 duration-200">
                             <AlertCircle size={20} className="mt-0.5 flex-shrink-0" />
-                            <span className="text-sm">{error}</span>
+                            <span className="text-sm font-medium">{error}</span>
                         </div>
                     )}
 
                     {success && (
-                        <div className="bg-emerald-900/30 border-l-4 border-emerald-500 text-emerald-200 px-4 py-3 rounded-lg mb-6 flex items-start space-x-3 animate-in fade-in duration-200">
+                        <div className="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-300 px-4 py-3 rounded-xl mb-6 flex items-start space-x-3 animate-in fade-in zoom-in-95 duration-200">
                             <CheckCircle size={20} className="mt-0.5 flex-shrink-0" />
-                            <span className="text-sm">{success}</span>
+                            <span className="text-sm font-medium">{success}</span>
                         </div>
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {!isLogin && (
-                            <>
+                            <div className="space-y-5 animate-in slide-in-from-top-4 duration-300 fade-in">
                                 {/* Full Name Input */}
                                 <div>
-                                    <label className="block text-sm font-semibold text-white mb-2">
+                                    <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                                         Full Name
                                     </label>
-                                    <div className="relative">
-                                        <User
-                                            className="absolute left-3 top-3.5 text-slate-400"
-                                            size={20}
-                                        />
+                                    <div className="relative group">
+                                        <User className="absolute left-4 top-3.5 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={20} />
                                         <input
                                             type="text"
                                             required={!isLogin}
                                             value={name}
                                             onChange={(e) => setName(e.target.value)}
-                                            className="w-full pl-11 pr-4 py-3 border border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all bg-slate-800 text-white placeholder-slate-400"
+                                            className="w-full pl-12 pr-4 py-3.5 border-2 border-slate-100 dark:border-slate-700/50 rounded-2xl focus:outline-none focus:border-teal-400 dark:focus:border-teal-500 transition-all bg-white dark:bg-slate-900/50 text-slate-800 dark:text-white placeholder-slate-400 shadow-sm"
                                             placeholder="Enter your full name"
                                         />
                                     </div>
@@ -184,183 +179,134 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 
                                 {/* Role Selection */}
                                 <div>
-                                    <label className="block text-sm font-semibold text-white mb-2">
+                                    <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
                                         I am a...
                                     </label>
                                     <div className="grid grid-cols-2 gap-3">
                                         <button
                                             type="button"
                                             onClick={() => setSelectedRole("RECOVERING_USER")}
-                                            className={`p-4 rounded-xl border-2 transition-all ${selectedRole === "RECOVERING_USER"
-                                                ? "border-amber-500 bg-amber-500/20 text-amber-300"
-                                                : "border-slate-600 bg-slate-800 text-slate-300 hover:border-slate-500"
+                                            className={`p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center justify-center gap-2 ${selectedRole === "RECOVERING_USER"
+                                                ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shadow-sm"
+                                                : "border-slate-100 dark:border-slate-700/50 bg-white dark:bg-slate-900/50 text-slate-500 hover:border-slate-200 dark:hover:border-slate-600"
                                                 }`}
                                         >
-                                            <Sparkles size={20} className="mx-auto mb-1" />
-                                            <div className="text-xs font-medium">Recovering User</div>
+                                            <Sparkles size={24} className={selectedRole === "RECOVERING_USER" ? "animate-pulse" : ""} />
+                                            <span className="text-xs font-bold uppercase tracking-wider">Recovering</span>
                                         </button>
                                         <button
                                             type="button"
                                             onClick={() => setSelectedRole("MENTOR")}
-                                            className={`p-4 rounded-xl border-2 transition-all ${selectedRole === "MENTOR"
-                                                ? "border-indigo-500 bg-indigo-500/20 text-indigo-300"
-                                                : "border-slate-600 bg-slate-800 text-slate-300 hover:border-slate-500"
+                                            className={`p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center justify-center gap-2 ${selectedRole === "MENTOR"
+                                                ? "border-teal-500 bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 shadow-sm"
+                                                : "border-slate-100 dark:border-slate-700/50 bg-white dark:bg-slate-900/50 text-slate-500 hover:border-slate-200 dark:hover:border-slate-600"
                                                 }`}
                                         >
-                                            <Heart size={20} className="mx-auto mb-1" />
-                                            <div className="text-xs font-medium">Mentor</div>
+                                            <Users size={24} className={selectedRole === "MENTOR" ? "animate-bounce" : ""} />
+                                            <span className="text-xs font-bold uppercase tracking-wider">Mentor</span>
                                         </button>
                                     </div>
                                 </div>
-
-                                {/* Gender Selection */}
-                                <div>
-                                    <label className="block text-sm font-semibold text-white mb-3">
-                                        Gender Identity
-                                    </label>
-                                    <div className="grid grid-cols-4 gap-2">
-                                        {[
-                                            { id: "male", label: "👨 Male", icon: "👨" },
-                                            { id: "female", label: "👩 Female", icon: "👩" },
-                                            { id: "other", label: "✨ Other", icon: "✨" },
-                                            { id: "prefer_not_to_say", label: "🤐 Prefer Not to Say", icon: "🤐" },
-                                        ].map((option) => (
-                                            <button
-                                                key={option.id}
-                                                type="button"
-                                                onClick={() => setGender(option.id as any)}
-                                                className={`p-3 rounded-lg border-2 transition-all text-center ${gender === option.id
-                                                    ? "border-amber-500 bg-amber-500/20 text-amber-300"
-                                                    : "border-slate-600 bg-slate-800 text-slate-300 hover:border-slate-500"
-                                                    }`}
-                                            >
-                                                <div className="text-xl mb-1">{option.icon}</div>
-                                                <div className="text-xs font-medium">{option.label.split(" ").slice(1).join(" ")}</div>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            </>
+                            </div>
                         )}
 
                         {/* Email Input */}
-                        <div>
-                            <label className="block text-sm font-semibold text-white mb-2">
-                                Email Address
-                            </label>
-                            <div className="relative">
-                                <Mail
-                                    className="absolute left-3 top-3.5 text-slate-500"
-                                    size={20}
-                                />
-                                <input
-                                    type="email"
-                                    required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full pl-11 pr-4 py-3 border border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all bg-slate-800 text-white placeholder-slate-400"
-                                    placeholder="name@example.com"
-                                />
+                        <div className="space-y-5">
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
+                                    Email Address
+                                </label>
+                                <div className="relative group">
+                                    <Mail className="absolute left-4 top-3.5 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={20} />
+                                    <input
+                                        type="email"
+                                        required
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="w-full pl-12 pr-4 py-3.5 border-2 border-slate-100 dark:border-slate-700/50 rounded-2xl focus:outline-none focus:border-teal-400 dark:focus:border-teal-500 transition-all bg-white dark:bg-slate-900/50 text-slate-800 dark:text-white placeholder-slate-400 shadow-sm"
+                                        placeholder="hello@example.com"
+                                    />
+                                </div>
                             </div>
-                        </div>
 
-                        {/* Password Input */}
-                        <div>
-                            <label className="block text-sm font-semibold text-white mb-2">
-                                Password
-                            </label>
-                            <div className="relative">
-                                <Lock
-                                    className="absolute left-3 top-3.5 text-slate-500"
-                                    size={20}
-                                />
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    required
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full pl-11 pr-12 py-3 border border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all bg-slate-800 text-white placeholder-slate-400"
-                                    placeholder="••••••••"
-                                    minLength={6}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-3.5 text-slate-500 hover:text-slate-300 transition-colors"
-                                >
-                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                                </button>
+                            {/* Password Input */}
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
+                                    Password
+                                </label>
+                                <div className="relative group">
+                                    <Lock className="absolute left-4 top-3.5 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={20} />
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        required
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="w-full pl-12 pr-12 py-3.5 border-2 border-slate-100 dark:border-slate-700/50 rounded-2xl focus:outline-none focus:border-teal-400 dark:focus:border-teal-500 transition-all bg-white dark:bg-slate-900/50 text-slate-800 dark:text-white placeholder-slate-400 shadow-sm"
+                                        placeholder="••••••••"
+                                        minLength={6}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-4 top-3.5 text-slate-400 hover:text-teal-500 transition-colors"
+                                    >
+                                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                    </button>
+                                </div>
+                                {!isLogin && (
+                                    <p className="text-xs text-slate-400 mt-2 ml-1 font-medium">
+                                        Must be at least 6 characters long
+                                    </p>
+                                )}
                             </div>
-                            {!isLogin && (
-                                <p className="text-xs text-slate-400 mt-1">
-                                    Minimum 6 characters required
-                                </p>
-                            )}
                         </div>
 
                         {/* Submit Button */}
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:shadow-lg hover:shadow-amber-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full mt-6 bg-gradient-to-r from-teal-400 to-emerald-500 hover:from-teal-500 hover:to-emerald-600 text-white py-4 rounded-2xl font-bold text-lg flex items-center justify-center space-x-2 shadow-xl shadow-teal-500/25 transition-all transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
                         >
                             {loading ? (
                                 <>
-                                    <Loader2 className="animate-spin" size={20} />
-                                    <span>
-                                        {isLogin ? "Signing In..." : "Creating Account..."}
-                                    </span>
+                                    <Loader2 className="animate-spin" size={22} />
+                                    <span>{isLogin ? "Signing In..." : "Creating Account..."}</span>
                                 </>
                             ) : (
                                 <>
                                     <span>{isLogin ? "Sign In" : "Create Account"}</span>
-                                    <ArrowRight size={20} />
+                                    <ArrowRight size={22} />
                                 </>
                             )}
                         </button>
                     </form>
 
-                    {/* Success Message for Sign Up */}
-                    {!isLogin && (
-                        <div className="mt-4 p-3 bg-amber-500/20 border border-amber-500/50 rounded-lg">
-                            <p className="text-xs text-amber-200 text-center">
-                                By creating an account, you agree to our terms and privacy
-                                policy
-                            </p>
-                        </div>
-                    )}
-                </div>
-
-                {/* Toggle Section */}
-                <div className="bg-slate-800 md:bg-slate-800/0 px-6 md:px-8 py-4 md:py-5 border-t md:border-t border-slate-700 md:border-slate-700 flex justify-center md:rounded-b-3xl">
-                    <button
-                        type="button"
-                        onClick={() => {
-                            setIsLogin(!isLogin);
-                            setError(null);
-                            setEmail("");
-                            setPassword("");
-                            setName("");
-                            setGender("");
-                        }}
-                        className="text-sm text-amber-400 font-semibold hover:text-amber-300 transition-colors flex items-center space-x-1"
-                    >
-                        <span>
-                            {isLogin
-                                ? "Don't have an account? "
-                                : "Already have an account? "}
-                        </span>
-                        <span className="underline">{isLogin ? "Sign up" : "Sign in"}</span>
-                    </button>
+                    {/* Toggle Section */}
+                    <div className="mt-8 text-center border-t border-slate-100 dark:border-slate-700/50 pt-6">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsLogin(!isLogin);
+                                setError(null);
+                                setEmail("");
+                                setPassword("");
+                                setName("");
+                            }}
+                            className="text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+                        >
+                            {isLogin ? "Don't have an account? " : "Already have an account? "}
+                            <span className="text-teal-500 dark:text-teal-400 underline decoration-2 underline-offset-4">
+                                {isLogin ? "Create one here" : "Sign in here"}
+                            </span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            {/* Footer Support Text - Desktop Only */}
-            <div className="hidden md:block mt-6 text-center max-w-md relative z-10">
-                <p className="text-sm text-slate-400">
-                    Need help? We're here 24/7. Your journey matters to us. 💚
-                </p>
-            </div>
+            {/* Footer Text */}
+            <p className="mt-8 text-sm font-medium text-slate-500 dark:text-slate-400 relative z-10 flex items-center gap-2">
+                We're so glad you're here <Heart size={14} className="text-rose-400" fill="currentColor" />
+            </p>
         </div>
     );
 };
