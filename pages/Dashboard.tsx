@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  AreaChart,
-  Area,
 } from "recharts";
 import {
   Flame,
@@ -20,17 +18,68 @@ import {
   ArrowRight,
   Heart,
   Brain,
-  Zap,
-  Loader2,
   Sparkles,
   Target,
   ChevronRight,
+  Edit3,
+  Check,
+  Star,
+  Trophy,
 } from "lucide-react";
 import { useUser } from "../context/UserContext";
 import { supabase } from "../services/supabaseClient";
 import { CravingLogger } from "../components/CravingLogger";
 import { MoodLogger } from "../components/MoodLogger";
 import { computeRiskScore, RiskScore } from "../services/riskScoreService";
+import { useToast } from "../context/ToastContext";
+
+// ─── Milestone config ────────────────────────────────────────────────────────
+const MILESTONES: Record<number, { emoji: string; title: string; science: string; color: string }> = {
+  1: { emoji: '🌱', title: '24 Hours Clean', science: 'Your blood pressure is already normalizing. Every hour counts.', color: '#10b981' },
+  3: { emoji: '⚡', title: '3 Days Clean', science: 'The acute withdrawal peak is passing. Your brain is stabilizing.', color: '#6366f1' },
+  7: { emoji: '🌟', title: 'One Week Clean', science: 'Your sleep is improving. Dopamine receptors are beginning to repair.', color: '#f59e0b' },
+  14: { emoji: '💪', title: 'Two Weeks Clean', science: 'Anxiety and depression symptoms are measurably easing. Keep going.', color: '#0d9488' },
+  30: { emoji: '🏆', title: '30 Days Clean!', science: 'Your brain has significantly rewired. Cravings are less frequent. This is massive.', color: '#f97316' },
+  60: { emoji: '🔥', title: '60 Days Clean!', science: 'Prefrontal cortex function is substantially restored. You are literally a different person.', color: '#ec4899' },
+  90: { emoji: '👑', title: '90 Days Clean!', science: 'You have completed the most critical window of early recovery. The neural pathways of addiction are weakening.', color: '#8b5cf6' },
+};
+
+// ─── Scroll Reveal ────────────────────────────────────────────────────────────
+function useScrollReveal() {
+  useEffect(() => {
+    const els = document.querySelectorAll('.scroll-reveal, .scroll-reveal-left, .scroll-reveal-right, .scroll-reveal-scale');
+    const obs = new IntersectionObserver(
+      (entries) => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('revealed'); }),
+      { threshold: 0.12, rootMargin: '0px 0px -30px 0px' }
+    );
+    els.forEach(el => obs.observe(el));
+    return () => obs.disconnect();
+  }, []);
+}
+
+// ─── Simple confetti burst ───────────────────────────────────────────────────
+function spawnConfetti() {
+  const colors = ['#f59e0b', '#10b981', '#6366f1', '#ec4899', '#f97316', '#0d9488'];
+  for (let i = 0; i < 60; i++) {
+    const el = document.createElement('div');
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    Object.assign(el.style, {
+      position: 'fixed', left: `${Math.random() * 100}vw`, top: '-10px',
+      width: `${5 + Math.random() * 8}px`, height: `${5 + Math.random() * 8}px`,
+      background: color, borderRadius: Math.random() > 0.5 ? '50%' : '2px', zIndex: '9999',
+      animation: `confettiFall ${1.2 + Math.random() * 1.8}s ease-in forwards`,
+      animationDelay: `${Math.random() * 0.6}s`,
+    });
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+  }
+  if (!document.getElementById('confetti-style')) {
+    const style = document.createElement('style');
+    style.id = 'confetti-style';
+    style.textContent = `@keyframes confettiFall { to { transform: translateY(105vh) rotate(720deg); opacity: 0; } }`;
+    document.head.appendChild(style);
+  }
+}
 
 interface CravingData {
   day: string;
@@ -62,19 +111,69 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 const Dashboard: React.FC = () => {
   const { user, loading, isNewUser } = useUser();
   const navigate = useNavigate();
+  const { showToast } = useToast();
+  useScrollReveal();
   const [cravingData, setCravingData] = useState<CravingData[]>([]);
   const [loadingChart, setLoadingChart] = useState(false);
   const [badges, setBadges] = useState<Badge[]>([]);
   const [moodScore, setMoodScore] = useState<string>("Stable");
   const [riskScore, setRiskScore] = useState<RiskScore | null>(null);
+  // Anchor message
+  const [anchorMessage, setAnchorMessage] = useState('');
+  const [anchorDraft, setAnchorDraft] = useState('');
+  const [editingAnchor, setEditingAnchor] = useState(false);
+  const [savingAnchor, setSavingAnchor] = useState(false);
+  // Victory
+  const [victoryLoading, setVictoryLoading] = useState(false);
 
   useEffect(() => {
     if (!user?.id || isNewUser) return;
     fetchCravingData();
     fetchBadges();
     fetchMoodData();
+    fetchAnchorMessage();
     computeRiskScore(user.id).then(setRiskScore);
   }, [user?.id, isNewUser]);
+
+  const fetchAnchorMessage = async () => {
+    try {
+      const { data } = await supabase
+        .from('users')
+        .select('bio')
+        .eq('id', user?.id)
+        .single();
+      if (data?.bio) setAnchorMessage(data.bio);
+    } catch { }
+  };
+
+  const saveAnchorMessage = async () => {
+    if (!anchorDraft.trim()) return;
+    setSavingAnchor(true);
+    try {
+      await supabase.from('users').update({ bio: anchorDraft.trim() }).eq('id', user?.id);
+      setAnchorMessage(anchorDraft.trim());
+      setEditingAnchor(false);
+      showToast('Your anchor is saved 💚', 'success');
+    } catch { showToast('Could not save. Try again.', 'error'); }
+    finally { setSavingAnchor(false); }
+  };
+
+  const handleVictory = async () => {
+    if (!user?.id) return;
+    setVictoryLoading(true);
+    try {
+      await supabase.from('craving_logs').insert({
+        user_id: user.id,
+        severity: 0,
+        trigger: 'craving_survived',
+        coping_strategy_used: 'Resisted successfully — logged as victory',
+      });
+      spawnConfetti();
+      showToast('🎉 You made it through! Victory recorded!', 'success');
+      fetchCravingData();
+    } catch { showToast('Could not record your victory', 'error'); }
+    finally { setVictoryLoading(false); }
+  };
 
   const fetchBadges = async () => {
     try {
@@ -192,34 +291,68 @@ const Dashboard: React.FC = () => {
 
   const moodConfig = getMoodConfig(moodScore);
 
+  const activeMilestone = MILESTONES[userStreak];
+
   return (
     <div className="space-y-6 animate-in pb-8">
 
+      {/* =================== MILESTONE BANNER =================== */}
+      {activeMilestone && (
+        <div className="relative overflow-hidden rounded-2xl p-5 flex items-center gap-4 bounce-in"
+          style={{ background: `linear-gradient(135deg, ${activeMilestone.color}18, ${activeMilestone.color}06)`, border: `1px solid ${activeMilestone.color}40`, boxShadow: `0 8px 32px ${activeMilestone.color}20` }}>
+          <div className="absolute -right-6 -top-6 w-28 h-28 rounded-full opacity-10 morph-blob" style={{ background: activeMilestone.color }} />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" style={{ backgroundSize: '200% 100%' }} />
+          <div className="text-4xl flex-shrink-0 animate-float">{activeMilestone.emoji}</div>
+          <div className="flex-1">
+            <p className="font-extrabold text-slate-900 dark:text-slate-100 text-base" style={{ fontFamily: 'Sora, sans-serif' }}>
+              {activeMilestone.title} 🎉
+            </p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">{activeMilestone.science}</p>
+          </div>
+          <Trophy size={22} style={{ color: activeMilestone.color }} className="flex-shrink-0 animate-glow-pulse" />
+        </div>
+      )}
+
       {/* =================== HEADER =================== */}
-      <header className="relative overflow-hidden bento-card rounded-2xl p-6 md:p-8">
+      <header className="relative overflow-hidden bento-card rounded-2xl p-6 md:p-8 shine-on-hover">
         {/* Decorative orbs */}
-        <div className="absolute -top-8 -right-8 w-40 h-40 bg-amber-300 rounded-full blur-3xl opacity-20" />
-        <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-teal-300 rounded-full blur-2xl opacity-20" />
+        <div className="absolute -top-8 -right-8 w-40 h-40 bg-amber-300 rounded-full blur-3xl opacity-20 animate-float" />
+        <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-teal-300 rounded-full blur-2xl opacity-20 animate-float-slow" />
+        <div className="absolute bottom-0 right-1/4 w-16 h-16 bg-violet-300 rounded-full blur-2xl opacity-15 animate-float-fast" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center space-x-2 mb-1">
-              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-glow-pulse" />
-              <span className="text-xs font-bold text-emerald-500 uppercase tracking-widest">Recovery Active</span>
+            <div className="flex items-center space-x-2 mb-2">
+              <div className="relative">
+                <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                <div className="absolute inset-0 w-2 h-2 rounded-full bg-emerald-400 animate-ping opacity-75" />
+              </div>
+              <span className="text-xs font-bold text-emerald-500 uppercase tracking-widest">
+                {(() => { const h = new Date().getHours(); if (h < 12) return '🌅 Good Morning'; if (h < 17) return '☀️ Good Afternoon'; if (h < 21) return '🌆 Good Evening'; return '🌙 Good Night'; })()}
+              </span>
             </div>
             <h1 style={{ fontFamily: 'Sora, sans-serif' }} className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-slate-100">
-              {isNewUser ? "Welcome, " : "Welcome back, "}<span className="gradient-text-amber">{userName}</span>
+              {isNewUser ? "Welcome, " : "Hey, "}<span className="gradient-text-amber">{userName}</span> 💙
             </h1>
-            <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium">
-              {userStreak === 0
-                ? "Start your wellness journey today — every step counts."
-                : `Day ${userStreak} of your fresh start. You're doing amazing!`}
+            <p className="text-slate-500 dark:text-slate-400 mt-1.5 font-medium leading-relaxed max-w-lg">
+              {isNewUser
+                ? "This is your safe space to heal, one day at a time. We're genuinely happy you're here."
+                : userStreak === 0
+                  ? "Every journey begins with a first step. Today is that step — and we're right here with you."
+                  : userStreak < 7
+                    ? `Day ${userStreak} — you're building momentum. That quiet strength you feel? That's real.`
+                    : userStreak < 30
+                      ? `${userStreak} days of showing up for yourself. Your body is healing in ways you can't even see yet.`
+                      : userStreak < 90
+                        ? `${userStreak} days clean — your brain has measurably rewired. You are genuinely a different, stronger person.`
+                        : `${userStreak} days. You didn't just survive — you rebuilt yourself. That is extraordinary.`
+              }
             </p>
           </div>
 
           <div className="flex items-center gap-3 flex-wrap">
-            <div className="flex items-center space-x-2 glass-subtle px-4 py-2.5 rounded-xl border border-amber-200/50">
-              <Flame size={20} fill="#f59e0b" className="text-amber-500 animate-glow-pulse" />
+            <div className="flex items-center space-x-2 glass-subtle px-4 py-2.5 rounded-xl border border-amber-200/50 glow-on-hover">
+              <span className="flame-flicker"><Flame size={20} fill="#f59e0b" className="text-amber-500" /></span>
               <div>
                 <p className="text-xs text-slate-400 leading-none">Streak</p>
                 <p style={{ fontFamily: 'Sora, sans-serif' }} className="text-lg font-extrabold text-amber-600 leading-none">{userStreak}d</p>
@@ -230,14 +363,87 @@ const Dashboard: React.FC = () => {
         </div>
       </header>
 
+      {/* =================== ANCHOR MESSAGE =================== */}
+      <div className="bento-card rounded-2xl p-5">
+        {!editingAnchor ? (
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Heart size={16} className="text-emerald-500" />
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Why I'm Here</p>
+                {anchorMessage ? (
+                  <p className="text-slate-800 dark:text-slate-100 font-semibold text-sm leading-relaxed">"{anchorMessage}"</p>
+                ) : (
+                  <p className="text-slate-400 text-sm italic">Write your personal reason for staying clean — it will appear here every time you open the app.</p>
+                )}
+              </div>
+            </div>
+            <button
+              onClick={() => { setAnchorDraft(anchorMessage); setEditingAnchor(true); }}
+              className="flex-shrink-0 p-2 rounded-xl text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors"
+              title="Edit your anchor"
+            >
+              <Edit3 size={15} />
+            </button>
+          </div>
+        ) : (
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">Your personal anchor — why are you doing this?</p>
+            <textarea
+              value={anchorDraft}
+              onChange={e => setAnchorDraft(e.target.value)}
+              placeholder="e.g. For my daughter. For the life I deserve. To prove I can."
+              rows={2}
+              autoFocus
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 text-sm placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 resize-none"
+            />
+            <div className="flex gap-2 mt-3">
+              <button
+                onClick={saveAnchorMessage}
+                disabled={savingAnchor || !anchorDraft.trim()}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold transition-colors disabled:opacity-50"
+              >
+                <Check size={14} />{savingAnchor ? 'Saving...' : 'Save'}
+              </button>
+              <button
+                onClick={() => setEditingAnchor(false)}
+                className="px-4 py-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 text-sm font-semibold transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* =================== VICTORY BUTTON =================== */}
+      <button
+        onClick={handleVictory}
+        disabled={victoryLoading}
+        className="w-full relative overflow-hidden rounded-2xl p-4 flex items-center justify-center gap-3 font-bold text-white transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-60 shine-on-hover group"
+        style={{ background: 'linear-gradient(135deg, #10b981, #0d9488)', boxShadow: '0 4px 24px rgba(16,185,129,0.25)' }}
+      >
+        {/* Animated background sweep on hover */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          style={{ background: 'linear-gradient(135deg, #059669, #0f766e)' }} />
+        {/* Ripple ring */}
+        <div className="absolute inset-0 rounded-2xl border-2 border-emerald-300/50 animate-ripple opacity-0 group-hover:opacity-100" />
+        <Star size={20} fill="white" className="flex-shrink-0 relative z-10 group-hover:rotate-12 transition-transform duration-300" />
+        <span className="text-base relative z-10">
+          {victoryLoading ? 'Recording your win...' : '🌟 I Survived a Craving — Log My Win'}
+        </span>
+      </button>
+
       {/* =================== STAT BENTO GRID =================== */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Streak */}
-        <div className="bento-card rounded-2xl p-5 relative overflow-hidden group">
-          <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-orange-300 rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition-opacity" />
+        <div className="bento-card rounded-2xl p-5 relative overflow-hidden group tilt-card shine-on-hover scroll-reveal stagger-1">
+          <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-orange-300 rounded-full blur-2xl opacity-20 group-hover:opacity-50 group-hover:scale-125 transition-all duration-500" />
           <div className="relative z-10">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center mb-3 shadow-md group-hover:scale-110 transition-transform">
-              <Flame size={18} className="text-white" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center mb-3 shadow-md group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+              <span className="flame-flicker"><Flame size={18} className="text-white" /></span>
             </div>
             <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-1">Sobriety</p>
             <p style={{ fontFamily: 'Sora, sans-serif' }} className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 stat-val">{userStreak}<span className="text-sm font-semibold text-slate-400 ml-1">days</span></p>
@@ -245,10 +451,10 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Points */}
-        <div className="bento-card rounded-2xl p-5 relative overflow-hidden group">
-          <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-amber-300 rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition-opacity" />
+        <div className="bento-card rounded-2xl p-5 relative overflow-hidden group tilt-card shine-on-hover scroll-reveal stagger-2">
+          <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-amber-300 rounded-full blur-2xl opacity-20 group-hover:opacity-50 group-hover:scale-125 transition-all duration-500" />
           <div className="relative z-10">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center mb-3 shadow-md group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center mb-3 shadow-md group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
               <Award size={18} className="text-white" />
             </div>
             <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-1">Points</p>
@@ -257,10 +463,10 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Mood */}
-        <div className="bento-card rounded-2xl p-5 relative overflow-hidden group">
-          <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-rose-300 rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition-opacity" />
+        <div className="bento-card rounded-2xl p-5 relative overflow-hidden group tilt-card shine-on-hover scroll-reveal stagger-3">
+          <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-rose-300 rounded-full blur-2xl opacity-20 group-hover:opacity-50 group-hover:scale-125 transition-all duration-500" />
           <div className="relative z-10">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center mb-3 shadow-md group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center mb-3 shadow-md group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
               <Heart size={18} className="text-white" />
             </div>
             <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-1">Mood</p>
@@ -269,10 +475,10 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Risk Score */}
-        <div className="bento-card rounded-2xl p-5 relative overflow-hidden group">
-          <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-indigo-300 rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition-opacity" />
+        <div className="bento-card rounded-2xl p-5 relative overflow-hidden group tilt-card shine-on-hover scroll-reveal stagger-4">
+          <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-indigo-300 rounded-full blur-2xl opacity-20 group-hover:opacity-50 group-hover:scale-125 transition-all duration-500" />
           <div className="relative z-10">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 shadow-md group-hover:scale-110 transition-transform
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 shadow-md group-hover:scale-110 group-hover:rotate-6 transition-all duration-300
               ${!riskScore || riskScore.level === 'low' ? 'bg-gradient-to-br from-emerald-400 to-teal-500' : ''}
               ${riskScore?.level === 'moderate' ? 'bg-gradient-to-br from-amber-400 to-orange-500' : ''}
               ${riskScore?.level === 'high' ? 'bg-gradient-to-br from-rose-500 to-red-600 animate-pulse' : ''}
@@ -295,7 +501,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* =================== CHART + BADGES =================== */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 scroll-reveal">
 
         {/* Chart */}
         <div className="lg:col-span-2 bento-card rounded-2xl p-6">

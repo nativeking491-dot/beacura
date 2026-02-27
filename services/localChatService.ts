@@ -179,18 +179,19 @@ const KNOWLEDGE_BASE: ResponsePattern[] = [
         intent: "relapse",
         patterns: [/\b(relapse|slipped|messed up|used again|drank|high)\b/i],
         responses: [
-            "Thank you for being honest. That takes courage. Please remember: a slip is an event, not a permanent failure. We can support you through this.",
-            "I'm here for you, no judgment. You are still worthy of recovery. Are you safe right now? Just breathe.",
-            "Take a deep breath. Shame is not helpful right now—action is. What is the very next right thing you can do to get back to safety?"
+            "Thank you for trusting me with this. That took real courage to say. A slip doesn't erase everything you've built — it's just one moment, not your whole story.",
+            "I'm here. No judgment — none at all. You reaching out right now is what recovery actually looks like. Are you physically safe?",
+            "Shame won't help us here, so let's set it aside. You are still worthy of healing, still capable of rebuilding, still loved. What do you need right now, in this exact moment?",
+            "One of the bravest things in recovery is coming back after a hard moment. You came back. That's everything."
         ]
     },
     {
         intent: "crisis",
         patterns: [/\b(die|suicide|kill|end it|hurt myself)\b/i],
         responses: [
-            "I hear that you are in pain. Please, take a deep breath. You are not alone. Support is available immediately.",
-            "Your life matters. Please reach out to a professional or call 988/911. We can get through this moment together. Just breathe.",
-            "I am concerned for your safety. Please contact emergency services or a trusted friend. You deserve support."
+            "I hear how much pain you're carrying right now. Please don't face this alone. 💙 Call 988 or reach out to someone you trust — right now, in this moment. I am here with you.",
+            "What you're feeling is real, and it matters deeply. Please reach out to 988 (Suicide & Crisis Lifeline) immediately. You are loved and your life has enormous value.",
+            "I'm genuinely worried about you and I care. Please call 988 right now. You don't have to explain — just say 'I need help.' One call can change everything."
         ]
     },
     {
@@ -214,10 +215,11 @@ const KNOWLEDGE_BASE: ResponsePattern[] = [
         intent: "mood_low",
         patterns: [/\b(sad|depress|lone|hurt|pain|cry|awful|terrible|hopeless)\b/i],
         responses: [
-            "I'm truly sorry you're hurting. It takes strength to just exist when things feel this heavy.",
-            "You are not alone in this darkness, even if it feels that way for sure. I'm right here. 💙",
-            "It's okay to not be okay today. Recovery isn't a straight line. Be gentle with yourself.",
-            "Emotions are like weather—they storm, but eventually they pass. We just need to find shelter until this passes. How can I support you?"
+            "I'm so glad you said something. Carrying this alone is exhausting, and you don't have to anymore. I'm right here. 💙",
+            "It makes complete sense that you feel this way. What you're going through is genuinely hard. You're not broken — you're healing, and healing hurts.",
+            "Even just existing through a day that feels this heavy is an act of bravery. I see you. I'm here.",
+            "Emotions like this are like weather — they storm, and then they shift. We just need to find shelter together until this one passes. Tell me more?",
+            "You showed up here, even when everything feels terrible. That quiet act of reaching out matters more than you know."
         ]
     },
     {
@@ -447,13 +449,21 @@ export const generateLocalResponse = async (
 
     // Reflection logic
     if (lowerPrompt.includes("i feel")) {
-        return prefix + `It sounds like you're feeling ${lowerPrompt.split("i feel")[1].trim()}. Can you tell me what triggered that feeling?`;
+        const feeling = lowerPrompt.split("i feel")[1].trim();
+        return prefix + `You feel ${feeling}. That's real and valid. Can you tell me what's underneath that — what happened, or what's been building up?`;
     }
     if (lowerPrompt.includes("i am")) {
-        return prefix + `You say you are ${lowerPrompt.split("i am")[1].trim()}. How long have you felt like that?`;
+        const state = lowerPrompt.split("i am")[1].trim();
+        return prefix + `You say you are ${state}. I hear that. How long have you been carrying that feeling?`;
+    }
+    if (lowerPrompt.includes("i can't")) {
+        return prefix + `That feeling of 'I can't' — it's real. What is the one tiny thing that feels impossible right now? Let's just look at that one thing together.`;
+    }
+    if (lowerPrompt.includes("nobody") || lowerPrompt.includes("no one")) {
+        return prefix + `I hear that loneliness, and I want you to know — right now, in this moment, I am here with you. You are not invisible. What's making you feel so alone?`;
     }
     if (lowerPrompt.includes("because")) {
-        return prefix + "I see. Identifying the 'why' is a powerful step in recovery. Tell me more.";
+        return prefix + "Identifying the 'why' behind a feeling is one of the most powerful tools in recovery. Tell me more — I'm listening.";
     }
 
     // Context-aware fallback
@@ -462,11 +472,13 @@ export const generateLocalResponse = async (
     }
 
     const DEFAULT_RESPONSES = [
-        "I'm listening. Please go on.",
-        "Thank you for sharing that with me. What else is on your mind?",
-        "Recovery is a journey of many small steps. I'm here for this one.",
-        "That sounds important. Can you explain a bit more?",
-        "I hear you. You are not alone in this."
+        "I'm here, and I'm listening. Take your time.",
+        "Thank you for sharing that with me. What else is on your mind right now?",
+        "You reached out, and that matters. Recovery is built on moments exactly like this one.",
+        "That sounds important. Can you tell me a little more? I want to understand.",
+        "You are not alone in this. I'm right here, walking this with you.",
+        "Whatever you're carrying right now — you can set some of it down here. I'm listening.",
+        "I notice you. I hear you. Keep going — I'm with you.",
     ];
 
     return prefix + DEFAULT_RESPONSES[Math.floor(Math.random() * DEFAULT_RESPONSES.length)];

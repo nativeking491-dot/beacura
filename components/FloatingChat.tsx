@@ -10,11 +10,16 @@ interface ChatMessage {
     timestamp: Date;
 }
 
-// Quick prompt chips
+// Quick prompt chips — empathetic, non-clinical
 const QUICK_PROMPTS = [
-    { label: "I'm struggling", emoji: "💙" },
+    { label: "I'm struggling right now", emoji: "💙" },
+    { label: "I feel like giving up", emoji: "🌧️" },
+    { label: "I had a craving", emoji: "🌊" },
+    { label: "I need some motivation", emoji: "⚡" },
+    { label: "Something good happened", emoji: "✨" },
+    { label: "I just need to vent", emoji: "🗣️" },
     { label: "Daily check-in", emoji: "☀️" },
-    { label: "Need motivation", emoji: "⚡" },
+    { label: "I'm feeling anxious", emoji: "🌀" },
 ];
 
 export const FloatingChat = () => {
@@ -31,11 +36,21 @@ export const FloatingChat = () => {
     // Initial welcome message
     useEffect(() => {
         if (isOpen && messages.length === 0) {
+            const greetingsByTime = () => {
+                const h = new Date().getHours();
+                if (h < 12) return 'Good morning';
+                if (h < 17) return 'Good afternoon';
+                if (h < 21) return 'Good evening';
+                return 'Hey';
+            };
+            const streakLine = user?.streak
+                ? `You're on a ${user.streak}-day streak — that took real work. 🌟`
+                : `Every single day you choose to try again is an act of courage.`;
             setTimeout(() => {
                 setMessages([{
                     id: "1",
                     sender: "ai",
-                    text: `Hey ${user?.name || "there"} 💙 I'm your recovery companion. Every moment of strength counts — ${user?.streak ? `you're on a ${user.streak}-day streak!` : "your journey starts now."}. How are you feeling right now?`,
+                    text: `${greetingsByTime()}, ${user?.name || 'friend'} 💙\n\nI'm here — no judgment, no rush, just someone to talk to. ${streakLine}\n\nHow are you feeling right now? You can say anything.`,
                     timestamp: new Date(),
                 }]);
             }, 400);
@@ -123,9 +138,9 @@ export const FloatingChat = () => {
                         : "opacity-0 scale-90 translate-y-4 pointer-events-none max-h-0"
                     }`}
                 style={{
-                    height: isOpen ? '520px' : '0px',
+                    height: isOpen ? '540px' : '0px',
                     borderRadius: '24px',
-                    boxShadow: '0 32px 64px rgba(0,0,0,0.22), 0 0 0 1px rgba(255,255,255,0.08)',
+                    boxShadow: '0 32px 64px rgba(0,0,0,0.30), 0 0 0 1px rgba(255,255,255,0.08), 0 0 60px rgba(124,58,237,0.1)',
                 }}
             >
                 {/* Dark glass background */}
@@ -143,7 +158,7 @@ export const FloatingChat = () => {
                 <div className="relative z-10 flex flex-col h-full">
 
                     {/* ─── Header ─── */}
-                    <div style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.3), rgba(59,130,246,0.2))', borderBottom: '1px solid rgba(255,255,255,0.07)' }}
+                    <div style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.35), rgba(251,191,36,0.10))', borderBottom: '1px solid rgba(255,255,255,0.07)' }}
                         className="p-4 flex items-center justify-between flex-shrink-0">
                         <div className="flex items-center gap-3">
                             {/* Animated avatar */}
@@ -227,17 +242,26 @@ export const FloatingChat = () => {
 
                         {/* Quick prompts */}
                         {showPrompts && messages.length <= 1 && !isTyping && (
-                            <div className="flex flex-wrap gap-2 justify-center pt-2 animate-in">
-                                {QUICK_PROMPTS.map(p => (
-                                    <button
-                                        key={p.label}
-                                        onClick={() => handleSend(p.label)}
-                                        className="px-3 py-1.5 rounded-full text-xs font-semibold text-white/70 hover:text-white transition-all"
-                                        style={{ background: 'rgba(139,92,246,0.2)', border: '1px solid rgba(139,92,246,0.4)' }}
-                                    >
-                                        {p.emoji} {p.label}
-                                    </button>
-                                ))}
+                            <div className="pt-2 animate-in">
+                                <p className="text-center text-[10px] mb-2" style={{ color: 'rgba(255,255,255,0.25)' }}>Choose something you feel, or just type freely ↓</p>
+                                <div className="flex flex-wrap gap-1.5 justify-center">
+                                    {QUICK_PROMPTS.map(p => (
+                                        <button
+                                            key={p.label}
+                                            onClick={() => handleSend(p.label)}
+                                            className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:scale-105 active:scale-95"
+                                            style={{
+                                                background: 'rgba(139,92,246,0.15)',
+                                                border: '1px solid rgba(139,92,246,0.3)',
+                                                color: 'rgba(255,255,255,0.65)',
+                                            }}
+                                            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(139,92,246,0.28)'; e.currentTarget.style.color = '#fff'; }}
+                                            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(139,92,246,0.15)'; e.currentTarget.style.color = 'rgba(255,255,255,0.65)'; }}
+                                        >
+                                            {p.emoji} {p.label}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         )}
 
@@ -253,7 +277,7 @@ export const FloatingChat = () => {
                                 value={input}
                                 onChange={e => setInput(e.target.value)}
                                 onKeyPress={e => e.key === "Enter" && handleSend()}
-                                placeholder="Share how you're feeling..."
+                                placeholder="You can say anything here."
                                 className="flex-1 px-4 py-2.5 rounded-2xl text-[13px] text-white placeholder-white/30 focus:outline-none transition-all"
                                 style={{
                                     background: 'rgba(255,255,255,0.07)',
@@ -280,11 +304,19 @@ export const FloatingChat = () => {
 
             {/* ─── FAB Button ─── */}
             <div className="relative">
-                {/* Pulsing ring when closed */}
+                {/* Soft heartbeat ring when closed */}
                 {!isOpen && (
                     <>
-                        <div className="absolute inset-0 rounded-full bg-violet-500 opacity-30 animate-ping" style={{ animationDuration: '2.5s' }} />
-                        <div className="absolute inset-0 rounded-full bg-violet-400 opacity-20 animate-ping" style={{ animationDuration: '2.5s', animationDelay: '0.4s' }} />
+                        <div className="absolute inset-[-4px] rounded-full" style={{
+                            border: '2px solid rgba(139,92,246,0.4)',
+                            animation: 'chat-heartbeat 2.2s ease-in-out infinite',
+                        }} />
+                        <style>{`
+                            @keyframes chat-heartbeat {
+                                0%, 100% { transform: scale(1); opacity: 0.5; }
+                                50% { transform: scale(1.12); opacity: 0.9; }
+                            }
+                        `}</style>
                     </>
                 )}
 

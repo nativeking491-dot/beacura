@@ -23,6 +23,217 @@ import {
 import { useUser } from "../context/UserContext";
 import { generateLocalResponse } from "../services/localChatService";
 
+// ─── Comprehensive meal detail database ────────────────────────────────────
+const MEAL_DETAILS: Record<string, {
+  image: string;
+  calories: number;
+  protein: number; // g
+  carbs: number;   // g
+  fat: number;     // g
+  fiber: number;   // g
+  prepTime: string;
+  keyNutrients: string[];
+  ingredients: string[];
+  recoveryBenefit: string;
+  cookLink: string;
+  cookLinkLabel: string;
+}> = {
+  // ── MONDAY ──────────────────────────────────────────────────
+  "oatmeal with walnuts": {
+    image: "https://images.unsplash.com/photo-1495214783159-3503fd1b572d?w=600&auto=format&fit=crop&q=70",
+    calories: 380, protein: 10, carbs: 52, fat: 14, fiber: 8,
+    prepTime: "10 min",
+    keyNutrients: ["Beta-glucan", "Omega-3 (ALA)", "Manganese", "Antioxidants"],
+    ingredients: ["½ cup rolled oats", "1 cup water or oat milk", "¼ cup walnuts", "½ cup blueberries", "1 tsp honey", "Pinch of cinnamon"],
+    recoveryBenefit: "Oats stabilize blood sugar and mood. Walnuts provide Omega-3 fatty acids that reduce neuroinflammation caused by substance use. Blueberries contain anthocyanins that protect dopamine neurons.",
+    cookLink: "https://www.youtube.com/results?search_query=oatmeal+with+walnuts+blueberries+healthy",
+    cookLinkLabel: "Watch: How to Make It",
+  },
+  "grilled salmon with quinoa": {
+    image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=600&auto=format&fit=crop&q=70",
+    calories: 520, protein: 42, carbs: 38, fat: 18, fiber: 5,
+    prepTime: "25 min",
+    keyNutrients: ["EPA/DHA Omega-3", "Complete Protein", "Magnesium", "Zinc"],
+    ingredients: ["150g salmon fillet", "½ cup quinoa", "2 cups spinach", "1 tbsp olive oil", "Lemon juice", "Garlic clove", "Salt & pepper"],
+    recoveryBenefit: "Salmon's EPA/DHA directly rebuilds brain cell membranes damaged by addiction. Quinoa provides all essential amino acids needed for neurotransmitter synthesis. Spinach offers folate for dopamine regulation.",
+    cookLink: "https://www.youtube.com/results?search_query=grilled+salmon+quinoa+spinach+healthy",
+    cookLinkLabel: "Watch: How to Make It",
+  },
+  "turkey stir-fry": {
+    image: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=600&auto=format&fit=crop&q=70",
+    calories: 490, protein: 38, carbs: 44, fat: 12, fiber: 6,
+    prepTime: "20 min",
+    keyNutrients: ["Tryptophan", "Selenium", "B6", "Chromium"],
+    ingredients: ["200g ground turkey", "1 cup broccoli florets", "½ cup brown rice (cooked)", "2 tbsp low-sodium soy sauce", "1 tsp sesame oil", "Ginger, garlic"],
+    recoveryBenefit: "Turkey is the richest dietary source of Tryptophan, which the brain converts to Serotonin and Melatonin — improving mood and sleep quality during early recovery.",
+    cookLink: "https://www.youtube.com/results?search_query=turkey+stir+fry+broccoli+brown+rice+healthy",
+    cookLinkLabel: "Watch: How to Make It",
+  },
+  // ── TUESDAY ─────────────────────────────────────────────────
+  "greek yogurt with chia seeds": {
+    image: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=600&auto=format&fit=crop&q=70",
+    calories: 290, protein: 18, carbs: 32, fat: 9, fiber: 7,
+    prepTime: "5 min",
+    keyNutrients: ["Probiotics", "Calcium", "Omega-3 (ALA)", "Tyrosine"],
+    ingredients: ["¾ cup full-fat Greek yogurt", "1 tbsp chia seeds", "1 tsp raw honey", "Sprinkle of cinnamon", "Optional: mixed berries"],
+    recoveryBenefit: "Greek yogurt's probiotics directly improve the gut-brain axis, reducing anxiety. Chia seeds slow glucose absorption preventing sugar crashes that trigger cravings. Tyrosine in yogurt is the precursor to Dopamine.",
+    cookLink: "https://www.youtube.com/results?search_query=greek+yogurt+chia+seeds+healthy+breakfast",
+    cookLinkLabel: "Watch: How to Prepare",
+  },
+  "lentil soup with whole grain": {
+    image: "https://images.unsplash.com/photo-1547592180-85f173990554?w=600&auto=format&fit=crop&q=70",
+    calories: 420, protein: 22, carbs: 58, fat: 6, fiber: 14,
+    prepTime: "35 min",
+    keyNutrients: ["Folate", "Iron", "Fiber", "Slow-release carbs"],
+    ingredients: ["1 cup red lentils", "1 carrot (diced)", "1 celery stalk", "1 onion", "2 garlic cloves", "Cumin, turmeric", "2 slices whole grain bread"],
+    recoveryBenefit: "Lentils are one of the highest-folate foods. Folate deficiency is nearly universal in heavy alcohol/drug use and directly impairs serotonin synthesis. This meal begins restoring it.",
+    cookLink: "https://www.youtube.com/results?search_query=lentil+soup+healthy+recipe+easy",
+    cookLinkLabel: "Watch: How to Make It",
+  },
+  "baked chicken breast": {
+    image: "https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=600&auto=format&fit=crop&q=70",
+    calories: 460, protein: 48, carbs: 42, fat: 8, fiber: 5,
+    prepTime: "50 min",
+    keyNutrients: ["Complete protein", "B3 (Niacin)", "Selenium", "Potassium"],
+    ingredients: ["200g chicken breast", "1 medium sweet potato", "Olive oil", "Paprika, garlic powder", "Rosemary", "Salt & pepper"],
+    recoveryBenefit: "Chicken provides Niacin (B3), essential for NAD+ production — the molecule that detoxifies the body and repairs DNA. Sweet potato's complex carbs fuel the brain without causing energy crashes.",
+    cookLink: "https://www.youtube.com/results?search_query=baked+chicken+breast+sweet+potato+healthy",
+    cookLinkLabel: "Watch: How to Make It",
+  },
+  // ── WEDNESDAY ───────────────────────────────────────────────
+  "green smoothie": {
+    image: "https://images.unsplash.com/photo-1638176066736-aaa6a2e1d551?w=600&auto=format&fit=crop&q=70",
+    calories: 310, protein: 22, carbs: 44, fat: 4, fiber: 6,
+    prepTime: "5 min",
+    keyNutrients: ["Chlorophyll", "Potassium", "Protein", "Vitamin K"],
+    ingredients: ["1 cup kale leaves", "1 banana (frozen)", "1 scoop protein powder", "1 cup almond milk", "½ tsp ginger", "Ice"],
+    recoveryBenefit: "Kale contains sulforaphane which activates the Nrf2 pathway — the body's master detox switch. This helps the liver process and expel residual toxins from substance use more efficiently.",
+    cookLink: "https://www.youtube.com/results?search_query=green+smoothie+kale+banana+protein+detox",
+    cookLinkLabel: "Watch: How to Blend",
+  },
+  "chickpea salad": {
+    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&auto=format&fit=crop&q=70",
+    calories: 390, protein: 16, carbs: 46, fat: 16, fiber: 12,
+    prepTime: "10 min",
+    keyNutrients: ["Fiber", "Folate", "Healthy fats (MUFA)", "Vitamin E"],
+    ingredients: ["1 can chickpeas (drained)", "½ avocado (diced)", "Cherry tomatoes", "Cucumber", "Red onion", "Lemon juice", "Olive oil", "Parsley"],
+    recoveryBenefit: "Avocado's monounsaturated fats rebuild myelin — the insulating sheath around nerve cells often damaged by chronic substance use. Chickpeas are exceptionally high in B6, critical for GABA and serotonin.",
+    cookLink: "https://www.youtube.com/results?search_query=chickpea+avocado+salad+healthy+recipe",
+    cookLinkLabel: "Watch: How to Make It",
+  },
+  // ── THURSDAY ────────────────────────────────────────────────
+  "scrambled eggs with spinach": {
+    image: "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=600&auto=format&fit=crop&q=70",
+    calories: 340, protein: 26, carbs: 8, fat: 22, fiber: 3,
+    prepTime: "10 min",
+    keyNutrients: ["Choline", "Lutein", "Iron", "Vitamin D"],
+    ingredients: ["3 eggs", "1 cup fresh spinach", "30g feta cheese (crumbled)", "1 tbsp olive oil", "Salt, pepper, garlic"],
+    recoveryBenefit: "Eggs are the #1 dietary source of Choline, which the brain uses to make acetylcholine — the neurotransmitter central to memory and learning that is depleted by drug use. Spinach's iron addresses anaemia common in recovery.",
+    cookLink: "https://www.youtube.com/results?search_query=scrambled+eggs+spinach+feta+healthy+breakfast",
+    cookLinkLabel: "Watch: How to Cook",
+  },
+  // ── FRIDAY ──────────────────────────────────────────────────
+  "almond butter toast": {
+    image: "https://images.unsplash.com/photo-1481070414801-51fd732d7184?w=600&auto=format&fit=crop&q=70",
+    calories: 350, protein: 12, carbs: 42, fat: 16, fiber: 6,
+    prepTime: "5 min",
+    keyNutrients: ["Vitamin E", "Magnesium", "B6", "Healthy fats"],
+    ingredients: ["2 slices sprouted grain bread", "2 tbsp almond butter", "1 banana (sliced)", "Drizzle of honey", "Sprinkle of chia seeds"],
+    recoveryBenefit: "Almonds are the richest food source of Vitamin E, a potent antioxidant that repairs oxidative damage in the central nervous system. Magnesium calms the nervous system and helps with anxiety and insomnia.",
+    cookLink: "https://www.youtube.com/results?search_query=almond+butter+toast+banana+healthy+breakfast",
+    cookLinkLabel: "Watch: How to Assemble",
+  },
+  "shrimp pasta": {
+    image: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=600&auto=format&fit=crop&q=70",
+    calories: 530, protein: 36, carbs: 54, fat: 14, fiber: 4,
+    prepTime: "25 min",
+    keyNutrients: ["B12", "Zinc", "Iodine", "Selenium"],
+    ingredients: ["150g shrimp (peeled)", "200g whole wheat pasta", "3 garlic cloves", "1 zucchini (sliced)", "2 tbsp olive oil", "Lemon zest", "Parsley", "Red chilli flakes"],
+    recoveryBenefit: "Shrimp is exceptionally high in B12 and Iodine, both critical for thyroid function and nerve conduction. Many people in long-term recovery have depleted B12 stores, causing the numbness and fatigue they misattribute to other causes.",
+    cookLink: "https://www.youtube.com/results?search_query=shrimp+pasta+garlic+olive+oil+zucchini+healthy",
+    cookLinkLabel: "Watch: How to Make It",
+  },
+  // ── SATURDAY ────────────────────────────────────────────────
+  "smoothie bowl with pumpkin seeds": {
+    image: "https://images.unsplash.com/photo-1590301157890-4810ed352733?w=600&auto=format&fit=crop&q=70",
+    calories: 380, protein: 14, carbs: 56, fat: 12, fiber: 9,
+    prepTime: "10 min",
+    keyNutrients: ["Zinc", "Magnesium", "Probiotics", "Fiber"],
+    ingredients: ["1 frozen banana", "½ cup frozen berries", "½ cup Greek yogurt", "¼ cup almond milk", "Toppings: pumpkin seeds, granola, fresh fruit"],
+    recoveryBenefit: "Pumpkin seeds are exceptionally high in Zinc and Magnesium. Zinc deficiency is extremely common after heavy drug or alcohol use and directly impairs immune function and wound healing. Zinc also co-factors hundreds of enzyme reactions.",
+    cookLink: "https://www.youtube.com/results?search_query=smoothie+bowl+pumpkin+seeds+healthy+recipe",
+    cookLinkLabel: "Watch: How to Make It",
+  },
+  "veggie burger": {
+    image: "https://images.unsplash.com/photo-1520072959219-c595dc870360?w=600&auto=format&fit=crop&q=70",
+    calories: 440, protein: 20, carbs: 52, fat: 14, fiber: 10,
+    prepTime: "20 min",
+    keyNutrients: ["Plant protein", "Iron", "B12 (fortified)", "Fiber"],
+    ingredients: ["1 veggie burger patty", "Wholegrain bun", "2 cups kale", "Olive oil", "Lemon juice", "Walnuts", "Parmesan or nutritional yeast"],
+    recoveryBenefit: "A high-fiber plant-based meal feeds beneficial gut bacteria. Research shows that the microbiome directly controls GABA levels in the brain — restoring it reduces anxiety and cravings.",
+    cookLink: "https://www.youtube.com/results?search_query=veggie+burger+kale+salad+healthy",
+    cookLinkLabel: "Watch: How to Cook",
+  },
+  "miso glazed tofu": {
+    image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=70",
+    calories: 360, protein: 24, carbs: 28, fat: 16, fiber: 5,
+    prepTime: "30 min",
+    keyNutrients: ["Isoflavones", "Probiotics", "Calcium", "Complete amino acids"],
+    ingredients: ["300g firm tofu (pressed)", "2 tbsp white miso paste", "1 tbsp mirin", "1 tsp sesame oil", "Bok choy", "Sesame seeds", "Ginger"],
+    recoveryBenefit: "Miso contains live cultures (probiotics) and isoflavones that reduce systemic inflammation — a key driver of depression in recovery. Tofu provides all essential amino acids including Tryptophan for serotonin synthesis.",
+    cookLink: "https://www.youtube.com/results?search_query=miso+glazed+tofu+bok+choy+recipe",
+    cookLinkLabel: "Watch: How to Make It",
+  },
+  // ── SUNDAY ──────────────────────────────────────────────────
+  "buckwheat pancakes": {
+    image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&auto=format&fit=crop&q=70",
+    calories: 400, protein: 14, carbs: 62, fat: 10, fiber: 6,
+    prepTime: "20 min",
+    keyNutrients: ["Rutin", "Magnesium", "Lysine", "Complex carbs"],
+    ingredients: ["1 cup buckwheat flour", "1 egg", "¾ cup milk", "1 tsp baking powder", "Pinch of salt", "Mixed berries for topping", "Maple syrup (1 tsp)"],
+    recoveryBenefit: "Buckwheat contains Rutin, a flavonoid that strengthens capillary walls and reduces brain fog. Unlike wheat flour, it causes a much lower glycaemic spike, preventing the energy crashes that are a common craving trigger.",
+    cookLink: "https://www.youtube.com/results?search_query=buckwheat+pancakes+mixed+berries+healthy+recipe",
+    cookLinkLabel: "Watch: How to Make It",
+  },
+};
+
+// ─── Fuzzy match meal name to MEAL_DETAILS key ──────────────────────────────
+function getMealDetails(mealName: string) {
+  const lower = mealName.toLowerCase();
+  for (const key of Object.keys(MEAL_DETAILS)) {
+    if (lower.includes(key) || key.split(" ").filter(w => w.length > 4).every(w => lower.includes(w))) {
+      return MEAL_DETAILS[key];
+    }
+  }
+  return null;
+}
+
+// ─── Meal Image lookup (same as before) ─────────────────────────────────────
+function getMealImage(name: string): string {
+  const n = name.toLowerCase();
+  if (n.includes("oatmeal") || n.includes("oat")) return "https://images.unsplash.com/photo-1495214783159-3503fd1b572d?w=500&auto=format&fit=crop&q=70";
+  if (n.includes("yogurt")) return "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=500&auto=format&fit=crop&q=70";
+  if (n.includes("smoothie bowl")) return "https://images.unsplash.com/photo-1590301157890-4810ed352733?w=500&auto=format&fit=crop&q=70";
+  if (n.includes("smoothie")) return "https://images.unsplash.com/photo-1638176066736-aaa6a2e1d551?w=500&auto=format&fit=crop&q=70";
+  if (n.includes("egg") || n.includes("scrambled")) return "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=500&auto=format&fit=crop&q=70";
+  if (n.includes("almond") || n.includes("toast")) return "https://images.unsplash.com/photo-1481070414801-51fd732d7184?w=500&auto=format&fit=crop&q=70";
+  if (n.includes("pancake")) return "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=500&auto=format&fit=crop&q=70";
+  if (n.includes("salmon")) return "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=500&auto=format&fit=crop&q=70";
+  if (n.includes("lentil") || n.includes("soup")) return "https://images.unsplash.com/photo-1547592180-85f173990554?w=500&auto=format&fit=crop&q=70";
+  if (n.includes("chickpea") || n.includes("salad")) return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&auto=format&fit=crop&q=70";
+  if (n.includes("tuna") || n.includes("wrap")) return "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=500&auto=format&fit=crop&q=70";
+  if (n.includes("quinoa") || n.includes("bowl")) return "https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=500&auto=format&fit=crop&q=70";
+  if (n.includes("veggie") || n.includes("burger")) return "https://images.unsplash.com/photo-1520072959219-c595dc870360?w=500&auto=format&fit=crop&q=70";
+  if (n.includes("bean") || n.includes("chili")) return "https://images.unsplash.com/photo-1547461777-ebaea5f35edb?w=500&auto=format&fit=crop&q=70";
+  if (n.includes("turkey") || n.includes("stir")) return "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=500&auto=format&fit=crop&q=70";
+  if (n.includes("chicken") || n.includes("baked")) return "https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=500&auto=format&fit=crop&q=70";
+  if (n.includes("shrimp") || n.includes("pasta")) return "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=500&auto=format&fit=crop&q=70";
+  if (n.includes("tofu") || n.includes("miso")) return "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=70";
+  if (n.includes("beef") || n.includes("taco")) return "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=500&auto=format&fit=crop&q=70";
+  if (n.includes("cod") || n.includes("fish")) return "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=500&auto=format&fit=crop&q=70";
+  return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&auto=format&fit=crop&q=70";
+}
+
 const Health: React.FC = () => {
   const { user } = useUser();
   const navigate = useNavigate();
@@ -37,6 +248,8 @@ const Health: React.FC = () => {
   const [dailyMeals, setDailyMeals] = useState({ breakfast: "", lunch: "", dinner: "" });
   const [completedExercises, setCompletedExercises] = useState<string[]>([]);
   const [justDrank, setJustDrank] = useState(false);
+  // Meal detail modal
+  const [selectedMeal, setSelectedMeal] = useState<{ name: string; type: string } | null>(null);
 
   const currentPlan = WEEKLY_MEAL_PLAN[activeDayIdx];
   const currentExercisePlan = WEEKLY_EXERCISE_PLAN[activeDayIdx];
@@ -276,8 +489,8 @@ const Health: React.FC = () => {
               <div
                 key={i}
                 className={`h-9 rounded-xl transition-all duration-300 flex items-center justify-center text-lg ${i < glasses
-                    ? "bg-gradient-to-br from-blue-400 to-cyan-400 shadow-md shadow-blue-100 dark:shadow-none scale-100"
-                    : "bg-slate-100 dark:bg-slate-800 scale-90 opacity-60"
+                  ? "bg-gradient-to-br from-blue-400 to-cyan-400 shadow-md shadow-blue-100 dark:shadow-none scale-100"
+                  : "bg-slate-100 dark:bg-slate-800 scale-90 opacity-60"
                   }`}
               >
                 {i < glasses ? "💧" : ""}
@@ -289,8 +502,8 @@ const Health: React.FC = () => {
             onClick={handleDrinkWater}
             disabled={glasses === 12}
             className={`w-full py-3.5 rounded-2xl font-bold text-sm flex items-center justify-center space-x-2 transition-all duration-300 ${glasses === 12
-                ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 border border-emerald-200 dark:border-emerald-500/20 cursor-default"
-                : "bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg shadow-blue-200 dark:shadow-none hover:-translate-y-0.5 hover:shadow-blue-300 dark:hover:shadow-none"
+              ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 border border-emerald-200 dark:border-emerald-500/20 cursor-default"
+              : "bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg shadow-blue-200 dark:shadow-none hover:-translate-y-0.5 hover:shadow-blue-300 dark:hover:shadow-none"
               }`}
           >
             <Droplets size={17} className={justDrank ? "animate-bounce" : ""} />
@@ -351,21 +564,13 @@ const Health: React.FC = () => {
             </div>
             <div>
               <h2 style={{ fontFamily: 'Sora, sans-serif' }} className="font-bold text-slate-900 dark:text-slate-100 text-lg">Suggested Diet Plan</h2>
-              <p className="text-xs text-slate-400">Science-backed meals for recovery</p>
+              <p className="text-xs text-slate-400">Click any meal for full details — Science-backed for recovery</p>
             </div>
           </div>
-
-          {/* Day Tabs */}
           <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl overflow-x-auto no-scrollbar gap-0.5">
             {WEEKLY_MEAL_PLAN.map((item, idx) => (
-              <button
-                key={item.day}
-                onClick={() => setActiveDayIdx(idx)}
-                className={`flex flex-col items-center px-3 py-2 rounded-xl text-[11px] font-bold transition-all whitespace-nowrap min-w-[48px] ${activeDayIdx === idx
-                    ? "bg-white dark:bg-slate-700 text-amber-600 shadow-md"
-                    : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                  }`}
-              >
+              <button key={item.day} onClick={() => setActiveDayIdx(idx)}
+                className={`flex flex-col items-center px-3 py-2 rounded-xl text-[11px] font-bold transition-all whitespace-nowrap min-w-[48px] ${activeDayIdx === idx ? "bg-white dark:bg-slate-700 text-amber-600 shadow-md" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"}`}>
                 <span className="opacity-60">{item.day.substring(0, 3).toUpperCase()}</span>
                 <span>{idx === todayIdx ? "●" : item.day.substring(0, 2)}</span>
               </button>
@@ -377,26 +582,167 @@ const Health: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {(["breakfast", "lunch", "dinner"] as const).map((meal) => {
               const configs = {
-                breakfast: { icon: "🌅", label: "Breakfast", gradient: "from-amber-50 to-orange-50 dark:from-amber-500/10 dark:to-orange-500/10", border: "border-amber-100 dark:border-amber-500/20", text: "text-amber-700 dark:text-amber-400" },
-                lunch: { icon: "☀️", label: "Lunch", gradient: "from-teal-50 to-emerald-50 dark:from-teal-500/10 dark:to-emerald-500/10", border: "border-teal-100 dark:border-teal-500/20", text: "text-teal-700 dark:text-teal-400" },
-                dinner: { icon: "🌙", label: "Dinner", gradient: "from-indigo-50 to-violet-50 dark:from-indigo-500/10 dark:to-violet-500/10", border: "border-indigo-100 dark:border-indigo-500/20", text: "text-indigo-700 dark:text-indigo-400" },
+                breakfast: { icon: "🌅", label: "Breakfast", gradient: "from-amber-50 to-orange-50 dark:from-amber-500/10 dark:to-orange-500/10", border: "border-amber-100 dark:border-amber-500/20", text: "text-amber-700 dark:text-amber-400", ring: "ring-amber-400" },
+                lunch: { icon: "☀️", label: "Lunch", gradient: "from-teal-50 to-emerald-50 dark:from-teal-500/10 dark:to-emerald-500/10", border: "border-teal-100 dark:border-teal-500/20", text: "text-teal-700 dark:text-teal-400", ring: "ring-teal-400" },
+                dinner: { icon: "🌙", label: "Dinner", gradient: "from-indigo-50 to-violet-50 dark:from-indigo-500/10 dark:to-violet-500/10", border: "border-indigo-100 dark:border-indigo-500/20", text: "text-indigo-700 dark:text-indigo-400", ring: "ring-indigo-400" },
               };
               const c = configs[meal];
+              const mealName = currentPlan.meals[meal as keyof typeof currentPlan.meals];
+              const imgUrl = getMealImage(mealName);
+              const details = getMealDetails(mealName);
+
               return (
-                <div key={meal} className={`bg-gradient-to-br ${c.gradient} border ${c.border} rounded-2xl p-5 group hover-lift`}>
-                  <div className="flex items-center space-x-2 mb-3">
-                    <span className="text-xl">{c.icon}</span>
-                    <span className={`text-xs font-bold uppercase tracking-wider ${c.text}`}>{c.label}</span>
+                <div key={meal}
+                  onClick={() => setSelectedMeal({ name: mealName, type: c.label })}
+                  className={`relative group bg-gradient-to-br ${c.gradient} border ${c.border} rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 hover:ring-2 ${c.ring}`}>
+
+                  {/* Food image strip on hover */}
+                  <div className="relative h-28 overflow-hidden">
+                    <img src={imgUrl} alt={mealName} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&auto=format&fit=crop&q=70"; }} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                    <span className={`absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-sm ${c.text}`}>
+                      {c.icon} {c.label}
+                    </span>
+                    {details && (
+                      <span className="absolute top-2 right-2 text-[10px] font-bold text-white/80 bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-full">
+                        🔥 {details.calories} kcal
+                      </span>
+                    )}
                   </div>
-                  <p className="font-bold text-slate-800 dark:text-slate-100 text-sm leading-relaxed">
-                    {currentPlan.meals[meal as keyof typeof currentPlan.meals]}
-                  </p>
+
+                  <div className="p-4">
+                    <p className="font-bold text-slate-800 dark:text-slate-100 text-sm leading-snug mb-2">{mealName}</p>
+                    {details && (
+                      <div className="flex gap-3 text-[10px] text-slate-500 dark:text-slate-400 mb-3">
+                        <span>🥩 {details.protein}g protein</span>
+                        <span>🌾 {details.carbs}g carbs</span>
+                        <span>⏱ {details.prepTime}</span>
+                      </div>
+                    )}
+                    <p className={`text-[10px] font-bold ${c.text} flex items-center gap-1`}>
+                      <span>Click for full details</span><ChevronRight size={11} />
+                    </p>
+                  </div>
                 </div>
               );
             })}
           </div>
         </div>
       </section>
+
+      {/* =================== MEAL DETAIL MODAL =================== */}
+      {selectedMeal && (() => {
+        const details = getMealDetails(selectedMeal.name);
+        const imgUrl = details?.image || getMealImage(selectedMeal.name);
+        const macros = details ? [
+          { label: "Calories", value: details.calories, unit: "kcal", color: "bg-orange-400", pct: Math.min(100, (details.calories / 700) * 100) },
+          { label: "Protein", value: details.protein, unit: "g", color: "bg-blue-400", pct: Math.min(100, (details.protein / 60) * 100) },
+          { label: "Carbs", value: details.carbs, unit: "g", color: "bg-amber-400", pct: Math.min(100, (details.carbs / 80) * 100) },
+          { label: "Fat", value: details.fat, unit: "g", color: "bg-rose-400", pct: Math.min(100, (details.fat / 40) * 100) },
+          { label: "Fiber", value: details.fiber, unit: "g", color: "bg-emerald-400", pct: Math.min(100, (details.fiber / 25) * 100) },
+        ] : [];
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setSelectedMeal(null)}>
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+
+            {/* Modal */}
+            <div className="relative bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto z-10"
+              onClick={(e) => e.stopPropagation()}>
+
+              {/* Hero image */}
+              <div className="relative h-52 flex-shrink-0 overflow-hidden rounded-t-3xl">
+                <img src={imgUrl} alt={selectedMeal.name} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                <button onClick={() => setSelectedMeal(null)}
+                  className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-colors">
+                  <X size={16} />
+                </button>
+                <div className="absolute bottom-4 left-4">
+                  <p className="text-white/70 text-xs font-bold uppercase tracking-widest">{selectedMeal.type}</p>
+                  <h3 style={{ fontFamily: 'Sora, sans-serif' }} className="text-white font-extrabold text-xl leading-tight">{selectedMeal.name}</h3>
+                  {details && <p className="text-white/60 text-xs mt-0.5">⏱ Prep time: {details.prepTime}</p>}
+                </div>
+              </div>
+
+              <div className="p-5 space-y-5">
+
+                {/* Macro bars */}
+                {details && (
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Nutrition per serving</h4>
+                    <div className="space-y-2">
+                      {macros.map(m => (
+                        <div key={m.label} className="flex items-center gap-3">
+                          <span className="text-xs text-slate-500 dark:text-slate-400 w-14 flex-shrink-0">{m.label}</span>
+                          <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                            <div className={`h-full ${m.color} rounded-full transition-all duration-700`} style={{ width: `${m.pct}%` }} />
+                          </div>
+                          <span className="text-xs font-bold text-slate-700 dark:text-slate-200 w-16 text-right">{m.value} {m.unit}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Key Nutrients */}
+                {details && (
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Key Nutrients</h4>
+                    <div className="flex flex-wrap gap-1.5">
+                      {details.keyNutrients.map(n => (
+                        <span key={n} className="text-xs font-semibold px-3 py-1 rounded-full bg-teal-50 dark:bg-teal-500/10 text-teal-700 dark:text-teal-400 border border-teal-100 dark:border-teal-500/20">{n}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Ingredients */}
+                {details && (
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Ingredients</h4>
+                    <ul className="grid grid-cols-2 gap-1">
+                      {details.ingredients.map((ing, i) => (
+                        <li key={i} className="flex items-start gap-1.5 text-xs text-slate-700 dark:text-slate-300">
+                          <span className="text-emerald-500 mt-0.5 flex-shrink-0">✓</span>
+                          <span>{ing}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Recovery Benefit */}
+                {details && (
+                  <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 rounded-2xl p-4">
+                    <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-1">🧠 Recovery Science</p>
+                    <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{details.recoveryBenefit}</p>
+                  </div>
+                )}
+
+                {/* Cook reference link */}
+                {details && (
+                  <a href={details.cookLink} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl bg-rose-50 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20 text-rose-600 dark:text-rose-400 font-bold text-sm hover:bg-rose-100 dark:hover:bg-rose-500/20 transition-colors">
+                    <span>▶</span>
+                    <span>{details.cookLinkLabel}</span>
+                    <ChevronRight size={14} />
+                  </a>
+                )}
+
+                {!details && (
+                  <div className="text-center text-slate-400 text-sm py-4">
+                    <p className="font-bold">{selectedMeal.name}</p>
+                    <p className="text-xs mt-1">Full nutrition details coming soon for this meal.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* =================== NUTRITION INSIGHT =================== */}
       <section className="relative overflow-hidden bento-card rounded-2xl p-6 md:p-8">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, lazy } from "react";
+import React, { useState, useEffect, Suspense, lazy, useRef } from "react";
 import { Routes, Route, Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import {
   Home,
@@ -75,11 +75,20 @@ const AppContent: React.FC = () => {
         <div className="text-center animate-in">
           <div className="relative w-20 h-20 mx-auto mb-6">
             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 animate-glow-pulse opacity-30 blur-xl" />
-            <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
-              <Heart fill="white" size={32} className="text-white" />
+            {/* Triple rings */}
+            <div className="absolute inset-0 rounded-full border-2 border-amber-400/20 animate-pulse-ring" />
+            <div className="absolute inset-0 rounded-full border-2 border-amber-400/15 animate-pulse-ring" style={{ animationDelay: '0.5s' }} />
+            <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-xl">
+              <Heart fill="white" size={32} className="text-white animate-glow-pulse" />
             </div>
           </div>
-          <p style={{ fontFamily: 'Sora, sans-serif' }} className="text-slate-500 font-semibold tracking-wide">Loading Beacura...</p>
+          <p style={{ fontFamily: 'Sora, sans-serif' }} className="text-slate-500 font-semibold tracking-wide animate-pulse">Loading Beacura...</p>
+          {/* Wave loading bars */}
+          <div className="flex items-end justify-center gap-1 mt-4 h-6">
+            {[1, 2, 3, 4, 5].map(i => (
+              <div key={i} className="w-1.5 bg-amber-400 rounded-full wave-bar" style={{ height: '16px', animationDelay: `${i * 0.1}s` }} />
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -137,15 +146,18 @@ const AppContent: React.FC = () => {
           }`}
       >
         {isActive && (
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-amber-400 rounded-r-full" />
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-amber-400 rounded-r-full nav-indicator" />
         )}
-        <div className={`p-1.5 rounded-lg transition-all ${isActive
+        <div className={`p-1.5 rounded-lg transition-all duration-200 ${isActive
           ? "bg-amber-50 dark:bg-amber-500/10"
           : "group-hover:bg-amber-50/60 dark:group-hover:bg-white/5"
           }`}>
-          <Icon size={17} />
+          <Icon size={17} className={`transition-transform duration-200 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`} />
         </div>
         <span className="font-semibold text-sm">{label}</span>
+        {isActive && (
+          <div className="ml-auto w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+        )}
       </Link>
     );
   };
@@ -268,30 +280,38 @@ const AppContent: React.FC = () => {
                   <div className="absolute inset-0 rounded-full bg-amber-400 blur-lg opacity-40 animate-glow-pulse" />
                   <div className="w-14 h-14 rounded-full border-2 border-amber-400 border-t-transparent animate-spin" />
                 </div>
+                {/* Wave bars */}
+                <div className="flex items-end justify-center gap-1 mt-3 h-5">
+                  {[1, 2, 3, 4, 5].map(i => (
+                    <div key={i} className="w-1 bg-amber-400/60 rounded-full wave-bar" style={{ height: '12px', animationDelay: `${i * 0.1}s` }} />
+                  ))}
+                </div>
               </div>
             </div>
           }>
-            <Routes>
-              <Route path="/" element={!isAuthenticated ? <Landing /> : <Navigate to="/dashboard" />} />
-              <Route path="/auth" element={!isAuthenticated ? <Auth onLogin={() => { }} /> : <Navigate to="/dashboard" />} />
-              <Route path="/learn-more" element={<LearnMore />} />
-              <Route path="/onboarding" element={isAuthenticated ? <Onboarding /> : <Navigate to="/auth" />} />
-              <Route path="/mentor-dashboard" element={isAuthenticated ? <MentorDashboard /> : <Navigate to="/auth" />} />
-              <Route path="/check-admin" element={isAuthenticated ? <CheckAdmin /> : <Navigate to="/auth" />} />
-              <Route path="/db-test" element={<DatabaseTest />} />
-              <Route path="/dashboard" element={isAuthenticated ? <DashboardRouter /> : <Navigate to="/auth" />} />
-              <Route path="/counseling" element={isAuthenticated ? <Counseling /> : <Navigate to="/auth" />} />
-              <Route path="/health" element={isAuthenticated ? <Health /> : <Navigate to="/auth" />} />
-              <Route path="/exercise" element={isAuthenticated ? <Exercise /> : <Navigate to="/auth" />} />
-              <Route path="/exercise-timer/:exerciseIndex" element={isAuthenticated ? <ExerciseTimer /> : <Navigate to="/auth" />} />
-              <Route path="/motivation" element={isAuthenticated ? <Motivation /> : <Navigate to="/auth" />} />
-              <Route path="/medical" element={isAuthenticated ? <Medical /> : <Navigate to="/auth" />} />
-              <Route path="/journal" element={isAuthenticated ? <Journal /> : <Navigate to="/auth" />} />
-              <Route path="/chat" element={isAuthenticated ? <Chatbot /> : <Navigate to="/auth" />} />
-              <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/auth" />} />
-              <Route path="/theme-settings" element={isAuthenticated ? <ThemeSettings /> : <Navigate to="/auth" />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+            <div key={location.pathname} className="page-transition-enter">
+              <Routes>
+                <Route path="/" element={!isAuthenticated ? <Landing /> : <Navigate to="/dashboard" />} />
+                <Route path="/auth" element={!isAuthenticated ? <Auth onLogin={() => { }} /> : <Navigate to="/dashboard" />} />
+                <Route path="/learn-more" element={<LearnMore />} />
+                <Route path="/onboarding" element={isAuthenticated ? <Onboarding /> : <Navigate to="/auth" />} />
+                <Route path="/mentor-dashboard" element={isAuthenticated ? <MentorDashboard /> : <Navigate to="/auth" />} />
+                <Route path="/check-admin" element={isAuthenticated ? <CheckAdmin /> : <Navigate to="/auth" />} />
+                <Route path="/db-test" element={<DatabaseTest />} />
+                <Route path="/dashboard" element={isAuthenticated ? <DashboardRouter /> : <Navigate to="/auth" />} />
+                <Route path="/counseling" element={isAuthenticated ? <Counseling /> : <Navigate to="/auth" />} />
+                <Route path="/health" element={isAuthenticated ? <Health /> : <Navigate to="/auth" />} />
+                <Route path="/exercise" element={isAuthenticated ? <Exercise /> : <Navigate to="/auth" />} />
+                <Route path="/exercise-timer/:exerciseIndex" element={isAuthenticated ? <ExerciseTimer /> : <Navigate to="/auth" />} />
+                <Route path="/motivation" element={isAuthenticated ? <Motivation /> : <Navigate to="/auth" />} />
+                <Route path="/medical" element={isAuthenticated ? <Medical /> : <Navigate to="/auth" />} />
+                <Route path="/journal" element={isAuthenticated ? <Journal /> : <Navigate to="/auth" />} />
+                <Route path="/chat" element={isAuthenticated ? <Chatbot /> : <Navigate to="/auth" />} />
+                <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/auth" />} />
+                <Route path="/theme-settings" element={isAuthenticated ? <ThemeSettings /> : <Navigate to="/auth" />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </div>
           </Suspense>
         </div>
       </main>
@@ -302,10 +322,13 @@ const AppContent: React.FC = () => {
           {/* Floating SOS Button */}
           <button
             onClick={() => setIsSOSOpen(true)}
-            className="fixed bottom-6 left-6 md:left-auto md:right-28 z-40 bg-rose-600 hover:bg-rose-700 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg shadow-rose-500/30 transition-transform hover:scale-110 animate-pulse-slow"
+            className="fixed bottom-6 left-6 md:left-auto md:right-28 z-40 bg-rose-600 hover:bg-rose-700 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg shadow-rose-500/30 transition-all duration-300 hover:scale-110 active:scale-95 relative group"
             title="Emergency SOS"
           >
-            <ShieldAlert size={28} />
+            {/* Double pulse rings */}
+            <div className="absolute inset-0 rounded-full bg-rose-500 animate-ping opacity-30" />
+            <div className="absolute inset-0 rounded-full bg-rose-400 animate-pulse opacity-20" />
+            <ShieldAlert size={28} className="relative z-10 group-hover:rotate-12 transition-transform duration-300" />
           </button>
 
           <SOSModal
