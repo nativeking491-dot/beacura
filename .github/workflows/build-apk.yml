@@ -40,7 +40,9 @@ jobs:
 
       - name: Build Android APK
         working-directory: ./android
-        run: ./gradlew assembleDebug --stacktrace
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleDebug --stacktrace
         
       - name: Find generated APKs
         if: always()
