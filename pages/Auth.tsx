@@ -314,24 +314,30 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 
     // ── Auth Form ────────────────────────────────────────────────────
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col justify-center items-center p-4 relative overflow-hidden transition-colors duration-500">
-            {/* Background blobs */}
+        <div className="min-h-screen flex flex-col justify-center items-center p-4 relative overflow-hidden transition-colors duration-500" style={{ background: 'var(--surface-0)' }}>
+            {/* Background aurora blobs */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-teal-400/20 dark:bg-teal-500/10 blur-[120px]" />
-                <div className="absolute top-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-emerald-400/20 dark:bg-emerald-500/10 blur-[140px]" />
-                <div className="absolute -bottom-[20%] left-[10%] w-[50%] h-[50%] rounded-full bg-blue-400/20 dark:bg-blue-500/10 blur-[120px]" />
+                <div className="absolute -top-[20%] -left-[10%] w-[55%] h-[55%] rounded-full blur-[140px] animate-float-slow" style={{ background: 'rgba(139, 92, 246, 0.15)' }} />
+                <div className="absolute top-[20%] -right-[10%] w-[60%] h-[60%] rounded-full blur-[160px] animate-float" style={{ background: 'rgba(99, 102, 241, 0.12)' }} />
+                <div className="absolute -bottom-[20%] left-[10%] w-[50%] h-[50%] rounded-full blur-[130px] animate-float-slow" style={{ background: 'rgba(16, 185, 129, 0.08)' }} />
             </div>
 
-            <div className="w-full max-w-md relative z-10 bg-white/70 dark:bg-slate-800/70 backdrop-blur-2xl rounded-3xl shadow-2xl dark:shadow-black/40 border border-white/50 dark:border-slate-700/50 flex flex-col overflow-hidden">
+            <div className="w-full max-w-md relative z-10 rounded-3xl flex flex-col overflow-hidden" style={{
+                background: 'rgba(14, 13, 31, 0.85)',
+                backdropFilter: 'blur(24px)',
+                WebkitBackdropFilter: 'blur(24px)',
+                border: '1px solid rgba(139, 92, 246, 0.15)',
+                boxShadow: '0 16px 64px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.03) inset'
+            }}>
                 {/* Header */}
                 <div className="px-8 pt-10 pb-6 text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-400 to-emerald-500 text-white mb-6 shadow-lg shadow-teal-500/30 hover:scale-105 transition-transform duration-300">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 text-white mb-6 shadow-lg hover:scale-105 transition-transform duration-300" style={{ boxShadow: '0 8px 32px rgba(139, 92, 246, 0.4)' }}>
                         <Heart size={32} fill="currentColor" />
                     </div>
-                    <h2 style={{ fontFamily: 'Sora, sans-serif' }} className="text-3xl font-extrabold text-slate-800 dark:text-white mb-2 tracking-tight">
-                        {isLogin ? "Welcome Back" : "Start Your Journey"}
+                    <h2 style={{ fontFamily: 'Sora, sans-serif' }} className="text-3xl font-extrabold mb-2 tracking-tight" >
+                        <span className="gradient-text-violet">{isLogin ? "Welcome Back" : "Start Your Journey"}</span>
                     </h2>
-                    <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">
+                    <p style={{ color: '#94a3b8' }} className="font-medium text-sm">
                         {isLogin
                             ? "Continue your path to recovery in a safe space"
                             : "Join our supportive and healing community"}
@@ -341,8 +347,12 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                 <div className="px-8 pb-8">
                     {/* Error banner */}
                     {error && (
-                        <div className="bg-rose-50 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-300 px-4 py-3 rounded-xl mb-5 flex items-start gap-3 animate-in fade-in zoom-in-95 duration-200">
-                            <AlertCircle size={18} className="mt-0.5 flex-shrink-0" />
+                        <div className="px-4 py-3 rounded-xl mb-5 flex items-start gap-3 animate-in fade-in zoom-in-95 duration-200" style={{
+                            background: 'rgba(244, 63, 94, 0.1)',
+                            border: '1px solid rgba(244, 63, 94, 0.25)',
+                            color: '#fda4af'
+                        }}>
+                            <AlertCircle size={18} className="mt-0.5 flex-shrink-0" style={{ color: '#fb7185' }} />
                             <span className="text-sm font-medium">{error}</span>
                         </div>
                     )}
@@ -353,24 +363,31 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                             <div className="space-y-4 animate-in slide-in-from-top-4 fade-in duration-300">
                                 {/* Name */}
                                 <div>
-                                    <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">Full Name</label>
+                                    <label className="block text-sm font-bold mb-1.5" style={{ color: '#c4b5fd' }}>Full Name</label>
                                     <div className="relative group">
-                                        <User className="absolute left-4 top-3.5 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={18} />
+                                        <User className="absolute left-4 top-3.5 transition-colors" size={18} style={{ color: '#64748b' }} />
                                         <input
                                             type="text"
                                             required={!isLogin}
                                             value={name}
                                             onChange={e => setName(e.target.value)}
-                                            className="w-full pl-11 pr-4 py-3.5 border-2 border-slate-100 dark:border-slate-700/50 rounded-2xl focus:outline-none focus:border-teal-400 dark:focus:border-teal-500 transition-all bg-white dark:bg-slate-900/50 text-slate-800 dark:text-white placeholder-slate-400 text-sm"
+                                            className="w-full pl-11 pr-4 py-3.5 rounded-2xl focus:outline-none transition-all text-sm"
                                             placeholder="Your full name"
                                             minLength={2}
+                                            style={{
+                                                background: 'rgba(255, 255, 255, 0.06)',
+                                                border: '1.5px solid rgba(255, 255, 255, 0.1)',
+                                                color: '#f1f5f9',
+                                            }}
+                                            onFocus={e => { e.target.style.borderColor = 'rgba(139, 92, 246, 0.5)'; e.target.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.1)'; }}
+                                            onBlur={e => { e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'; e.target.style.boxShadow = 'none'; }}
                                         />
                                     </div>
                                 </div>
 
                                 {/* Role */}
                                 <div>
-                                    <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">I am joining as...</label>
+                                    <label className="block text-sm font-bold mb-1.5" style={{ color: '#c4b5fd' }}>I am joining as...</label>
                                     <div className="grid grid-cols-2 gap-3">
                                         {([
                                             { value: "RECOVERING_USER", icon: <Sparkles size={20} />, label: "Recovering" },
@@ -380,10 +397,12 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                                                 key={opt.value}
                                                 type="button"
                                                 onClick={() => setSelectedRole(opt.value)}
-                                                className={`p-3.5 rounded-2xl border-2 transition-all duration-200 flex flex-col items-center gap-1.5 text-xs font-bold
-                                                    ${selectedRole === opt.value
-                                                        ? "border-teal-500 bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400"
-                                                        : "border-slate-100 dark:border-slate-700/50 bg-white dark:bg-slate-900/50 text-slate-500"}`}
+                                                className="p-3.5 rounded-2xl transition-all duration-200 flex flex-col items-center gap-1.5 text-xs font-bold"
+                                                style={{
+                                                    background: selectedRole === opt.value ? 'rgba(139, 92, 246, 0.15)' : 'rgba(255, 255, 255, 0.04)',
+                                                    border: selectedRole === opt.value ? '2px solid rgba(139, 92, 246, 0.5)' : '2px solid rgba(255, 255, 255, 0.08)',
+                                                    color: selectedRole === opt.value ? '#c4b5fd' : '#94a3b8',
+                                                }}
                                             >
                                                 {opt.icon}
                                                 <span className="uppercase tracking-wider">{opt.label}</span>
@@ -396,17 +415,24 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 
                         {/* Email */}
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">Email Address</label>
+                            <label className="block text-sm font-bold mb-1.5" style={{ color: '#c4b5fd' }}>Email Address</label>
                             <div className="relative group">
-                                <Mail className="absolute left-4 top-3.5 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={18} />
+                                <Mail className="absolute left-4 top-3.5 transition-colors" size={18} style={{ color: '#64748b' }} />
                                 <input
                                     type="email"
                                     required
                                     value={email}
                                     onChange={e => setEmail(e.target.value)}
-                                    className="w-full pl-11 pr-4 py-3.5 border-2 border-slate-100 dark:border-slate-700/50 rounded-2xl focus:outline-none focus:border-teal-400 dark:focus:border-teal-500 transition-all bg-white dark:bg-slate-900/50 text-slate-800 dark:text-white placeholder-slate-400 text-sm"
+                                    className="w-full pl-11 pr-4 py-3.5 rounded-2xl focus:outline-none transition-all text-sm"
                                     placeholder="hello@example.com"
                                     autoComplete="email"
+                                    style={{
+                                        background: 'rgba(255, 255, 255, 0.06)',
+                                        border: '1.5px solid rgba(255, 255, 255, 0.1)',
+                                        color: '#f1f5f9',
+                                    }}
+                                    onFocus={e => { e.target.style.borderColor = 'rgba(139, 92, 246, 0.5)'; e.target.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.1)'; }}
+                                    onBlur={e => { e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'; e.target.style.boxShadow = 'none'; }}
                                 />
                             </div>
                         </div>
@@ -414,34 +440,43 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                         {/* Password */}
                         <div>
                             <div className="flex items-center justify-between mb-1.5">
-                                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Password</label>
+                                <label className="block text-sm font-bold" style={{ color: '#c4b5fd' }}>Password</label>
                                 {isLogin && (
                                     <button
                                         type="button"
                                         onClick={() => setScreen("forgot")}
-                                        className="text-xs font-bold text-teal-500 hover:text-teal-600 transition-colors"
+                                        className="text-xs font-bold transition-colors hover:opacity-80"
+                                        style={{ color: '#a78bfa' }}
                                     >
                                         Forgot password?
                                     </button>
                                 )}
                             </div>
                             <div className="relative group">
-                                <Lock className="absolute left-4 top-3.5 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={18} />
+                                <Lock className="absolute left-4 top-3.5 transition-colors" size={18} style={{ color: '#64748b' }} />
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     required
                                     value={password}
                                     onChange={e => setPassword(e.target.value)}
-                                    className="w-full pl-11 pr-12 py-3.5 border-2 border-slate-100 dark:border-slate-700/50 rounded-2xl focus:outline-none focus:border-teal-400 dark:focus:border-teal-500 transition-all bg-white dark:bg-slate-900/50 text-slate-800 dark:text-white placeholder-slate-400 text-sm"
+                                    className="w-full pl-11 pr-12 py-3.5 rounded-2xl focus:outline-none transition-all text-sm"
                                     placeholder="••••••••"
                                     minLength={6}
                                     autoComplete={isLogin ? "current-password" : "new-password"}
+                                    style={{
+                                        background: 'rgba(255, 255, 255, 0.06)',
+                                        border: '1.5px solid rgba(255, 255, 255, 0.1)',
+                                        color: '#f1f5f9',
+                                    }}
+                                    onFocus={e => { e.target.style.borderColor = 'rgba(139, 92, 246, 0.5)'; e.target.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.1)'; }}
+                                    onBlur={e => { e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'; e.target.style.boxShadow = 'none'; }}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(v => !v)}
-                                    className="absolute right-4 top-3.5 text-slate-400 hover:text-teal-500 transition-colors"
+                                    className="absolute right-4 top-3.5 transition-colors hover:opacity-80"
                                     aria-label={showPassword ? "Hide password" : "Show password"}
+                                    style={{ color: '#64748b' }}
                                 >
                                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                 </button>
@@ -454,7 +489,8 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                                         {[0, 1, 2, 3].map(i => (
                                             <div
                                                 key={i}
-                                                className={`h-1 flex-1 rounded-full transition-all duration-300 ${i < strength.score ? strength.color : "bg-slate-100 dark:bg-slate-700"}`}
+                                                className={`h-1 flex-1 rounded-full transition-all duration-300 ${i < strength.score ? strength.color : ""}`}
+                                                style={i >= strength.score ? { background: 'rgba(255,255,255,0.08)' } : {}}
                                             />
                                         ))}
                                     </div>
@@ -469,7 +505,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full mt-2 bg-gradient-to-r from-teal-400 to-emerald-500 hover:from-teal-500 hover:to-emerald-600 text-white py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-2 shadow-xl shadow-teal-500/25 transition-all transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+                            className="w-full mt-2 py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none btn-primary"
                         >
                             {loading ? (
                                 <><Loader2 className="animate-spin" size={20} /><span>{isLogin ? "Signing In..." : "Creating Account..."}</span></>
@@ -480,14 +516,15 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                     </form>
 
                     {/* Toggle sign in / sign up */}
-                    <div className="mt-7 text-center border-t border-slate-100 dark:border-slate-700/50 pt-6">
+                    <div className="mt-7 text-center pt-6" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                         <button
                             type="button"
                             onClick={switchMode}
-                            className="text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+                            className="text-sm font-bold transition-colors"
+                            style={{ color: '#94a3b8' }}
                         >
                             {isLogin ? "Don't have an account? " : "Already have an account? "}
-                            <span className="text-teal-500 dark:text-teal-400 underline decoration-2 underline-offset-4">
+                            <span className="underline decoration-2 underline-offset-4" style={{ color: '#a78bfa' }}>
                                 {isLogin ? "Create one here" : "Sign in here"}
                             </span>
                         </button>
@@ -495,7 +532,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                 </div>
             </div>
 
-            <p className="mt-8 text-sm font-medium text-slate-500 dark:text-slate-400 relative z-10 flex items-center gap-2">
+            <p className="mt-8 text-sm font-medium relative z-10 flex items-center gap-2" style={{ color: '#64748b' }}>
                 We're so glad you're here <Heart size={14} className="text-rose-400" fill="currentColor" />
             </p>
         </div>

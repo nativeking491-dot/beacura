@@ -1,0 +1,2 @@
+﻿services/geminiService.ts(239,23): error TS1127: Invalid character.
+services/geminiService.ts(260,1): error TS1160: Unterminated template literal.

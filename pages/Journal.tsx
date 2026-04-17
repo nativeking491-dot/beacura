@@ -4,6 +4,7 @@ import { useToast } from '../context/ToastContext';
 import { useUser } from '../context/UserContext';
 import { analyzeSentiment } from '../services/sentimentService';
 import { supabase } from '../services/supabaseClient';
+import { generateLocalResponse } from '../services/localAIService';
 
 interface JournalEntry {
     id: string;
@@ -52,6 +53,9 @@ export default function Journal() {
     const [loadingHistory, setLoadingHistory] = useState(false);
     const [expandedId, setExpandedId] = useState<string | null>(null);
     const [quickPrompts] = useState(getRandomPrompts);
+    const [writingStreak, setWritingStreak] = useState(0);
+    const [aiReflection, setAiReflection] = useState<string | null>(null);
+    const [isGeneratingReflection, setIsGeneratingReflection] = useState(false);
     const { showToast } = useToast();
     const { user } = useUser();
 
@@ -64,9 +68,46 @@ export default function Journal() {
                 .select('id, content, sentiment, created_at')
                 .eq('user_id', user.id)
                 .order('created_at', { ascending: false })
-                .limit(10);
+                .limit(20);
             if (error) throw error;
-            setPastEntries((data as JournalEntry[]) || []);
+            
+            const entries = (data as JournalEntry[]) || [];
+            setPastEntries(entries);
+            
+            // Calculate consecutive writing streak
+            let streak = 0;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            let currentDateCheck = today;
+            
+            // Check if there's an entry for today or yesterday to start the streak
+            if (entries.length > 0) {
+                 const firstEntryDate = new Date(entries[0].created_at);
+                 firstEntryDate.setHours(0,0,0,0);
+                 
+                 const diffDays = Math.round((today.getTime() - firstEntryDate.getTime()) / (1000 * 60 * 60 * 24));
+                 
+                 if (diffDays <= 1) {
+                     streak = 1;
+                     currentDateCheck = firstEntryDate;
+                     
+                     // Count backwards
+                     for (let i = 1; i < entries.length; i++) {
+                         const entryDate = new Date(entries[i].created_at);
+                         entryDate.setHours(0,0,0,0);
+                         
+                         const dayDiff = Math.round((currentDateCheck.getTime() - entryDate.getTime()) / (1000 * 60 * 60 * 24));
+                         if (dayDiff === 1) {
+                             streak++;
+                             currentDateCheck = entryDate;
+                         } else if (dayDiff > 1) {
+                             break;
+                         }
+                     }
+                 }
+            }
+            setWritingStreak(streak);
+
         } catch {
             showToast('Could not load journal history', 'error');
         } finally {
@@ -96,6 +137,7 @@ export default function Journal() {
             return;
         }
         setIsSaving(true);
+        setAiReflection(null);
         try {
             const { error } = await supabase.from('journal_entries').insert({
                 user_id: user.id,
@@ -104,6 +146,15 @@ export default function Journal() {
             });
             if (error) throw error;
             showToast('Journal entry saved securely. 💙', 'success');
+            
+            // Generate AI reflection prompt
+            setIsGeneratingReflection(true);
+            const reflection = await generateLocalResponse([
+                { role: 'system', content: `You are a compassionate journaling guide. The user just wrote a journal entry. Read it and offer ONE very short, gentle, open-ended reflection question to help them process it further. Don't give advice or summarize. Keep it under 2 sentences. Start with something encouraging like "Thank you for sharing." or "That sounds heavy."` },
+                { role: 'user', content: entry.trim() }
+            ]);
+            setAiReflection(reflection);
+            
             setEntry('');
             setSentiment('neutral');
             loadHistory();
@@ -111,6 +162,7 @@ export default function Journal() {
             showToast('Failed to save entry. Please try again.', 'error');
         } finally {
             setIsSaving(false);
+            setIsGeneratingReflection(false);
         }
     };
 
@@ -136,35 +188,50 @@ export default function Journal() {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 space-y-4 md:space-y-0">
                 <div>
-                    <div className="inline-flex items-center space-x-2 px-3 py-1 bg-violet-500/10 text-violet-500 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
+                    <div className="inline-flex items-center space-x-2 px-3 py-1 bg-violet-500/10 text-violet-400 rounded-full text-xs font-bold uppercase tracking-wider mb-3 border border-violet-500/20">
                         <BookOpen size={14} />
                         <span>Your Safe Space</span>
                     </div>
-                    <h1 style={{ fontFamily: 'Sora, sans-serif' }} className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight">
-                        Your Private{' '}<span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-500 via-fuchsia-500 to-rose-400">Journal</span>
-                    </h1>
-                    <p className="text-slate-500 dark:text-slate-400 mt-2 flex items-center gap-2 text-sm">
+                    <div className="flex items-center gap-3">
+                      <h1 style={{ fontFamily: 'Sora, sans-serif' }} className="text-3xl md:text-4xl font-extrabold text-slate-100 leading-tight">
+                          Your Private{' '}<span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-fuchsia-400 to-rose-400">Journal</span>
+                      </h1>
+                      {writingStreak > 0 && (
+                          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 rounded-xl mt-1">
+                              <span className="text-lg">✍️</span>
+                              <span className="text-sm font-bold text-emerald-400">{writingStreak} Day Streak</span>
+                          </div>
+                      )}
+                    </div>
+                    <p className="text-slate-400 mt-2 flex items-center gap-2 text-sm">
                         <Lock size={13} />
                         Everything you write here is yours alone. No judgment. Just honesty.
                     </p>
                 </div>
-                <div className="flex items-center gap-2 bg-white dark:bg-slate-800 px-4 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm text-slate-500 dark:text-slate-400 text-sm font-semibold">
+                <div className="flex items-center gap-2 bg-white/5 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/10 shadow-sm text-slate-300 text-sm font-semibold hover:bg-white/10 transition-colors">
                     <Calendar size={15} />
                     {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
                 </div>
             </div>
 
             {/* Editor */}
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl" style={{ background: 'linear-gradient(145deg, #ffffff 0%, #faf5ff 100%)' }}>
+            <div className="relative rounded-3xl overflow-hidden bento-card border border-white/10">
+                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-2xl z-0" pointer-events="none" />
                 {/* Warm ambient glows */}
-                <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '250px', height: '250px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(167,139,250,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
-                <div style={{ position: 'absolute', bottom: '-40px', left: '-40px', width: '180px', height: '180px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(251,191,36,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '250px', height: '250px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.2) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
+                <div style={{ position: 'absolute', bottom: '-40px', left: '-40px', width: '180px', height: '180px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
+                
+                {/* Mood-reactive background */}
+                <div className="absolute inset-0 z-0 bg-gradient-to-br transition-opacity duration-1000 opacity-20"
+                    style={{
+                        backgroundImage: sentiment === 'positive' ? 'linear-gradient(to bottom right, #10b981, transparent)' :
+                                         sentiment === 'negative' ? 'linear-gradient(to bottom right, #f43f5e, transparent)' :
+                                         'linear-gradient(to bottom right, #8b5cf6, transparent)'
+                    }} 
+                />
+                
                 {/* Sentiment glow */}
-                <div className={`absolute -top-40 -right-40 w-96 h-96 rounded-full blur-3xl opacity-10 transition-colors duration-1000 pointer-events-none ${style.glow}`} />
-                <div className="dark:hidden absolute inset-0 rounded-3xl" style={{ border: '1px solid rgba(167,139,250,0.15)' }} />
-
-                {/* Dark mode */}
-                <div className="hidden dark:block absolute inset-0 rounded-3xl" style={{ background: 'linear-gradient(145deg, rgba(30,15,60,0.95) 0%, rgba(15,12,40,0.95) 100%)', border: '1px solid rgba(167,139,250,0.12)' }} />
+                <div className={`absolute -top-40 -right-40 w-96 h-96 rounded-full blur-3xl opacity-10 transition-colors duration-1000 pointer-events-none z-0 ${style.glow}`} />
 
                 <div className="relative z-10 p-6 md:p-8">
 
@@ -183,8 +250,8 @@ export default function Journal() {
                     {/* ── Quick-start prompts (above textarea) ── */}
                     {!entry && (
                         <div className="mb-4">
-                            <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 mb-3 flex items-center gap-2">
-                                <Sparkles size={11} />
+                            <p className="text-xs font-semibold text-slate-400 mb-3 flex items-center gap-2">
+                                <Sparkles size={11} className="text-violet-400" />
                                 Not sure where to start? Tap one of these:
                             </p>
                             <div className="flex flex-wrap gap-2">
@@ -193,7 +260,7 @@ export default function Journal() {
                                         key={i}
                                         onClick={() => setEntry(prompt + '\n')}
                                         style={{ transitionDelay: `${i * 60}ms` }}
-                                        className="text-left px-3.5 py-2 rounded-xl border border-violet-200 dark:border-violet-500/20 bg-violet-50 dark:bg-violet-500/8 hover:border-violet-400 hover:bg-violet-100 dark:hover:bg-violet-500/20 transition-all text-xs text-violet-700 dark:text-violet-300 font-medium hover:shadow-sm hover:-translate-y-0.5"
+                                        className="text-left px-3.5 py-2 rounded-xl border border-violet-500/20 bg-violet-500/10 hover:border-violet-400/50 hover:bg-violet-500/20 transition-all text-xs text-violet-300 font-medium hover:shadow-[0_0_10px_rgba(139,92,246,0.3)] hover:-translate-y-0.5"
                                     >
                                         {prompt}
                                     </button>
@@ -206,18 +273,18 @@ export default function Journal() {
                         value={entry}
                         onChange={(e) => setEntry(e.target.value)}
                         placeholder="Whatever you're feeling right now is valid. Let it out here — no one is watching, no one is judging. This space is entirely yours."
-                        className="w-full bg-transparent resize-none text-slate-800 dark:text-slate-100 text-base leading-relaxed placeholder-slate-300 dark:placeholder-slate-600 focus:outline-none focus:ring-0 p-2"
+                        className="w-full bg-transparent resize-none text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-0 px-2 py-4"
                         style={{ minHeight: '200px', fontFamily: 'Georgia, serif', fontSize: '1rem', lineHeight: '1.8' }}
                     />
 
                     {/* Word count */}
-                    <p className="text-xs text-slate-300 dark:text-slate-600 text-right mb-4">
+                    <p className="text-xs text-slate-500 text-right mb-4">
                         {entry.trim() ? `${entry.trim().split(/\s+/).filter(Boolean).length} words` : 'Start writing — this space is yours'}
                     </p>
 
-                    <div className="border-t border-slate-100 dark:border-white/5 pt-4 flex flex-wrap justify-between items-center gap-3">
-                        <p className="text-xs text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
-                            <Lock size={11} />
+                    <div className="border-t border-white/10 pt-4 flex flex-wrap justify-between items-center gap-3">
+                        <p className="text-xs text-slate-400 flex items-center gap-1.5">
+                            <Lock size={11} className="text-violet-400" />
                             Saved privately · Only you can read this
                         </p>
 
@@ -225,7 +292,7 @@ export default function Journal() {
                             onClick={handleSave}
                             disabled={isSaving || !entry.trim()}
                             className="flex items-center space-x-2 px-6 py-3 text-white rounded-xl font-bold transition-all transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 shadow-lg"
-                            style={{ background: 'linear-gradient(135deg, #7c3aed, #c026d3)', boxShadow: '0 4px 20px rgba(124,58,237,0.35)' }}
+                            style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 20px rgba(139,92,246,0.4)' }}
                         >
                             {isSaving ? <Clock size={17} className="animate-spin" /> : <Heart size={17} fill="rgba(255,255,255,0.4)" />}
                             <span>{isSaving ? 'Saving...' : 'Save My Thoughts'}</span>
@@ -241,17 +308,60 @@ export default function Journal() {
                 `}</style>
             </div>
 
+            {/* Active Reflection Prompt (AI) */}
+            {(isGeneratingReflection || aiReflection) && (
+                <div className="mt-8 relative z-10 animate-in slide-in-from-bottom-4 duration-500">
+                     <div className="bento-card border-none rounded-2xl p-6 relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-violet-600/20 to-indigo-600/20 backdrop-blur-xl z-0 pointer-events-none" />
+                        <div className="absolute -top-12 -right-12 w-32 h-32 bg-fuchsia-500 rounded-full blur-3xl opacity-20 pointer-events-none" />
+                        
+                        <div className="relative z-10">
+                            <div className="flex items-center gap-2 mb-3">
+                                <div className="p-1.5 rounded-lg bg-violet-500/20 text-violet-300">
+                                    <Sparkles size={16} />
+                                </div>
+                                <h3 className="text-sm font-bold text-violet-200">AI Reflection</h3>
+                            </div>
+                            
+                            {isGeneratingReflection ? (
+                                <div className="flex items-center gap-2 text-slate-400 text-sm">
+                                    <div className="flex space-x-1">
+                                      <div className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" />
+                                      <div className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                      <div className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                    </div>
+                                    Thinking about what you wrote...
+                                </div>
+                            ) : (
+                                <div>
+                                    <p className="text-slate-100 italic" style={{ fontFamily: 'Georgia, serif', fontSize: '1.05rem', lineHeight: '1.6' }}>"{aiReflection}"</p>
+                                    <button 
+                                        onClick={() => {
+                                            setEntry("Thinking about that: ");
+                                            setAiReflection(null);
+                                        }}
+                                        className="mt-4 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-sm font-medium transition-colors border border-white/5"
+                                    >
+                                        Reply in Journal
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                     </div>
+                </div>
+            )}
+
             {/* Reflection Prompts */}
-            <div className="mt-8">
-                <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                    <BookOpen size={13} /> Deeper reflection — click to add
+            <div className="mt-8 relative z-10">
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <BookOpen size={13} className="text-violet-400" /> Deeper reflection — click to add
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {PROMPTS.map((prompt, i) => (
                         <button
                             key={i}
                             onClick={() => setEntry(e => e + (e ? '\n\n' : '') + prompt + '\n')}
-                            className="text-left p-4 rounded-xl bg-white/60 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:border-violet-400 hover:bg-violet-50 dark:hover:bg-violet-500/10 transition-all text-sm text-slate-600 dark:text-slate-300 hover:shadow-md hover:-translate-y-0.5"
+                            className="text-left p-4 rounded-xl bg-white/5 border border-white/10 hover:border-violet-500/50 hover:bg-white/10 transition-all text-sm text-slate-300 hover:text-white hover:shadow-[0_0_15px_rgba(139,92,246,0.15)] hover:-translate-y-0.5"
                         >
                             <span className="text-violet-400 mr-2">“</span>{prompt}<span className="text-violet-400 ml-1">”</span>
                         </button>
@@ -260,57 +370,86 @@ export default function Journal() {
             </div>
 
             {/* Past Entries */}
-            <div className="mt-10">
-                <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                    <Clock size={13} /> Your Story So Far
+            <div className="mt-12 relative z-10">
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <Clock size={13} className="text-emerald-400" /> Your Story So Far
                 </h3>
 
                 {loadingHistory && (
-                    <div className="text-center py-8 text-slate-400 text-sm">Loading your past reflections...</div>
+                    <div className="text-center py-8 text-slate-500 text-sm">Loading your past reflections...</div>
                 )}
 
                 {!loadingHistory && pastEntries.length === 0 && (
-                    <div className="text-center py-12 rounded-2xl" style={{ background: 'linear-gradient(135deg, rgba(167,139,250,0.05) 0%, rgba(244,114,182,0.05) 100%)', border: '1px dashed rgba(167,139,250,0.2)' }}>
+                    <div className="text-center py-12 rounded-2xl bg-white/5 border border-white/10 border-dashed">
                         <div className="text-4xl mb-3">📖</div>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm font-semibold">Your story starts with the first entry.</p>
-                        <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">Every word you write here is a step forward. 💙</p>
+                        <p className="text-slate-300 text-sm font-semibold">Your story starts with the first entry.</p>
+                        <p className="text-slate-500 text-xs mt-1">Every word you write here is a step forward. 💙</p>
                     </div>
                 )}
 
-                <div className="space-y-3">
-                    {pastEntries.map(e => {
+                <div className="relative pl-6 md:pl-8 border-l border-white/10 space-y-8 mt-4 pb-8">
+                    {pastEntries.map((e, index) => {
                         const s = sentimentStyle[e.sentiment || 'neutral'];
                         const isExpanded = expandedId === e.id;
+                        
+                        // Show date divider if it's the first entry or a different day from the previous
+                        let showDateDivider = false;
+                        if (index === 0) {
+                            showDateDivider = true;
+                        } else {
+                            const prevDate = new Date(pastEntries[index - 1].created_at).toDateString();
+                            const currDate = new Date(e.created_at).toDateString();
+                            showDateDivider = prevDate !== currDate;
+                        }
+
                         return (
-                            <div key={e.id} className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-md transition-all">
-                                <button
-                                    onClick={() => setExpandedId(isExpanded ? null : e.id)}
-                                    className="w-full flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors text-left"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <span className={`px-2 py-0.5 rounded-lg border text-xs font-bold ${s.badge}`}>{s.label}</span>
-                                        <span className="text-sm text-slate-600 dark:text-slate-300 font-medium truncate max-w-[200px] md:max-w-sm">
-                                            {e.content.substring(0, 80)}{e.content.length > 80 ? '...' : ''}
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center gap-3 shrink-0 ml-2">
-                                        <span className="text-xs text-slate-400">{formatDate(e.created_at)}</span>
-                                        <ChevronDown size={16} className={`text-slate-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-                                    </div>
-                                </button>
-                                {isExpanded && (
-                                    <div className="px-5 pb-5 border-t border-slate-100 dark:border-slate-700">
-                                        <p className="text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed pt-4" style={{ fontFamily: 'Georgia, serif', fontSize: '0.95rem', lineHeight: '1.8' }}>{e.content}</p>
-                                        <div className="flex justify-end mt-4">
-                                            <button
-                                                onClick={() => handleDelete(e.id)}
-                                                className="flex items-center gap-1.5 text-xs text-rose-400 hover:text-rose-600 font-semibold transition-colors"
-                                            >
-                                                <Trash2 size={13} /> Delete
-                                            </button>
-                                        </div>
-                                    </div>
+                            <div key={e.id} className="relative">
+                                {/* Timeline Dot */}
+                                <div className="absolute -left-[31px] md:-left-[39px] top-6 w-3 h-3 rounded-full bg-slate-900 border-2 border-violet-500/50 shadow-[0_0_10px_rgba(139,92,246,0.5)] z-10" />
+                                
+                                {showDateDivider && (
+                                   <div className="mb-4">
+                                       <span className="px-3 py-1 bg-white/5 rounded-full text-xs font-bold text-slate-400 border border-white/5">
+                                           {new Date(e.created_at).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+                                       </span>
+                                   </div>
                                 )}
+
+                                <div className="bg-white/5 rounded-2xl border border-white/10 overflow-hidden hover:border-white/20 transition-all hover:shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
+                                    <button
+                                        onClick={() => setExpandedId(isExpanded ? null : e.id)}
+                                        className="w-full flex flex-col md:flex-row md:items-center justify-between p-4 hover:bg-white/5 transition-colors text-left gap-3"
+                                    >
+                                        <div className="flex items-start md:items-center gap-3">
+                                            <span className={`px-2 py-1 rounded-lg border text-[10px] font-bold shrink-0 ${s.badge}`}>{s.label}</span>
+                                            <span className="text-sm text-slate-300 font-medium line-clamp-2 md:truncate md:max-w-md">
+                                                {e.content}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center justify-between md:justify-end gap-3 shrink-0 w-full md:w-auto">
+                                            <span className="text-xs text-slate-500 font-medium bg-slate-900/50 px-2 py-1 rounded-md">
+                                                {new Date(e.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                            <ChevronDown size={16} className={`text-slate-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                                        </div>
+                                    </button>
+                                    
+                                    {isExpanded && (
+                                        <div className="animate-in slide-in-from-top-2 duration-200">
+                                            <div className="px-5 pb-5 border-t border-white/10 bg-slate-900/40">
+                                                <p className="text-slate-200 whitespace-pre-wrap leading-relaxed pt-5 pb-2" style={{ fontFamily: 'Georgia, serif', fontSize: '1rem', lineHeight: '1.8' }}>{e.content}</p>
+                                                <div className="flex justify-end mt-4 pt-4 border-t border-white/5">
+                                                    <button
+                                                        onClick={() => handleDelete(e.id)}
+                                                        className="flex items-center gap-1.5 text-xs text-rose-500 hover:text-rose-400 font-semibold transition-colors"
+                                                    >
+                                                        <Trash2 size={13} /> Delete
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         );
                     })}

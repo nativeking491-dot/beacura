@@ -14,11 +14,17 @@ import {
   Heart,
   Brain,
   Dumbbell,
-  Loader2,
   Moon,
-  Sun,
   Sparkles,
-  BookOpen, // Added for Journal
+  BookOpen,
+  ChevronLeft,
+  ChevronRight,
+  Flame,
+  Activity,
+  Target,
+  BarChart3,
+  Milestone,
+  Map,
 } from "lucide-react";
 import { useTheme } from "./context/ThemeContext";
 
@@ -27,6 +33,7 @@ const Landing = lazy(() => import("./pages/Landing"));
 const Auth = lazy(() => import("./pages/Auth"));
 import { FloatingChat } from "./components/FloatingChat";
 import { SOSModal } from "./components/SOSModal";
+import { AIAvatarCompanion } from "./components/AIAvatarCompanion";
 
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Counseling = lazy(() => import("./pages/Counseling"));
@@ -46,6 +53,12 @@ const DatabaseTest = lazy(() => import("./pages/DatabaseTest"));
 const Journal = lazy(() => import("./pages/Journal"));
 const ExerciseTimer = lazy(() => import("./pages/ExerciseTimer"));
 const DashboardRouter = lazy(() => import("./pages/DashboardRouter"));
+const PhysioHub = lazy(() => import("./pages/PhysioHub"));
+const BodyMap = lazy(() => import("./pages/BodyMap"));
+const GuidedRehab = lazy(() => import("./pages/GuidedRehab"));
+const PainJournal = lazy(() => import("./pages/PainJournal"));
+const RecoveryTimeline = lazy(() => import("./pages/RecoveryTimeline"));
+const HealingPaths = lazy(() => import("./pages/HealingPaths"));
 
 import { UserRole } from "./types";
 import { authService, supabase } from "./services/supabaseClient";
@@ -54,14 +67,34 @@ import { OnboardingProvider } from "./context/OnboardingContext";
 import { ToastProvider } from "./context/ToastContext";
 import ErrorBoundary from "./components/ErrorBoundary";
 
+// Bottom tab bar routes (5 primary routes for mobile)
+const BOTTOM_NAV = [
+  { to: "/dashboard", icon: LayoutDashboard, label: "Home" },
+  { to: "/physio", icon: Activity, label: "Physio" },
+  { to: "/chat", icon: Brain, label: "AI" },
+  { to: "/journal", icon: BookOpen, label: "Journal" },
+  { to: "/profile", icon: User, label: "Profile" },
+];
+
 const AppContent: React.FC = () => {
   const { user, loading: userLoading } = useUser();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSOSOpen, setIsSOSOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try { return localStorage.getItem('sidebar-collapsed') === 'true'; } catch { return false; }
+  });
   const { theme } = useTheme();
 
   const isAuthenticated = !!user;
   const isAdmin = user?.role === "ADMIN";
+
+  const toggleSidebar = () => {
+    setSidebarCollapsed(c => {
+      const next = !c;
+      try { localStorage.setItem('sidebar-collapsed', String(next)); } catch { }
+      return next;
+    });
+  };
 
   // Close sidebar on route change
   const location = useLocation();
@@ -74,11 +107,11 @@ const AppContent: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center animate-in">
           <div className="relative w-20 h-20 mx-auto mb-6">
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 animate-glow-pulse opacity-30 blur-xl" />
+            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 animate-glow-pulse opacity-30 blur-xl" />
             {/* Triple rings */}
-            <div className="absolute inset-0 rounded-full border-2 border-amber-400/20 animate-pulse-ring" />
-            <div className="absolute inset-0 rounded-full border-2 border-amber-400/15 animate-pulse-ring" style={{ animationDelay: '0.5s' }} />
-            <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-xl">
+            <div className="absolute inset-0 rounded-full border-2 border-violet-500/20 animate-pulse-ring" />
+            <div className="absolute inset-0 rounded-full border-2 border-violet-500/15 animate-pulse-ring" style={{ animationDelay: '0.5s' }} />
+            <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-xl">
               <Heart fill="white" size={32} className="text-white animate-glow-pulse" />
             </div>
           </div>
@@ -86,7 +119,7 @@ const AppContent: React.FC = () => {
           {/* Wave loading bars */}
           <div className="flex items-end justify-center gap-1 mt-4 h-6">
             {[1, 2, 3, 4, 5].map(i => (
-              <div key={i} className="w-1.5 bg-amber-400 rounded-full wave-bar" style={{ height: '16px', animationDelay: `${i * 0.1}s` }} />
+              <div key={i} className="w-1.5 bg-violet-500 rounded-full wave-bar" style={{ height: '16px', animationDelay: `${i * 0.1}s` }} />
             ))}
           </div>
         </div>
@@ -108,11 +141,13 @@ const AppContent: React.FC = () => {
     icon: Icon,
     label,
     isAdminItem = false,
+    collapsed = false,
   }: {
     to: string;
     icon: any;
     label: string;
     isAdminItem?: boolean;
+    collapsed?: boolean;
   }) => {
     const location = useLocation();
     const isActive = location.pathname === to;
@@ -121,18 +156,19 @@ const AppContent: React.FC = () => {
       return (
         <Link
           to={to}
-          className={`group flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative ${isActive
+          title={collapsed ? label : undefined}
+          className={`group flex items-center ${collapsed ? 'justify-center' : 'space-x-3'} px-3 py-2.5 rounded-xl transition-all duration-200 relative ${isActive
             ? "nav-item-active-admin"
             : "text-purple-300 hover:bg-white/5 hover:text-white"
             }`}
         >
-          {isActive && (
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-violet-400 rounded-r-full" />
+          {isActive && !collapsed && (
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-violet-400 rounded-r-full nav-indicator" />
           )}
           <div className={`p-1.5 rounded-lg transition-all ${isActive ? "bg-violet-500/20" : "group-hover:bg-white/5"}`}>
             <Icon size={17} />
           </div>
-          <span className="font-semibold text-sm">{label}</span>
+          {!collapsed && <span className="font-semibold text-sm">{label}</span>}
         </Link>
       );
     }
@@ -140,31 +176,35 @@ const AppContent: React.FC = () => {
     return (
       <Link
         to={to}
-        className={`group flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative ${isActive
+        title={collapsed ? label : undefined}
+        className={`group flex items-center ${collapsed ? 'justify-center' : 'space-x-3'} px-3 py-2.5 rounded-xl transition-all duration-200 relative ${isActive
           ? "nav-item-active"
-          : "text-slate-500 hover:text-slate-700 hover:bg-amber-50/60 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-white/5"
+          : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
           }`}
       >
-        {isActive && (
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-amber-400 rounded-r-full nav-indicator" />
+        {isActive && !collapsed && (
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-violet-400 rounded-r-full nav-indicator" />
         )}
-        <div className={`p-1.5 rounded-lg transition-all duration-200 ${isActive
-          ? "bg-amber-50 dark:bg-amber-500/10"
-          : "group-hover:bg-amber-50/60 dark:group-hover:bg-white/5"
+        {isActive && collapsed && (
+          <div className="absolute inset-0 rounded-xl bg-violet-500/10" />
+        )}
+        <div className={`p-1.5 rounded-lg transition-all duration-200 relative z-10 ${isActive
+          ? "bg-violet-500/10"
+          : "group-hover:bg-white/5"
           }`}>
-          <Icon size={17} className={`transition-transform duration-200 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`} />
+          <Icon size={17} className={`transition-transform duration-200 ${isActive ? 'scale-110 text-violet-400' : 'group-hover:scale-110'}`} />
         </div>
-        <span className="font-semibold text-sm">{label}</span>
-        {isActive && (
-          <div className="ml-auto w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+        {!collapsed && <span className="font-semibold text-sm">{label}</span>}
+        {isActive && !collapsed && (
+          <div className="ml-auto w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
         )}
       </Link>
     );
   };
 
   const sidebarBg = isAdmin
-    ? "bg-[#0f0c29] border-white/[0.06]"
-    : "bg-white/80 dark:bg-slate-900/80 border-slate-100 dark:border-white/[0.06]";
+    ? "bg-[#070711] border-white/[0.06]"
+    : "bg-[#070711]/80 border-white/[0.06]";
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row transition-colors duration-300">
@@ -173,13 +213,13 @@ const AppContent: React.FC = () => {
           {/* Mobile Header */}
           <div
             className={`md:hidden fixed w-full z-50 flex justify-between items-center px-4 py-3 border-b ${isAdmin
-              ? "bg-[#0f0c29]/90 border-white/10 backdrop-blur-xl"
-              : "glass border-slate-200/60 dark:border-white/[0.06]"
+              ? "bg-[#070711]/90 border-white/10 backdrop-blur-xl"
+              : "glass border-white/[0.06]"
               }`}
           >
-            <div className={`flex items-center space-x-2 font-bold text-xl ${isAdmin ? "text-white" : "text-amber-500"}`}>
+            <div className={`flex items-center space-x-2 font-bold text-xl ${isAdmin ? "text-white" : "text-violet-400"}`}>
               <div className="relative">
-                <div className="absolute inset-0 rounded-full bg-amber-400 blur-md opacity-40 animate-glow-pulse" />
+                <div className="absolute inset-0 rounded-full bg-violet-400 blur-md opacity-40 animate-glow-pulse" />
                 <Heart fill="currentColor" size={22} className="relative" />
               </div>
               <span style={{ fontFamily: 'Sora, sans-serif' }} className="font-bold">
@@ -209,81 +249,168 @@ const AppContent: React.FC = () => {
           <aside
             className={`
               fixed inset-y-0 left-0 transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
-              md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-40
-              w-60 ${sidebarBg} border-r backdrop-blur-xl flex flex-col h-full
+              md:relative md:translate-x-0 transition-all duration-300 ease-in-out z-40
+              ${sidebarCollapsed ? "md:w-[64px]" : "md:w-60"} w-60 ${sidebarBg} border-r backdrop-blur-xl flex flex-col h-full
             `}
           >
-            {/* Logo */}
-            <div className={`p-5 hidden md:flex items-center space-x-2.5 ${isAdmin ? "border-b border-white/10" : "border-b border-slate-100 dark:border-white/[0.06]"}`}>
-              <div className="relative">
-                <div className={`absolute inset-0 rounded-full ${isAdmin ? "bg-violet-400" : "bg-amber-400"} blur-lg opacity-50 animate-glow-pulse`} />
-                <div className={`relative w-9 h-9 rounded-xl flex items-center justify-center ${isAdmin ? "bg-gradient-to-br from-violet-500 to-indigo-600" : "bg-gradient-to-br from-amber-400 to-orange-500"} shadow-lg`}>
+            {/* Logo + Collapse button */}
+            <div className="p-4 hidden md:flex items-center justify-between border-b border-white/[0.06]">
+              {!sidebarCollapsed && (
+                <div className="flex items-center space-x-2.5">
+                  <div className="relative flex-shrink-0">
+                    <div className="absolute inset-0 rounded-full bg-violet-400 blur-lg opacity-50 animate-glow-pulse" />
+                    <div className="relative w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br from-violet-500 to-indigo-600 shadow-lg">
+                      <Heart fill="white" size={18} className="text-white" />
+                    </div>
+                  </div>
+                  <div>
+                    <span style={{ fontFamily: 'Sora, sans-serif' }} className="font-bold text-lg text-slate-100">
+                      {isAdmin ? "Admin" : "Beacura"}
+                    </span>
+                    {isAdmin && <p className="text-xs text-violet-300 -mt-0.5">Admin panel</p>}
+                  </div>
+                </div>
+              )}
+              {sidebarCollapsed && (
+                <div className="relative w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br from-violet-500 to-indigo-600 shadow-lg mx-auto">
                   <Heart fill="white" size={18} className="text-white" />
                 </div>
-              </div>
-              <div>
-                <span style={{ fontFamily: 'Sora, sans-serif' }} className={`font-bold text-lg ${isAdmin ? "text-white" : "text-slate-800 dark:text-slate-100"}`}>
-                  {isAdmin ? "Admin Panel" : "Beacura"}
-                </span>
-                {isAdmin && <p className="text-xs text-violet-300 -mt-0.5">Full system access</p>}
-              </div>
+              )}
+              {!sidebarCollapsed && (
+                <button onClick={toggleSidebar} className="p-1.5 rounded-lg transition-colors text-slate-400 hover:text-slate-200 hover:bg-white/10">
+                  <ChevronLeft size={16} />
+                </button>
+              )}
             </div>
 
+            {/* Expand chevron when collapsed */}
+            {sidebarCollapsed && (
+              <button onClick={toggleSidebar} className="mx-auto mt-3 p-1.5 rounded-lg transition-colors text-slate-400 hover:text-slate-200 hover:bg-white/10">
+                <ChevronRight size={16} />
+              </button>
+            )}
+
+            {/* User avatar chip in sidebar */}
+            {!sidebarCollapsed && !isAdmin && user && (
+              <div className="mx-3 mt-3 p-3 rounded-xl bg-white/5 flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-extrabold text-sm flex-shrink-0 shadow-md"
+                  style={{ background: 'linear-gradient(135deg, #10b981, #8b5cf6)' }}>
+                  {(user.name || 'U').charAt(0).toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-slate-100 truncate">{user.name || 'User'}</p>
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <Flame size={11} className="text-emerald-400" />
+                    <span className="text-[10px] font-bold text-emerald-400">{user.streak || 0} days</span>
+                  </div>
+                </div>
+              </div>
+            )}
+            {sidebarCollapsed && !isAdmin && user && (
+              <div className="mx-auto mt-3 w-9 h-9 rounded-xl flex items-center justify-center text-white font-extrabold text-sm shadow-md"
+                style={{ background: 'linear-gradient(135deg, #f59e0b, #8b5cf6)' }}>
+                {(user.name || 'U').charAt(0).toUpperCase()}
+              </div>
+            )}
+
             {/* Nav Items */}
-            <nav className="flex-1 px-3 pt-4 pb-2 mt-16 md:mt-0 space-y-0.5 overflow-y-auto no-scrollbar">
+            <nav className={`flex-1 ${sidebarCollapsed ? 'px-2' : 'px-3'} pt-3 pb-2 mt-16 md:mt-0 space-y-0.5 overflow-y-auto no-scrollbar`}>
               {isAdmin ? (
-                <>
-                  <NavItem to="/dashboard" icon={LayoutDashboard} label="Dashboard" isAdminItem />
-                </>
+                <NavItem to="/dashboard" icon={LayoutDashboard} label="Dashboard" isAdminItem collapsed={sidebarCollapsed} />
               ) : (
                 <>
-                  <NavItem to="/dashboard" icon={LayoutDashboard} label="Dashboard" />
-                  <NavItem to="/counseling" icon={MessageCircle} label="Counseling" />
-                  <NavItem to="/health" icon={Utensils} label="Health & Diet" />
-                  <NavItem to="/exercise" icon={Dumbbell} label="Exercise" />
-                  <NavItem to="/motivation" icon={Award} label="Motivation" />
-                  <NavItem to="/medical" icon={ShieldAlert} label="Medical Tips" />
-                  <NavItem to="/journal" icon={BookOpen} label="Journal" />
-                  <NavItem to="/chat" icon={Brain} label="AI Support" />
-                  <NavItem to="/profile" icon={User} label="My Profile" />
+                  <NavItem to="/dashboard" icon={LayoutDashboard} label="Dashboard" collapsed={sidebarCollapsed} />
+
+                  {/* Physio Rehab Section */}
+                  {!sidebarCollapsed && (
+                    <div className="pt-3 pb-1 px-3">
+                      <p className="text-[9px] font-extrabold text-emerald-400/60 uppercase tracking-[0.2em]">Rehabilitation</p>
+                    </div>
+                  )}
+                  {sidebarCollapsed && <div className="my-1.5 mx-3 h-px bg-white/[0.06]" />}
+                  <NavItem to="/physio" icon={Activity} label="Physio Hub" collapsed={sidebarCollapsed} />
+                  <NavItem to="/body-map" icon={Target} label="Body Map" collapsed={sidebarCollapsed} />
+                  <NavItem to="/pain-journal" icon={BarChart3} label="Pain Journal" collapsed={sidebarCollapsed} />
+                  <NavItem to="/recovery-timeline" icon={Milestone} label="Timeline" collapsed={sidebarCollapsed} />
+
+                  {/* Wellness Section */}
+                  {!sidebarCollapsed && (
+                    <div className="pt-3 pb-1 px-3">
+                      <p className="text-[9px] font-extrabold text-violet-400/60 uppercase tracking-[0.2em]">Wellness</p>
+                    </div>
+                  )}
+                  {sidebarCollapsed && <div className="my-1.5 mx-3 h-px bg-white/[0.06]" />}
+                  <NavItem to="/healing-paths" icon={Map} label="Healing Paths" collapsed={sidebarCollapsed} />
+                  <NavItem to="/counseling" icon={MessageCircle} label="Counseling" collapsed={sidebarCollapsed} />
+                  <NavItem to="/health" icon={Utensils} label="Health & Diet" collapsed={sidebarCollapsed} />
+                  <NavItem to="/exercise" icon={Dumbbell} label="Exercise" collapsed={sidebarCollapsed} />
+                  <NavItem to="/motivation" icon={Award} label="Motivation" collapsed={sidebarCollapsed} />
+                  <NavItem to="/medical" icon={ShieldAlert} label="Medical Tips" collapsed={sidebarCollapsed} />
+                  <NavItem to="/journal" icon={BookOpen} label="Journal" collapsed={sidebarCollapsed} />
+                  <NavItem to="/chat" icon={Brain} label="AI Support" collapsed={sidebarCollapsed} />
+                  <NavItem to="/profile" icon={User} label="My Profile" collapsed={sidebarCollapsed} />
                 </>
               )}
             </nav>
 
             {/* Bottom */}
-            <div className={`p-3 border-t ${isAdmin ? "border-white/10" : "border-slate-100 dark:border-white/[0.06]"} space-y-0.5`}>
-              <NavItem to="/theme-settings" icon={Moon} label="Change Theme" isAdminItem={isAdmin} />
+            <div className={`${sidebarCollapsed ? 'px-2' : 'px-3'} pb-3 border-t ${isAdmin ? "border-white/10" : "border-slate-100 dark:border-white/[0.06]"} space-y-0.5 pt-2`}>
+              <NavItem to="/theme-settings" icon={Moon} label="Change Theme" isAdminItem={isAdmin} collapsed={sidebarCollapsed} />
               <button
                 onClick={handleLogout}
-                className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all duration-200 group ${isAdmin
+                className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'space-x-3'} px-3 py-2.5 rounded-xl transition-all duration-200 group ${isAdmin
                   ? "text-rose-400 hover:bg-rose-500/10"
                   : "text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10"
                   }`}
+                title={sidebarCollapsed ? 'Logout' : undefined}
               >
-                <div className="p-1.5 rounded-lg group-hover:bg-rose-50 dark:group-hover:bg-rose-500/10 transition-all">
+                <div className="p-1.5 rounded-lg group-hover:bg-rose-50 dark:group-hover:bg-rose-500/10 transition-all flex-shrink-0">
                   <LogOut size={17} />
                 </div>
-                <span className="font-semibold text-sm">Logout</span>
+                {!sidebarCollapsed && <span className="font-semibold text-sm">Logout</span>}
               </button>
             </div>
           </aside>
         </>
       )}
 
+      {/* Mobile Bottom Tab Bar */}
+      {isAuthenticated && !isAdmin && (
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#070711]/90 backdrop-blur-xl border-t border-white/[0.06] flex items-center justify-around px-2 py-2">
+          {BOTTOM_NAV.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.to;
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl relative"
+              >
+                {isActive && (
+                  <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-6 h-1 rounded-full bg-violet-400 bottom-nav-pill" />
+                )}
+                <Icon size={20} className={`transition-colors ${isActive ? 'text-violet-400' : 'text-slate-500'}`} />
+                <span className={`text-[10px] font-bold transition-colors ${isActive ? 'text-violet-400' : 'text-slate-500'}`}>{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      )}
+
       {/* Main Content */}
       <main className={`flex-1 overflow-y-auto min-h-screen ${isAuthenticated ? "pt-14 md:pt-0" : ""}`}>
-        <div className="max-w-6xl mx-auto p-4 md:p-8">
+        <div className="max-w-6xl mx-auto p-4 md:p-8 pb-24 md:pb-8">
           <Suspense fallback={
             <div className="flex items-center justify-center min-h-[50vh]">
               <div className="text-center">
                 <div className="relative w-14 h-14 mx-auto mb-4">
-                  <div className="absolute inset-0 rounded-full bg-amber-400 blur-lg opacity-40 animate-glow-pulse" />
-                  <div className="w-14 h-14 rounded-full border-2 border-amber-400 border-t-transparent animate-spin" />
+                  <div className="absolute inset-0 rounded-full bg-violet-500 blur-lg opacity-40 animate-glow-pulse" />
+                  <div className="w-14 h-14 rounded-full border-2 border-violet-500 border-t-transparent animate-spin" />
                 </div>
                 {/* Wave bars */}
                 <div className="flex items-end justify-center gap-1 mt-3 h-5">
                   {[1, 2, 3, 4, 5].map(i => (
-                    <div key={i} className="w-1 bg-amber-400/60 rounded-full wave-bar" style={{ height: '12px', animationDelay: `${i * 0.1}s` }} />
+                    <div key={i} className="w-1 bg-violet-500/60 rounded-full wave-bar" style={{ height: '12px', animationDelay: `${i * 0.1}s` }} />
                   ))}
                 </div>
               </div>
@@ -299,6 +426,7 @@ const AppContent: React.FC = () => {
                 <Route path="/check-admin" element={isAuthenticated ? <CheckAdmin /> : <Navigate to="/auth" />} />
                 <Route path="/db-test" element={<DatabaseTest />} />
                 <Route path="/dashboard" element={isAuthenticated ? <DashboardRouter /> : <Navigate to="/auth" />} />
+                <Route path="/healing-paths" element={isAuthenticated ? <HealingPaths /> : <Navigate to="/auth" />} />
                 <Route path="/counseling" element={isAuthenticated ? <Counseling /> : <Navigate to="/auth" />} />
                 <Route path="/health" element={isAuthenticated ? <Health /> : <Navigate to="/auth" />} />
                 <Route path="/exercise" element={isAuthenticated ? <Exercise /> : <Navigate to="/auth" />} />
@@ -309,6 +437,11 @@ const AppContent: React.FC = () => {
                 <Route path="/chat" element={isAuthenticated ? <Chatbot /> : <Navigate to="/auth" />} />
                 <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/auth" />} />
                 <Route path="/theme-settings" element={isAuthenticated ? <ThemeSettings /> : <Navigate to="/auth" />} />
+                <Route path="/physio" element={isAuthenticated ? <PhysioHub /> : <Navigate to="/auth" />} />
+                <Route path="/body-map" element={isAuthenticated ? <BodyMap /> : <Navigate to="/auth" />} />
+                <Route path="/guided-rehab" element={isAuthenticated ? <GuidedRehab /> : <Navigate to="/auth" />} />
+                <Route path="/pain-journal" element={isAuthenticated ? <PainJournal /> : <Navigate to="/auth" />} />
+                <Route path="/recovery-timeline" element={isAuthenticated ? <RecoveryTimeline /> : <Navigate to="/auth" />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </div>
@@ -318,6 +451,7 @@ const AppContent: React.FC = () => {
 
       {isAuthenticated && (
         <>
+          <AIAvatarCompanion />
           <FloatingChat />
           {/* Floating SOS Button */}
           <button
