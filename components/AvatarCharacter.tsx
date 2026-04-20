@@ -80,14 +80,14 @@ export const AvatarCharacter: React.FC = () => {
             
             if (preferredVoice) utterance.voice = preferredVoice;
             
-            utterance.rate = 0.9;
-            utterance.pitch = avatarType === 'aira' ? 1.1 : 0.9;
-            utterance.volume = 0.8;
+            utterance.rate = 0.85; // slower, softer, more comforting
+            utterance.pitch = avatarType === 'aira' ? 1.2 : 0.85; // warmer pitch
+            utterance.volume = 0.9;
 
             utterance.onstart = () => setIsSpeaking(true);
             utterance.onend = () => {
                 setIsSpeaking(false);
-                setTimeout(() => setIsOpen(false), 3000);
+                setTimeout(() => setIsOpen(false), 4000);
             };
             utterance.onerror = () => setIsSpeaking(false);
 
@@ -96,6 +96,31 @@ export const AvatarCharacter: React.FC = () => {
             setTimeout(() => setIsOpen(false), 5000);
         }
     };
+
+    // Global Event Listeners for dynamic prompts
+    useEffect(() => {
+        const handleSpeak = (e: any) => speak(e.detail.text);
+        const handleGenerate = async (e: any) => {
+            if (!isVisible || isMuted) return;
+            const promptContext = e.detail.context;
+            setIsSpeaking(true); // pulsing while thinking
+            try {
+                const artificialPrompt = `You are a warm, deeply empathetic recovery doctor guide (${avatarType}). The user is looking at or hovering over a feature. Describe extremely warmly in just 1 short sentence why this is helpful: ${promptContext}`;
+                const apiResponse = await generateLocalResponse(artificialPrompt, user?.streak || 0, user?.name || "Friend");
+                speak(apiResponse);
+            } catch (err) {
+                console.error(err);
+                setIsSpeaking(false);
+            }
+        };
+
+        window.addEventListener('avatar-speak', handleSpeak);
+        window.addEventListener('avatar-generate-speak', handleGenerate);
+        return () => {
+            window.removeEventListener('avatar-speak', handleSpeak);
+            window.removeEventListener('avatar-generate-speak', handleGenerate);
+        };
+    }, [user, isMuted, isVisible, avatarType]);
 
     // Handle route changes
     useEffect(() => {
@@ -123,14 +148,14 @@ export const AvatarCharacter: React.FC = () => {
     const glowColor = avatarType === 'aira' ? 'fuchsia' : 'emerald';
 
     return (
-        <div className="fixed bottom-24 md:bottom-8 right-4 md:right-8 z-[60] flex flex-col items-end pointer-events-none">
+        <div className="fixed bottom-24 md:bottom-8 left-4 md:left-8 z-[60] flex flex-col items-start pointer-events-none">
             {/* Speech Bubble */}
             <div 
-                className={`transition-all duration-500 ease-in-out transform origin-bottom-right pointer-events-auto
+                className={`transition-all duration-500 ease-in-out transform origin-bottom-left pointer-events-auto
                 ${isOpen ? 'scale-100 opacity-100 translate-y-0' : 'scale-90 opacity-0 translate-y-4 pointer-events-none'}
-                mb-4 relative`}
+                mb-4 relative left-4 md:left-0`}
             >
-                <div className="bg-slate-900/90 backdrop-blur-md border border-white/10 p-4 rounded-t-2xl rounded-bl-2xl rounded-br-sm shadow-[0_8px_32px_rgba(0,0,0,0.5)] max-w-[280px]">
+                <div className="bg-slate-900/90 backdrop-blur-md border border-white/10 p-4 rounded-t-2xl rounded-br-2xl rounded-bl-sm shadow-[0_8px_32px_rgba(0,0,0,0.5)] max-w-[280px]">
                     <div className="flex justify-between items-start mb-1.5 gap-3">
                         <div className={`flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-${glowColor}-400`}>
                             <Sparkles size={12} className={isSpeaking ? 'animate-pulse' : ''} />
@@ -146,12 +171,12 @@ export const AvatarCharacter: React.FC = () => {
                     <p className="text-sm text-slate-200 leading-relaxed font-medium">
                         {message}
                     </p>
-                    <div className="absolute -bottom-2 right-6 w-4 h-4 bg-slate-900/90 border-b border-r border-white/10 transform rotate-45" />
+                    <div className="absolute -bottom-2 left-6 w-4 h-4 bg-slate-900/90 border-b border-l border-white/10 transform -rotate-45" />
                 </div>
             </div>
 
             {/* Avatar Frame & Controls */}
-            <div className="flex items-end gap-3 pointer-events-auto group">
+            <div className="flex items-end gap-3 pointer-events-auto group flex-row">
                 
                 {/* Controls */}
                 <div className="bg-slate-900/80 backdrop-blur-sm border border-white/10 rounded-2xl flex flex-col gap-1 p-1 opacity-0 hover:opacity-100 group-hover:opacity-100 transition-opacity translate-y-[-20%]">

@@ -20,6 +20,8 @@ import { useUser } from "../context/UserContext";
 import { useTranslation } from "react-i18next";
 import { generateLocalResponse } from "../services/localChatService";
 import { getDynamicIntelligence, DailyHealthPlan, DynamicMeal } from "../services/dynamicIntelligenceService";
+import { SleepTracker } from "../components/SleepTracker";
+import { HydrationTracker } from "../components/HydrationTracker";
 
 // Helper for generating images locally since text-to-image API can't be relied upon every second
 function getMealImage(name: string): string {
@@ -286,7 +288,7 @@ const Health: React.FC = () => {
          );
       })()}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Tracking */}
           <div className="bento-card p-6 rounded-2xl">
               <div className="flex justify-between items-center mb-4">
@@ -310,26 +312,8 @@ const Health: React.FC = () => {
               </div>
           </div>
 
-          <div className="bento-card p-6 rounded-2xl flex flex-col justify-between">
-              <div>
-                  <h3 className="font-bold text-white flex items-center gap-2 mb-2">
-                     <Droplets size={16} className="text-blue-400" /> Hydration Tracker
-                  </h3>
-                  <p className="text-xs text-slate-400">Aim for 12 glasses today to flush receptor toxins.</p>
-              </div>
-              <div className="mt-4">
-                  <div className="flex justify-between text-xs text-slate-500 mb-1">
-                      <span>{glasses} Glasses</span>
-                      <span>12 Target</span>
-                  </div>
-                  <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
-                      <div className="h-full bg-blue-500" style={{ width: `${waterPct}%` }} />
-                  </div>
-              </div>
-              <button onClick={handleDrinkWater} className="mt-4 w-full bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 font-bold text-sm py-2 rounded-lg transition-colors border border-blue-500/20">
-                 + Log Glass of Water
-              </button>
-          </div>
+          <HydrationTracker />
+          <SleepTracker />
       </div>
 
        {/* Exercises */}

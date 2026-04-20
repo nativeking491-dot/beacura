@@ -336,6 +336,30 @@ const Dashboard: React.FC = () => {
     checkTodayCheckIn();
   }, [user?.id, isNewUser]);
 
+  // AI Voice Greeting on Load
+  useEffect(() => {
+    if (!user?.id) return;
+    const todayStr = new Date().toDateString();
+    if (!sessionStorage.getItem(`avatar_greeted_${todayStr}`)) {
+      sessionStorage.setItem(`avatar_greeted_${todayStr}`, 'true');
+      const timeOfDay = (() => { const h = new Date().getHours(); if (h < 12) return 'morning'; if (h < 17) return 'afternoon'; return 'evening'; })();
+      
+      if (isNewUser) {
+        setTimeout(() => {
+            window.dispatchEvent(new CustomEvent('avatar-speak', { 
+                detail: { text: "Welcome to your new safe space. I am your personal recovery doctor. Hover over any tab to learn what it does. I am here to guide you." }
+            }));
+        }, 1500);
+      } else {
+        setTimeout(() => {
+            window.dispatchEvent(new CustomEvent('avatar-generate-speak', {
+                detail: { context: `The user just logged in this ${timeOfDay}. Their current streak is ${user.streak || 0} days. Warn them empathetically of their vulnerable state or encourage them to take a daily check-in or journal their thoughts right now.` }
+            }));
+        }, 1500);
+      }
+    }
+  }, [user?.id, isNewUser]);
+
   const checkTodayCheckIn = async () => {
     try {
       const today = new Date().toISOString().split("T")[0];

@@ -151,12 +151,32 @@ const AppContent: React.FC = () => {
   }) => {
     const location = useLocation();
     const isActive = location.pathname === to;
+    const [hoverTimer, setHoverTimer] = React.useState<any>(null);
+
+    const handleMouseEnter = () => {
+      if (isActive) return;
+      const timer = setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('avatar-generate-speak', {
+          detail: { context: `The user is hovering over the ${label} navigation tab. Emphasize uniquely warmly how this exact feature can specifically help them right now.` }
+        }));
+      }, 1200);
+      setHoverTimer(timer);
+    };
+
+    const handleMouseLeave = () => {
+      if (hoverTimer) {
+        clearTimeout(hoverTimer);
+        setHoverTimer(null);
+      }
+    };
 
     if (isAdminItem) {
       return (
         <Link
           to={to}
           title={collapsed ? label : undefined}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
           className={`group flex items-center ${collapsed ? 'justify-center' : 'space-x-3'} px-3 py-2.5 rounded-xl transition-all duration-200 relative ${isActive
             ? "nav-item-active-admin"
             : "text-purple-300 hover:bg-white/5 hover:text-white"
@@ -177,6 +197,8 @@ const AppContent: React.FC = () => {
       <Link
         to={to}
         title={collapsed ? label : undefined}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         className={`group flex items-center ${collapsed ? 'justify-center' : 'space-x-3'} px-3 py-2.5 rounded-xl transition-all duration-200 relative ${isActive
           ? "nav-item-active"
           : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
