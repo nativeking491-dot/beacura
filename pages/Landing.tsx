@@ -29,40 +29,7 @@ const PARTICLE_CONFIG = [
   { size: 5, color: 'rgba(168,85,247,0.4)', duration: 21, left: 15, delay: 6 },
 ];
 
-// ─── India Mental Health Data Ticker ───────────────────────────────────────────────
-const TICKER_ITEMS = [
-  { quote: '"62% of young adults report heartbreak-induced depressive episodes."', author: "NIMHANS Study" },
-  { quote: '"1 in 3 Indians experience severe trauma. PTSD is highly underdiagnosed."', author: "WHO Report 2024" },
-  { quote: '"52% of IT professionals report severe burnout and exhaustion."', author: "AIIMS Survey" },
-  { quote: '"Only 1 in 100 people seeking addiction treatment receive formal support."', author: "Ministry of Social Justice" },
-  { quote: '"Depression rates in injury recovery patients are 3x the general population."', author: "Medical Journal" },
-  { quote: '"We are not alone. 30,000+ people found support tonight."', author: "Beacura Live Data" },
-];
-
-// ─── Testimonials ─────────────────────────────────────────────────────────────
-const TESTIMONIALS = [
-  {
-    quote: "After my divorce, I felt completely shattered. Beacura gave me daily structure, helped me track my emotions, and the AI was there at 2 AM when I couldn't sleep.",
-    name: "Priya K.",
-    streak: 47,
-    avatar: "P",
-    color: "#ec4899",
-  },
-  {
-    quote: "Post knee-surgery rehab felt impossible until I found the guided exercises here. The body map and pain journal let me see real, measurable progress every week.",
-    name: "Carlos T.",
-    streak: 63,
-    avatar: "C",
-    color: "#10b981",
-  },
-  {
-    quote: "I struggled with burnout for 3 years and never talked about it. This platform understood that recovery isn't just physical — it's mental, emotional, everything.",
-    name: "Rahul M.",
-    streak: 90,
-    avatar: "R",
-    color: "#8b5cf6",
-  },
-];
+// (Static test datasets removed)
 
 // ─── How it works ─────────────────────────────────────────────────────────────
 const HOW_IT_WORKS = [
@@ -186,68 +153,7 @@ const SplitText: React.FC<{ text: string; className?: string; baseDelay?: number
   );
 };
 
-// ─── Testimonial carousel ─────────────────────────────────────────────────────
-const TestimonialCarousel: React.FC = () => {
-  const [active, setActive] = useState(0);
-  useEffect(() => {
-    const t = setInterval(() => setActive(a => (a + 1) % TESTIMONIALS.length), 5000);
-    return () => clearInterval(t);
-  }, []);
-
-  const t = TESTIMONIALS[active];
-  return (
-    <div className="relative overflow-hidden">
-      <div
-        key={active}
-        className="bento-card rounded-3xl p-8 spotlight-card animate-in text-center"
-      >
-        {/* Avatar */}
-        <div className="relative w-16 h-16 mx-auto mb-5">
-          <div
-            className="absolute inset-0 rounded-full blur-lg opacity-60 animate-glow-pulse"
-            style={{ background: t.color }}
-          />
-          <div
-            className="relative w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-extrabold shadow-xl"
-            style={{ background: `linear-gradient(135deg, ${t.color}, ${t.color}88)` }}
-          >
-            {t.avatar}
-          </div>
-        </div>
-
-        <blockquote className="text-slate-700 dark:text-slate-200 text-base md:text-lg font-medium leading-relaxed mb-6 italic">
-          "{t.quote}"
-        </blockquote>
-
-        <div className="flex items-center justify-center gap-3">
-          <p className="font-bold text-slate-800 dark:text-slate-100">{t.name}</p>
-          <span
-            className="px-3 py-1 rounded-full text-xs font-bold text-white"
-            style={{ background: `linear-gradient(135deg, ${t.color}, ${t.color}88)` }}
-          >
-            🔥 {t.streak} days
-          </span>
-        </div>
-      </div>
-
-      {/* Dot controls */}
-      <div className="flex justify-center gap-2 mt-4">
-        {TESTIMONIALS.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setActive(i)}
-            className="rounded-full transition-all duration-300"
-            style={{
-              width: i === active ? 24 : 8,
-              height: 8,
-              background: i === active ? "#f59e0b" : "#e2e8f0",
-            }}
-          />
-        ))}
-      </div>
-    </div>
-  );
-};
+// (Testimonial UI Component Removed)
 
 // ─── Stat Card ────────────────────────────────────────────────────────────────
 const StatCard = ({ value, suffix, label, icon: Icon, color }: any) => {
@@ -283,10 +189,8 @@ const FeatureCard = ({ title, desc, icon: Icon, gradient, delay }: any) => (
 );
 
 const Landing: React.FC = () => {
-  const typewriterText = useTypewriter(
-    ['strength.', 'hope.', 'healing.', 'clarity.', 'peace.', 'freedom.'],
-    90, 2200
-  );
+  const typewriterWords = React.useMemo(() => ['strength.', 'hope.', 'healing.', 'clarity.', 'peace.', 'freedom.'], []);
+  const typewriterText = useTypewriter(typewriterWords, 90, 2200);
 
   useScrollReveal();
 
@@ -324,16 +228,13 @@ const Landing: React.FC = () => {
         <div className="orb w-64 h-64 bg-teal-300 bottom-0 left-1/4 opacity-25" style={{ animationDelay: '4s' }} />
         <div className="orb w-48 h-48 bg-indigo-300 bottom-1/4 right-1/3 opacity-20" style={{ animationDelay: '1s' }} />
 
-        {/* Live Crisis Counter badge */}
+        {/* Dynamic Badge Placeholder */}
         <div className="animate-in bounce-in mb-8" style={{ animationDelay: '0ms' }}>
           <div className="inline-flex items-center space-x-2.5 glass px-5 py-2.5 rounded-full text-sm font-semibold text-rose-400 shadow-sm glow-on-hover">
-            <span className="relative flex items-center">
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse" />
-              <span className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-rose-400 animate-ping opacity-75" />
-            </span>
-            <span style={{ fontFamily: 'Sora, sans-serif' }}>
-              <span className="text-white font-bold">14,208</span> people reached out for help tonight
-            </span>
+             <Heart size={14} className="text-rose-500 animate-pulse" />
+             <span style={{ fontFamily: 'Sora, sans-serif' }}>
+               <span className="text-white font-bold">Your journey begins here.</span>
+             </span>
           </div>
         </div>
 
@@ -397,18 +298,8 @@ const Landing: React.FC = () => {
         </div>
       </section>
 
-      {/* ==================== SOCIAL PROOF TICKER ==================== */}
-      <div className="w-full overflow-hidden py-4 mb-12 border-y border-slate-100 dark:border-white/[0.05]" style={{ background: 'rgba(255,255,255,0.4)', backdropFilter: 'blur(10px)' }}>
-        <div className="marquee-track">
-          {[...TICKER_ITEMS, ...TICKER_ITEMS].map((item, i) => (
-            <div key={i} className="flex items-center gap-3 px-8 flex-shrink-0">
-              <span className="text-amber-400 text-lg">✦</span>
-              <span className="text-sm font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap">{item.quote}</span>
-              <span className="text-xs text-slate-400 whitespace-nowrap">— {item.author}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Empty space where static ticker used to be */}
+      <div className="w-full py-4 mb-4"></div>
 
 
 
@@ -571,19 +462,7 @@ const Landing: React.FC = () => {
         </div>
       </section>
 
-      {/* ==================== TESTIMONIALS ==================== */}
-      <section className="w-full max-w-3xl px-4 mb-24 scroll-reveal">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center space-x-2 glass px-4 py-2 rounded-full text-sm font-semibold text-rose-600 mb-4 glow-on-hover">
-            <Heart size={14} className="animate-glow-pulse" />
-            <span>Real stories</span>
-          </div>
-          <h2 style={{ fontFamily: 'Sora, sans-serif' }} className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100">
-            Lives transformed
-          </h2>
-        </div>
-        <TestimonialCarousel />
-      </section>
+      {/* Active AI and Dynamic Content replaces static testimonials */}
 
       {/* ==================== CTA BANNER ==================== */}
       <section className="w-full max-w-5xl px-4 mb-24 scroll-reveal">
