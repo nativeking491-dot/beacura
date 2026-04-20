@@ -42,6 +42,7 @@ import { computeRiskScore, RiskScore } from "../services/riskScoreService";
 import { useToast } from "../context/ToastContext";
 import { StreakRing } from "../components/StreakRing";
 import { DailyCheckIn } from "../components/DailyCheckIn";
+import { TodayMission } from "../components/TodayMission";
 import { getCategoryConfig, getMilestoneDays, type CategoryConfig } from "../services/recoveryConfig";
 import type { RecoveryCategory } from "../context/OnboardingContext";
 import { useTranslation } from "react-i18next";
