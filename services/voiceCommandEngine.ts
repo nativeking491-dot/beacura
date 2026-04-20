@@ -29,7 +29,7 @@ export class VoiceCommandEngine {
     this.recognition = new SpeechRecognition();
     this.recognition.continuous = true;
     this.recognition.interimResults = false;
-    this.recognition.lang = 'en-US';
+    this.recognition.lang = navigator.language || 'en-US';
 
     this.recognition.onstart = () => {
       this.isListening = true;

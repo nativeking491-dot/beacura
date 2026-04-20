@@ -178,6 +178,7 @@ export const AvatarCharacter: React.FC = () => {
     const preferredVoice = pickVoice(voices, avatarType, i18n.language) ?? undefined;
     if (preferredVoice) {
       utterance.voice = preferredVoice;
+      utterance.lang = preferredVoice.lang; // Force alignment
       localStorage.setItem(STORAGE_KEYS.voiceURI, preferredVoice.voiceURI);
     }
 
