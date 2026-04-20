@@ -46,6 +46,7 @@ const Exercise = lazy(() => import("./pages/Exercise"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const CheckAdmin = lazy(() => import("./pages/CheckAdmin"));
 const ThemeSettings = lazy(() => import("./pages/ThemeSettings"));
+const AvatarSettings = lazy(() => import("./pages/AvatarSettings"));
 const LearnMore = lazy(() => import("./pages/LearnMore"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
 const MentorDashboard = lazy(() => import("./pages/MentorDashboard"));
@@ -378,6 +379,7 @@ const AppContent: React.FC = () => {
             {/* Bottom */}
             <div className={`${sidebarCollapsed ? 'px-2' : 'px-3'} pb-3 border-t ${isAdmin ? "border-white/10" : "border-slate-100 dark:border-white/[0.06]"} space-y-0.5 pt-2`}>
               <NavItem to="/theme-settings" icon={Moon} label="Change Theme" isAdminItem={isAdmin} collapsed={sidebarCollapsed} />
+              <NavItem to="/avatar-settings" icon={Sparkles} label="Avatar Settings" isAdminItem={isAdmin} collapsed={sidebarCollapsed} />
               <button
                 onClick={handleLogout}
                 className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'space-x-3'} px-3 py-2.5 rounded-xl transition-all duration-200 group ${isAdmin
@@ -459,6 +461,7 @@ const AppContent: React.FC = () => {
                 <Route path="/chat" element={isAuthenticated ? <Chatbot /> : <Navigate to="/auth" />} />
                 <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/auth" />} />
                 <Route path="/theme-settings" element={isAuthenticated ? <ThemeSettings /> : <Navigate to="/auth" />} />
+                <Route path="/avatar-settings" element={isAuthenticated ? <AvatarSettings /> : <Navigate to="/auth" />} />
                 <Route path="/physio" element={isAuthenticated ? <PhysioHub /> : <Navigate to="/auth" />} />
                 <Route path="/body-map" element={isAuthenticated ? <BodyMap /> : <Navigate to="/auth" />} />
                 <Route path="/guided-rehab" element={isAuthenticated ? <GuidedRehab /> : <Navigate to="/auth" />} />
