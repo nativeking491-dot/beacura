@@ -47,6 +47,7 @@ const AVATAR_META: Record<AvatarType, {
     accentText: 'text-emerald-400',
     accentBorder: 'border-emerald-500/70',
     accentBg: 'bg-emerald-500',
+    pitch: 0.9,
     defaultLang: 'en-US',
   },
 };
