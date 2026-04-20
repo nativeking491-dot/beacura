@@ -188,7 +188,8 @@ export const AvatarCharacter: React.FC = () => {
 
     const speakId = ++pendingSpeakIdRef.current;
     setIsLoadingSpeech(true);
-    synthRef.current.cancel();
+    
+    // DELIBERATELY REMOVED synthRef.current.cancel(); to prevent Chrome Queue Hang.
 
     utterance.onstart = () => {
       if (speakId !== pendingSpeakIdRef.current) return;
@@ -274,6 +275,9 @@ export const AvatarCharacter: React.FC = () => {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    
+    let unlockAudio = () => {};
+
     if ('speechSynthesis' in window) {
       synthRef.current = window.speechSynthesis;
 
@@ -284,7 +288,21 @@ export const AvatarCharacter: React.FC = () => {
       const voices = window.speechSynthesis.getVoices();
       if (voices.length > 0) refreshVoices();
       window.speechSynthesis.onvoiceschanged = refreshVoices;
+      
+      // Zero-Volume User Gesture Unlock Sequence
+      unlockAudio = () => {
+          if (!synthRef.current) return;
+          const s = new SpeechSynthesisUtterance('');
+          s.volume = 0;
+          synthRef.current.speak(s);
+          window.removeEventListener('click', unlockAudio);
+      };
+      window.addEventListener('click', unlockAudio, { once: true });
     }
+    
+    return () => {
+        window.removeEventListener('click', unlockAudio);
+    };
   }, []);
 
   useEffect(() => {
