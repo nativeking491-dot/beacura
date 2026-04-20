@@ -42,9 +42,12 @@ import { computeRiskScore, RiskScore } from "../services/riskScoreService";
 import { useToast } from "../context/ToastContext";
 import { StreakRing } from "../components/StreakRing";
 import { DailyCheckIn } from "../components/DailyCheckIn";
-import { TodayMission } from "../components/TodayMission";
 import { getCategoryConfig, getMilestoneDays, type CategoryConfig } from "../services/recoveryConfig";
 import type { RecoveryCategory } from "../context/OnboardingContext";
+import { useTranslation } from "react-i18next";
+import { generateBreakthroughQuote } from "../services/dynamicIntelligenceService";
+import { generateLocalResponse } from "../services/localChatService";
+import { AlertTriangle, X } from "lucide-react";
 
 // Milestones are now dynamic per recovery category — see recoveryConfig.ts
 // const MILESTONE_DAYS = computed dynamically from config
@@ -222,25 +225,72 @@ const EmotionalWeatherWidget: React.FC<{ moodScore: number }> = ({ moodScore }) 
   );
 };
 
-// ─── Breakthrough Moments ───────────────────────────────────────────────────
-const BreakthroughMoments: React.FC = () => {
+const BreakthroughMoments: React.FC<{ streak: number }> = ({ streak }) => {
+  const [quote, setQuote] = useState<string>("Loading your dynamic insight...");
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    generateBreakthroughQuote({ current_streak: streak }, i18n.language)
+      .then(q => setQuote(q))
+      .catch(() => setQuote("Every breath forward rewires the mind."));
+  }, [streak, i18n.language]);
+
   return (
     <div className="bento-card p-6 rounded-2xl relative overflow-hidden group hover-lift card-3d shine-on-hover spotlight-card scroll-reveal">
       <div className="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-gradient-to-br from-fuchsia-500 to-purple-600 opacity-10 blur-2xl" />
       <h3 className="font-bold text-slate-100 flex items-center gap-2 mb-4">
-        <Zap size={18} className="text-fuchsia-400" />
-        Breakthroughs
+        <Sparkles size={18} className="text-fuchsia-400" />
+        AI Insight
       </h3>
-      <div className="space-y-3 relative z-10">
+      <div className="space-y-3 relative z-10 transition-opacity">
         <div className="p-3 rounded-xl bg-white/5 border border-white/5 text-sm text-slate-300 italic flex items-start gap-2">
           <span className="text-fuchsia-400 font-bold mt-0.5">"</span>
-          My worth isn't tied to how productive I am today.
-        </div>
-        <div className="p-3 rounded-xl bg-white/5 border border-white/5 text-sm text-slate-300 italic flex items-start gap-2 opacity-70">
-          <span className="text-fuchsia-400 font-bold mt-0.5">"</span>
-          A craving is just a thought, it doesn't control my hands.
+          {quote}
         </div>
       </div>
+    </div>
+  );
+};
+
+// ─── Crisis Intervention Widget ──────────────────────────────────────────────
+const CrisisIntervention: React.FC<{ name: string, streak: number, onDismiss: () => void }> = ({ name, streak, onDismiss }) => {
+  const [message, setMessage] = useState<string>("Our analysis detects you're going through a rough patch. Please breathe. You are safe.");
+  
+  useEffect(() => {
+    generateLocalResponse(
+        "I am currently at a high risk of relapse. My system analysis shows bad mood/cravings. Talk me down quickly, be very firm but incredibly compassionate. Remind me what I lose.",
+        streak,
+        name
+    ).then(res => {
+        if (res) setMessage(res);
+    });
+  }, [name, streak]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-500">
+       <div className="bg-slate-900 border border-rose-500/50 shadow-[0_0_50px_rgba(244,63,94,0.3)] rounded-3xl p-6 md:p-8 max-w-lg w-full relative overflow-hidden">
+           <div className="absolute top-0 right-0 p-4">
+              <button onClick={onDismiss} className="text-slate-400 hover:text-white"><X size={20} /></button>
+           </div>
+           
+           <div className="absolute -top-20 -left-20 w-40 h-40 bg-rose-600 rounded-full blur-3xl opacity-20 pointer-events-none" />
+           
+           <div className="relative z-10 flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-full bg-rose-500/10 border border-rose-500/30 flex items-center justify-center mb-4 text-rose-500 animate-pulse">
+                 <AlertTriangle size={32} />
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'Sora, sans-serif' }}>Predictive Alert</h2>
+              <p className="text-sm font-bold text-rose-400 uppercase tracking-widest mb-6">High Risk Pattern Detected</p>
+              
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-5 mb-6 text-left">
+                  <p className="text-slate-200 leading-relaxed italic" style={{ fontFamily: 'Georgia, serif', fontSize: '1.05rem' }}>"{message}"</p>
+              </div>
+
+              <button onClick={onDismiss} className="w-full py-3 rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-bold transition-all shadow-lg shadow-rose-500/20">
+                 I Will Stay Strong
+              </button>
+           </div>
+       </div>
     </div>
   );
 };
@@ -266,13 +316,22 @@ const Dashboard: React.FC = () => {
   // Check-in done today?
   const [checkInDone, setCheckInDone] = useState(false);
 
+  // Predictive intervention
+  const [showIntervention, setShowIntervention] = useState(false);
+
   useEffect(() => {
     if (!user?.id || isNewUser) return;
     fetchCravingData();
     fetchBadges();
     fetchMoodData();
     fetchAnchorMessage();
-    computeRiskScore(user.id).then(setRiskScore);
+    computeRiskScore(user.id).then((score) => {
+        setRiskScore(score);
+        if (score.level === 'high' && !sessionStorage.getItem(`intervention_shown_${new Date().toDateString()}`)) {
+            setShowIntervention(true);
+            sessionStorage.setItem(`intervention_shown_${new Date().toDateString()}`, 'true');
+        }
+    });
     checkTodayCheckIn();
   }, [user?.id, isNewUser]);
 
@@ -459,6 +518,14 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-in pb-8">
+
+      {showIntervention && (
+          <CrisisIntervention 
+             name={userName} 
+             streak={userStreak} 
+             onDismiss={() => setShowIntervention(false)} 
+          />
+      )}
 
       {/* =================== MILESTONE BANNER =================== */}
       {activeMilestone && (
@@ -831,7 +898,7 @@ const Dashboard: React.FC = () => {
       {/* =================== OPTIONAL NEW WIDGETS =================== */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <EmotionalWeatherWidget moodScore={moodScore} />
-        <BreakthroughMoments />
+        <BreakthroughMoments streak={userStreak} />
       </div>
 
       {/* =================== ACTION CARDS =================== */}

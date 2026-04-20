@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { BookOpen, Sparkles, Heart, Calendar, Clock, Lock, ChevronDown, Trash2 } from 'lucide-react';
+import { BookOpen, Sparkles, Heart, Calendar, Clock, Lock, ChevronDown, Trash2, Mic, MicOff } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { useUser } from '../context/UserContext';
 import { analyzeSentiment } from '../services/sentimentService';
@@ -56,8 +56,59 @@ export default function Journal() {
     const [writingStreak, setWritingStreak] = useState(0);
     const [aiReflection, setAiReflection] = useState<string | null>(null);
     const [isGeneratingReflection, setIsGeneratingReflection] = useState(false);
+    const [isRecording, setIsRecording] = useState(false);
+    const recognitionRef = React.useRef<any>(null);
     const { showToast } = useToast();
     const { user } = useUser();
+
+    useEffect(() => {
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            recognition.onresult = (event: any) => {
+                let finalTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    }
+                }
+                if (finalTranscript) {
+                    setEntry((prev) => prev + (prev.endsWith(' ') || prev === '' ? '' : ' ') + finalTranscript);
+                }
+            };
+
+            recognition.onerror = (event: any) => {
+                console.error("Speech recognition error", event.error);
+                setIsRecording(false);
+                showToast("Microphone error or permission denied.", "warning");
+            };
+
+            recognition.onend = () => {
+                setIsRecording(false);
+            };
+
+            recognitionRef.current = recognition;
+        }
+    }, [showToast]);
+
+    const toggleRecording = () => {
+        if (!recognitionRef.current) {
+            showToast("Speech recognition is not supported in this browser.", "error");
+            return;
+        }
+        if (isRecording) {
+            recognitionRef.current.stop();
+            setIsRecording(false);
+        } else {
+            recognitionRef.current.start();
+            setIsRecording(true);
+            showToast("Recording started. Speak clearly.", "success");
+        }
+    };
 
     const loadHistory = useCallback(async () => {
         if (!user?.id) return;
@@ -288,15 +339,25 @@ export default function Journal() {
                             Saved privately · Only you can read this
                         </p>
 
-                        <button
-                            onClick={handleSave}
-                            disabled={isSaving || !entry.trim()}
-                            className="flex items-center space-x-2 px-6 py-3 text-white rounded-xl font-bold transition-all transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 shadow-lg"
-                            style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 20px rgba(139,92,246,0.4)' }}
-                        >
-                            {isSaving ? <Clock size={17} className="animate-spin" /> : <Heart size={17} fill="rgba(255,255,255,0.4)" />}
-                            <span>{isSaving ? 'Saving...' : 'Save My Thoughts'}</span>
-                        </button>
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={toggleRecording}
+                                className={`flex items-center justify-center w-12 h-12 rounded-xl border transition-all ${isRecording ? 'bg-rose-500/20 border-rose-500 text-rose-400 animate-pulse' : 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10'}`}
+                                title="Dictate Journal"
+                            >
+                                {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
+                            </button>
+
+                            <button
+                                onClick={handleSave}
+                                disabled={isSaving || !entry.trim()}
+                                className="flex items-center space-x-2 px-6 py-3 text-white rounded-xl font-bold transition-all transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 shadow-lg"
+                                style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', boxShadow: '0 4px 20px rgba(139,92,246,0.4)' }}
+                            >
+                                {isSaving ? <Clock size={17} className="animate-spin" /> : <Heart size={17} fill="rgba(255,255,255,0.4)" />}
+                                <span>{isSaving ? 'Saving...' : 'Save My Thoughts'}</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 

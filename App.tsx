@@ -33,7 +33,7 @@ const Landing = lazy(() => import("./pages/Landing"));
 const Auth = lazy(() => import("./pages/Auth"));
 import { FloatingChat } from "./components/FloatingChat";
 import { SOSModal } from "./components/SOSModal";
-import { AIAvatarCompanion } from "./components/AIAvatarCompanion";
+import { AvatarCharacter } from "./components/AvatarCharacter";
 
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Counseling = lazy(() => import("./pages/Counseling"));
@@ -451,7 +451,7 @@ const AppContent: React.FC = () => {
 
       {isAuthenticated && (
         <>
-          <AIAvatarCompanion />
+          <AvatarCharacter />
           <FloatingChat />
           {/* Floating SOS Button */}
           <button
